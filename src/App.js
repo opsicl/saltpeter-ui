@@ -6,7 +6,7 @@ import { CronList } from './crons';
 
 const App = () => (
     <Admin restClient={SPClient('http://mon02.storm.lan:8888')}>
-        <Resource name="crons" list={PostList} />
+        <Resource name="crons" list={CronList} />
     </Admin>
 );
 
