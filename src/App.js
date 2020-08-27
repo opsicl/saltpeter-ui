@@ -1,26 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Admin, Resource } from 'admin-on-rest';
+import SPClient from './saltpeter/sp_rest_client';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import { CronList } from './crons';
+
+const App = () => (
+    <Admin restClient={SPClient('http://mon02.storm.lan:8888')}>
+        <Resource name="crons" list={PostList} />
+    </Admin>
+);
 
 export default App;
