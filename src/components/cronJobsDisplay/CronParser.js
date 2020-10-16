@@ -29,7 +29,7 @@ function CronParser(props) {
     props.mon +
     " " +
     props.dow;
-
+  
   try {
     var interval = parser.parseExpression(cronExpression, options);
 

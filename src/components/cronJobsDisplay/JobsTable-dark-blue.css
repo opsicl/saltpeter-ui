@@ -1,0 +1,116 @@
+@font-face {
+  font-family: Montserrat-Regular;
+  src: url('../fonts/montserrat/Montserrat-Regular.ttf'); 
+}
+
+@font-face {
+  font-family: Montserrat-Medium;
+  src: url('../fonts/montserrat/Montserrat-Medium.ttf');
+}
+
+body {
+  background-color: #1e1e2e;
+}
+
+.data {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  text-align: center;
+  padding-left: 10px;
+  font-size: 13px;
+  border-collapse: collapse;
+  width: 78%;
+  color: #d6d6d6;
+  margin-top: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #27293d;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
+}
+
+.data td,
+.data th {
+  padding: 7px;
+  font-family: Montserrat-Regular;
+}
+
+.data tr:hover {
+  color: #fe3e64;
+}
+
+.data th {
+  padding: 20px;
+  text-align: center;
+  font-family: Montserrat-Medium; 
+  font-size: 13px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: #27293d;
+  color: #e2e2e2;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.tableName th {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  font-family: Montserrat-Regular;
+  font-size: 20px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  background-color: #27293d;
+  color: #d6d6d6;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.searchBar {
+  border-radius: 5px;
+  background-image: url("./icons/search_icon.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-position-x: 5px;
+  background-size: 1.5rem 1.5rem;
+  width: 40%;
+  font-size: 13px;
+  font-family: Montserrat-Medium;
+  padding: 12px 20px 12px 40px;
+  opacity: 0.8;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.date {
+  background-color: #27293d;
+  color: #e2e2e2;
+  text-align: center;
+  font-family: Montserrat-Medium;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName {
+  background-color: #292929;
+  width: 78%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+}

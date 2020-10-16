@@ -1,0 +1,111 @@
+@font-face {
+  font-family: Montserrat-Regular;
+  src: url('../fonts/montserrat/Montserrat-Regular.ttf');
+}
+
+@font-face {
+  font-family: Montserrat-Medium;
+  src: url('../fonts/montserrat/Montserrat-Medium.ttf');
+}
+
+.swal-button-confirm {
+  font-family: Montserrat-Regular;
+  padding: 7px 19px !important;
+  border-radius: 2px !important;
+  background-color: #018786 !important;
+  color: black !important;
+  font-size: 13px !important;
+  border: 1px solid #3e549a !important;
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3) !important;
+  margin-bottom: 20px !important;
+  position: absolute !important;
+  right: 130px !important;
+}
+
+.swal-button-cancel {
+  font-family: Montserrat-Regular;
+  padding: 7px 19px !important;
+  border-radius: 2px !important;
+  background-color: #7E7E7E !important;
+  color: black !important;
+  font-size: 13px !important;
+  border: 1px solid #585858 !important;
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3) !important;
+  margin-right: 30px !important;
+  margin-bottom: 20px !important;
+  position: absolute !important;
+  right: 20px !important;
+}
+
+.swal-overlay {
+  background-color: rgba(43, 165, 137, 0.45);
+}
+
+.detailsTableName {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  font-family: Montserrat-Regular;
+  font-size: 20px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  color: #d6d6d6;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.details h1{
+  font-family: Montserrat-Medium;
+  font-size: 15px;
+  text-align: left;
+}
+
+.detailsTable {
+  background-color: #292929;
+  padding-left: 10px;
+  margin-top: 10px;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  text-align: left;
+  font-size: 13px;
+  border-collapse: collapse;
+  border: 1px solid #6D6D6D;
+}
+
+.detailsTable td,
+.detailsTable th {
+  font-family: Montserrat-Medium;
+  border: 1px solid #6D6D6D;
+  padding: 5px;
+  color: #E1E1E1;
+}
+
+.detailsTable th {
+  font-family: Montserrat-Medium;
+  vertical-align: top;
+  font-size: 13px;
+  color: #8B8B8B;
+}
+
+ul {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+ul li {
+    float: left;
+    margin-right: 3%;
+}
+
+ul li.right {
+    margin-right: 0;
+}
