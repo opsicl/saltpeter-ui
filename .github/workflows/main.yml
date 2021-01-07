@@ -33,12 +33,4 @@ jobs:
     #    npm install --no-color
     #    npm run build --if-present --no-color
     #    systemctl restart nginx
-    - run: |
-        pwd
-        mkdir test_folder
-        ls
-    - working-directory: /var/www/saltpeter-ui/ 
-      run: |
-        pwd
-        mkdir test_folder
-        ls
+    - run: who
