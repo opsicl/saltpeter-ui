@@ -28,8 +28,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: pwd
-    - run: ls
     - working-directory: /var/www/saltpeter-ui
-      run: pwd
-    - run: ls  
+      run: npm install
+    - working-directory: /var/www/saltpeter-ui
+      run: npm run build
