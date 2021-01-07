@@ -28,10 +28,17 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build and resrtart nginx
+    #- name: npm install, build and resrtart nginx
+    #  run: |
+    #    npm install --no-color
+    #    npm run build --if-present --no-color
+    #    systemctl restart nginx
+    - run: |
+        pwd
+        mkdir test_folder
+        ls
+    - working-directory: /var/www/saltpeter-ui/ 
       run: |
-        npm install --no-color
-        npm run build --if-present --no-color
-        systemctl restart nginx
-      env:
-        CI: true
+        pwd
+        mkdir test_folder
+        ls
