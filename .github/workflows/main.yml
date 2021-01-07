@@ -24,7 +24,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+          
+      # npm clean cache
+      - name: npm-clean-cache
+        run: npm cache clean --force
+        
+      # delete modules folder
+      - name: delete-modules-folder
+        run: rm -rf node_modules package-lock.jsonl
+        
       # npm install
       - name: npm-install-cmd
         run: npm install
