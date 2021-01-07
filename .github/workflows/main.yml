@@ -31,7 +31,7 @@ jobs:
         
       # delete modules folder
       - name: delete-modules-folder
-        run: rm -rf node_modules package-lock.jsonl
+        run: rm -rf node_modules
         
       # npm install
       - name: npm-install-cmd
