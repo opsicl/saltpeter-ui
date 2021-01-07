@@ -136,8 +136,8 @@ class JobsTable extends React.Component {
 	    <tbody>  
               <tr>
                 <th style={{ width: "25%" }}>Name_v2</th>
-                <th style={{ width: "50%" }}>Command</th>
-                <th style={{ width: "25%" }}>Running on</th>
+                <th style={{ width: "50%" }}>Command_v2</th>
+                <th style={{ width: "25%" }}>Running on_v2</th>
               </tr>
 	    </tbody>
           <tbody>{tableData}</tbody>
