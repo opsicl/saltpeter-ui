@@ -30,6 +30,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: pwd
     - run: ls
-    - run: cd /var/www/saltpeter-ui
-    - run: pwd
+    - working-directory: /var/www/saltpeter-ui
+      run: pwd
     - run: ls  
