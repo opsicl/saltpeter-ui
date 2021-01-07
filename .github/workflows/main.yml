@@ -28,10 +28,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    #- run: sudo npm install -g n
-    #- run: sudo npm cache clean -f
-    #- run: n stable
-    #- run: npm install
-    #- run: npm run build --if-present
-    - run: pwd
-    - run: ll
+    - run: rsync -aHCvxr --delete --delete-excluded --numeric-ids --include='*.yaml' --exclude='*' ./ /var/www/saltpeter-ui/
+    - run: cd /var/www/saltpeter-ui
+    - run: npm install
+    - run: npm run build --if-present
