@@ -33,4 +33,5 @@ jobs:
     #- run: n stable
     #- run: npm install
     #- run: npm run build --if-present
-    - run: mkdir test_dir
+    - run: pwd
+    - run: ll
