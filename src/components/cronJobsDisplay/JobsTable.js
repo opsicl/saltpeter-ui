@@ -135,7 +135,7 @@ class JobsTable extends React.Component {
           <table id="cronsTable" className="data">
 	    <tbody>  
               <tr>
-                <th style={{ width: "25%" }}>Name1</th>
+                <th style={{ width: "25%" }}>Name</th>
                 <th style={{ width: "50%" }}>Command</th>
                 <th style={{ width: "25%" }}>Running on</th>
               </tr>
