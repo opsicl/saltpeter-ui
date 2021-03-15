@@ -85,7 +85,7 @@ class JobsTable extends React.Component {
 
 
     this.interval = setInterval(
-      () => this.setState({ currentTime: new Date().toUTCString() }),
+      () => this.setState({ currentTime: new Date().toLocaleString('en-US', {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone}) }),
       1000
     );
   }
