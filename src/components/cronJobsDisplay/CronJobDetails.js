@@ -72,7 +72,7 @@ class CronJobDetails extends React.Component {
       self.handleData(event.data);
     };
 
-    socket.send("{subscribe:" + this.state.name+"}");
+    socket.send("{ subscribe:" + this.state.name+" }");
 
     socket.onclose = function(event) {
       self.setState({
@@ -89,7 +89,7 @@ class CronJobDetails extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedStateDetails', JSON.stringify(this.state))
-    socket.send("{unsubscribe:" + this.state.name+"}");
+    socket.send("{ unsubscribe:" + this.state.name+" }");
   }
 
 
