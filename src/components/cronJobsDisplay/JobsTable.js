@@ -85,7 +85,7 @@ class JobsTable extends React.Component {
 
 
     this.interval = setInterval(
-      () => this.setState({ currentTime: new Date().toUTCString() }),
+      () => this.setState({ currentTime: new Date().toLocaleString('en-US', {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone}) }),
       1000
     );
   }
@@ -135,7 +135,7 @@ class JobsTable extends React.Component {
           <table id="cronsTable" className="data">
 	    <tbody>  
               <tr>
-                <th style={{ width: "25%" }}>Name_v2</th>
+                <th style={{ width: "25%" }}>Name</th>
                 <th style={{ width: "50%" }}>Command</th>
                 <th style={{ width: "25%" }}>Running on</th>
               </tr>

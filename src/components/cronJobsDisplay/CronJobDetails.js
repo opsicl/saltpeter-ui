@@ -25,7 +25,7 @@ class CronJobDetails extends React.Component {
 
   handleData(json) {
     let data = JSON.parse(json);
-    
+    console.log(data)    
     if(data.hasOwnProperty("config")){
       // do nothing
     }
@@ -72,7 +72,10 @@ class CronJobDetails extends React.Component {
       self.handleData(event.data);
     };
 
-    socket.send(this.state.name+"-subscribe");
+    var obj = new Object()
+    obj.subscribe = this.state.name
+    var jsonString = JSON.stringify(obj)
+    socket.send(jsonString);
 
     socket.onclose = function(event) {
       self.setState({
@@ -89,7 +92,10 @@ class CronJobDetails extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedStateDetails', JSON.stringify(this.state))
-    socket.send(this.state.name+"-unsubscribe");
+    var obj = new Object()
+    obj.unsubscribe = this.state.name
+    var jsonString = JSON.stringify(obj)
+    socket.send(jsonString);
   }
 
 
