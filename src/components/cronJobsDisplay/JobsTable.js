@@ -11,7 +11,7 @@ class JobsTable extends React.Component {
     this.state = {
       jobs: [],
       search: "",
-      currentTime: new Date().toLocaleString(),
+      currentTime: Date.now(),
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
@@ -85,7 +85,7 @@ class JobsTable extends React.Component {
 
 
     this.interval = setInterval(
-      () => this.setState({ currentTime: new Date().toLocaleString() }),
+      () => this.setState({ currentTime: Date.now() }),
       1000
     );
   }
