@@ -20,11 +20,6 @@ class CronJobDetails extends React.Component {
     this.handleData.bind(this);
   }
 
-  convertDate(date){
-    let date_full = new Date(date).toString();
-    return date_full.substring(0, date_full.indexOf("+"));
-  }
-
   handleData(json) {
     let data = JSON.parse(json);
     console.log(data)    
@@ -70,25 +65,21 @@ class CronJobDetails extends React.Component {
     //this.setState(rehydrate)
 
     function secondsDiff(d1, d2) { 
-      let millisecondDiff = d2 - d1;
       let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
       return secDiff;
     }
 
     function minutesDiff(d1, d2) { 
-      let seconds = secondsDiff(d1, d2);
       let minutesDiff = Math.floor( ((d2-d1) % (1000*60*60)) / (1000*60) );
       return minutesDiff;
     }
 
     function hoursDiff(d1, d2) { 
-      let minutes = minutesDiff(d1, d2);
       let hoursDiff = Math.floor(((d2-d1) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       return hoursDiff;
     }
 
     function daysDiff(d1, d2) { 
-      let hours = hoursDiff(d1, d2);
       let daysDiff = Math.floor((d2-d1) / (1000 * 60 * 60 * 24));
       return daysDiff;
     }
