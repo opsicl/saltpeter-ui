@@ -2,8 +2,6 @@ import React from "react";
 import { socket } from "./socket.js";
 import "./CronJobDetails.css";
 
-const moment = require('moment')
-
 class CronJobDetails extends React.Component {
 
   constructor(props){
