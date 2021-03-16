@@ -2,6 +2,8 @@ import React from "react";
 import { socket } from "./socket.js";
 import "./CronJobDetails.css";
 
+const moment = require('moment')
+
 class CronJobDetails extends React.Component {
 
   constructor(props){
@@ -14,6 +16,8 @@ class CronJobDetails extends React.Component {
       last_run: "",
       targets: [],
       results: {},
+      currentTime: Date.now(),
+      untilNextRun: "",
     }
     this.handleData.bind(this);
   }
@@ -21,7 +25,7 @@ class CronJobDetails extends React.Component {
   convertDate(date){
     let date_full = new Date(date).toString();
     return date_full.substring(0, date_full.indexOf("+"));
-  }	
+  }
 
   handleData(json) {
     let data = JSON.parse(json);
@@ -67,6 +71,30 @@ class CronJobDetails extends React.Component {
     //const rehydrate = JSON.parse(localStorage.getItem('savedStateiDetails'))
     //this.setState(rehydrate)
 
+    function secondsDiff(d1, d2) { 
+      let millisecondDiff = d2 - d1;
+      let secDiff = Math.floor( ( d2 - d1) / 1000 );
+      return secDiff;
+    }
+
+    function minutesDiff(d1, d2) { 
+      let seconds = secondsDiff(d1, d2);
+      let minutesDiff = Math.floor( seconds / 60 );
+      return minutesDiff;
+    }
+
+    function hoursDiff(d1, d2) { 
+      let minutes = minutesDiff(d1, d2);
+      let hoursDiff = Math.floor( minutes / 60 );
+      return hoursDiff;
+    }
+
+    function daysDiff(d1, d2) { 
+      let hours = hoursDiff(d1, d2);
+      let daysDiff = Math.floor( hours / 24 );
+      return daysDiff;
+    }
+
     var self = this;
     socket.onmessage =  function(event) {
       self.handleData(event.data);
@@ -88,6 +116,14 @@ class CronJobDetails extends React.Component {
         results: {},
       });
     }
+
+    this.interval = setInterval(
+      () => this.setState((prevState,props) => ({ 
+	      currentTime: Date.now(),
+              untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
+      })),
+      1000
+    );
   }
 
   componentWillUnmount() {
@@ -96,6 +132,8 @@ class CronJobDetails extends React.Component {
     obj.unsubscribe = this.state.name
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
+
+    clearInterval(this.interval);
   }
 
 
@@ -125,7 +163,12 @@ class CronJobDetails extends React.Component {
 	      </tr>
 	      <tr>
                 <th>Next run</th>
-                 <td>{this.state.next_run}</td>
+                 <td>
+	           <div>
+	             <p>{this.state.next_run}</p>
+	             <p>{this.state.untilNextRun}</p>
+	          </div> 
+	        </td>
               </tr>
 	      <tr>
 	        <th style={{ width: "20%" }} >Last run</th>
@@ -134,7 +177,7 @@ class CronJobDetails extends React.Component {
 	      <tr>
                 <th>Last result</th>
                 <td >
-	            <div style={{ height:"400px", maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+	            <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
 		       return <div key={i}> 
 				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target}</p> 
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
@@ -151,7 +194,7 @@ class CronJobDetails extends React.Component {
               </tr>
 	      <tr>
 	        <th>Running on</th>
-	        <td style={{ height:"50px", maxHeight:"50px", overflow:"auto"}}> 
+	        <td style={{ maxHeight:"50px", overflow:"auto"}}> 
 	          <ul>
 	             {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
                        return <li key={i} className="output">{machine}</li>;
