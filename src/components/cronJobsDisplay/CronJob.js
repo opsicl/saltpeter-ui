@@ -33,7 +33,7 @@ class CronJob extends React.Component {
         <tr
           key={this.props.job.id}
 	  className="output"
-          style={{ color: "#f78fa4"}}
+          style={{ color: "#60CE80"}}
           onClick={this.handleHistory}>
           <td>{this.props.job.name}</td>
           <td>{this.props.job.command}</td>
