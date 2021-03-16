@@ -48,10 +48,10 @@ class CronJobDetails extends React.Component {
       var name = Object.keys(data)[0];
       if (name == this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
-          this.setState({ next_run: this.convertDate(data[name]["next_run"])});
+          this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("last_run")){
-	  this.setState({ last_run : this.convertDate(data[name]["last_run"])});
+	  this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("targets")){
           this.setState({ targets : data[name]["targets"] });
