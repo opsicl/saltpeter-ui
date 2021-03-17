@@ -6,15 +6,9 @@ import "./CronJob.css";
 class CronJob extends React.Component {
   constructor(props){
     super(props);
-    this.convertDate.bind(this);
     this.handleHistory.bind(this);
   }
 
-  convertDate(date){
-    let date_full = new Date(date).toString();
-    return date_full.substring(0, date_full.indexOf("+"));    
-  }
-  
   handleHistory = () => {
     const { history } = this.props;
     //console.log(this.props.job.name);

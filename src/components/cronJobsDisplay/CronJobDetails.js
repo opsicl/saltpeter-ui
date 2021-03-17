@@ -66,22 +66,42 @@ class CronJobDetails extends React.Component {
 
     function secondsDiff(d1, d2) { 
       let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
-      return secDiff;
+      if (secDiff >= 0) {
+        return secDiff;
+      }
+      else {
+	return 0;
+      }
     }
 
     function minutesDiff(d1, d2) { 
       let minutesDiff = Math.floor( ((d2-d1) % (1000*60*60)) / (1000*60) );
-      return minutesDiff;
+      if (minutesDiff >= 0) {
+        return minutesDiff;
+      }
+      else {
+        return 0;
+      }
     }
 
     function hoursDiff(d1, d2) { 
       let hoursDiff = Math.floor(((d2-d1) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      return hoursDiff;
+      if (hoursDiff >= 0) {
+        return hoursDiff;
+      }
+      else {
+        return 0;
+      }
     }
 
     function daysDiff(d1, d2) { 
       let daysDiff = Math.floor((d2-d1) / (1000 * 60 * 60 * 24));
-      return daysDiff;
+      if (daysDiff >= 0) {
+        return daysDiff;
+      }
+      else {
+        return 0;
+      }
     }
 
     var self = this;
@@ -107,7 +127,7 @@ class CronJobDetails extends React.Component {
     }
 
     this.interval = setInterval(
-      () => this.setState((prevState,props) => ({ 
+      () => this.setState((prevState,props) => ({
 	      currentTime: Date.now(),
               untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
       })),
@@ -141,16 +161,6 @@ class CronJobDetails extends React.Component {
 	        <td>{this.state.command}</td>
 	      </tr>
 	      <tr>
-	        <th>Targets</th>
-	        <td>
-	          <ul>
-	            {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
-              		return <li key={i} className="output">{machine}</li>;
-            		}) : ""}
-	          </ul>
-		</td>
-	      </tr>
-	      <tr>
                 <th>Next run</th>
                  <td>
 	           <div>
@@ -170,7 +180,11 @@ class CronJobDetails extends React.Component {
 		       return <div key={i}> 
 				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target}</p> 
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
-				<p className="output" style={{textIndent: "4em", color:"white"}}>{this.state.results[target]["ret"]}</p>
+				<p className="output" style={{color:"white"}}>
+                                    <div>
+                                      {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "4em"}}>{str}</p>)}
+                                    </div>
+                                </p>
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Return code:</p>
 				<p className="output" style={{textIndent: "4em", color:"white"}}>{this.state.results[target]["retcode"]}</p>
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Endtime:</p>
@@ -185,9 +199,14 @@ class CronJobDetails extends React.Component {
 	        <th>Running on</th>
 	        <td style={{ maxHeight:"50px", overflow:"auto"}}> 
 	          <ul>
-	             {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
-                       return <li key={i} className="output">{machine}</li>;
-                     }) : ""}
+	             {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
+                          if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
+                            this.textColor = "#60CE80"
+                          } else {
+                            this.textColor = "white"
+			  }
+			  return <li key={i} className="output" style={{ color: this.textColor}} >{machine}</li>;
+                    }) : ""}
 	          </ul>
 	        </td>
 	      </tr>
