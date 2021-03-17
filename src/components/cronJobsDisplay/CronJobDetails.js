@@ -9,6 +9,7 @@ class CronJobDetails extends React.Component {
     this.state = {
       name: this.props.location.state.name,
       command: this.props.location.state.command,
+      soft_timeout: this.props.location.state.soft_timeout,
       runningOn: [],
       next_run: "",
       last_run: "",
@@ -16,6 +17,8 @@ class CronJobDetails extends React.Component {
       results: {},
       currentTime: Date.now(),
       untilNextRun: "",
+      softTimeoutCounter: this.props.location.state.soft_timeout,
+      hardTimeoutCounter: this.props.location.state.hard_timeout,
     }
     this.handleData.bind(this);
   }
@@ -36,7 +39,9 @@ class CronJobDetails extends React.Component {
         for (var i = 0; i < keys_running.length; i++) {
           var key_running = result_running[keys_running[i]]["name"];
             if (key_running == this.state.name) {
-              this.setState({ runningOn: result_running[keys_running[i]]["machines"] });
+              this.setState((prevState,props) => ({ 
+		runningOn: result_running[keys_running[i]]["machines"], 
+	      }));
               break;
           }
         }
@@ -143,6 +148,7 @@ class CronJobDetails extends React.Component {
     socket.send(jsonString);
 
     clearInterval(this.interval);
+    clearInterval(this.inverval2);
   }
 
 
@@ -160,6 +166,14 @@ class CronJobDetails extends React.Component {
 	        <th>Command</th>
 	        <td>{this.state.command}</td>
 	      </tr>
+	      <tr>
+                <th>Soft timeout</th>
+                <td>{this.state.softTimeoutCounter}</td>
+              </tr>
+	      <tr>
+                <th>Hard timeout</th>
+                <td>{this.state.hardTimeoutCounter}</td>
+              </tr>
 	      <tr>
                 <th>Next run</th>
                  <td>

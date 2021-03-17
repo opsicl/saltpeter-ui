@@ -17,6 +17,8 @@ class CronJob extends React.Component {
       state: { 
 	name: this.props.job.name,
 	command: this.props.job.command,
+	soft_timeout: this.props.job.soft_timeout,
+	hard_timeout: this.props.job.hard_timeout,
       }
     });
   };
