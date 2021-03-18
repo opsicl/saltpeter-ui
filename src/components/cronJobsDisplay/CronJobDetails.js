@@ -18,7 +18,8 @@ class CronJobDetails extends React.Component {
       results: {},
       currentTime: Date.now(),
       untilNextRun: "",
-      counterSoftTimeout: 0,
+      hardTimeoutCounter: this.props.location.state.hard_timeout, // to do(per machine)
+      softTimeoutCounter: this.props.location.state.soft_timeout,
     }
     this.handleData.bind(this);
   }
@@ -41,7 +42,6 @@ class CronJobDetails extends React.Component {
             if (key_running == this.state.name) {
               this.setState((prevState,props) => ({ 
 		runningOn: result_running[keys_running[i]]["machines"],
-		counterSoftTimeout : 0,
 	      }));
               break;
           }
@@ -77,6 +77,15 @@ class CronJobDetails extends React.Component {
       }
       else {
 	return 0;
+      }
+    }
+
+    function secondsDiffTimeout(d1, d2, t) {
+      let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
+      if (Number.isFinite(secDiff)){
+        return secDiff + t
+      } else {
+	return ""
       }
     }
 
@@ -136,7 +145,8 @@ class CronJobDetails extends React.Component {
       () => this.setState((prevState,props) => ({
 	      currentTime: Date.now(),
               untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
-	      counterSoftTimeout: prevState.counterSoftTimeout + 1,
+	      hardTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.last_run), this.state.hard_timeout),
+	      softTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.last_run), this.state.soft_timeout),
       })),
       1000
     );
@@ -156,12 +166,6 @@ class CronJobDetails extends React.Component {
   }
 
   render(){
-    var softTimeoutCounter;
-    if (Object.keys(this.state.runningOn).length > 0){
-	softTimeoutCounter = this.state.soft_timeout - this.state.counterSoftTimeout;
-    } else {
-	softTimeoutCounter = this.state.soft_timeout;
-    }
     return(
       <div>
 	  <h1 className="detailsTableName">Details</h1>
@@ -177,11 +181,19 @@ class CronJobDetails extends React.Component {
 	      </tr>
 	      <tr>
                 <th>Soft timeout</th>
-                <td>{softTimeoutCounter}</td>
+                <td>
+	            {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
+			    return <p>{this.state.softTimeoutCounter}</p>;
+                    }) : ""}
+	        </td>
               </tr>
 	      <tr>
                 <th>Hard timeout</th>
-                <td>{this.state.hard_timeout}</td>
+                <td>
+                    {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
+                          return <p>{this.state.hardTimeoutCounter}</p>;
+                    }) : ""}
+	        </td>
               </tr>
 	      <tr>
                 <th>Next run</th>
