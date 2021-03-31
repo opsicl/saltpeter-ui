@@ -213,7 +213,7 @@ class CronJobDetails extends React.Component {
                 <td >
 	            <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
 		       return <div key={i}> 
-				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target} :: started at {new Date(this.state.results[target]["starttime"]).toLocaleString()} :: ended at {this.state.results[target]["endtime"] ? new Date(this.state.results[target]["endtime"]).toLocaleString(): "-"} :: ret code {this.state.results[target]["retcode"]} </p> 
+				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target} :: started at {new Date(this.state.results[target]["starttime"]).toLocaleString()} :: ended at {this.state.results[target]["endtime"] ? new Date(this.state.results[target]["endtime"]).toLocaleString(): "-"} :: ret code {this.state.results[target]["retcode"] ? this.state.results[target]["retcode"] : "-"} </p> 
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
 				<p className="output" style={{color:"white"}}>
                                     <div>
