@@ -182,7 +182,7 @@ class CronJobDetails extends React.Component {
 	      <tr>
                 <th>Soft timeout</th>
                 <td>
-	            {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
+	            {this.state.runningOn ? this.state.runningOn.map((machine, i) => {
 			    return <p>{this.state.softTimeoutCounter}</p>;
                     }) : ""}
 	        </td>
@@ -190,7 +190,7 @@ class CronJobDetails extends React.Component {
 	      <tr>
                 <th>Hard timeout</th>
                 <td>
-                    {this.state.runningOn !== [] ? this.state.runningOn.map((machine, i) => {
+                    {this.state.runningOn ? this.state.runningOn.map((machine, i) => {
                           return <p>{this.state.hardTimeoutCounter}</p>;
                     }) : ""}
 	        </td>
