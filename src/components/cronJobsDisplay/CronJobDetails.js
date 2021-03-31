@@ -222,7 +222,9 @@ class CronJobDetails extends React.Component {
                                 </p>
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Return code:</p>
 				<p className="output" style={{textIndent: "4em", color:"white"}}>{this.state.results[target]["retcode"]}</p>
-				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Endtime:</p>
+				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Started at:</p>
+                <p className="output" style={{textIndent: "4em", color:"white"}}>{new Date(this.state.results[target]["starttime"]).toLocaleString()}</p>
+                <p className="output" style={{textIndent: "2em", color:"#018786"}}>Ended at:</p>
 				<p className="output" style={{textIndent: "4em", color:"white"}}>{new Date(this.state.results[target]["endtime"]).toLocaleString()}</p>
 			        <p>{i==Object.keys(this.state.results).length-1 ? "" : <br></br>}</p>
 			      </div>;
