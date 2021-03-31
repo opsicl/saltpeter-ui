@@ -233,7 +233,7 @@ class CronJobDetails extends React.Component {
 	        </td>
               </tr>
 	      <tr>
-	        <th>Running on</th>
+	        <th>Targets</th>
 	        <td style={{ maxHeight:"50px", overflow:"auto"}}> 
 	          <ul>
 	             {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
