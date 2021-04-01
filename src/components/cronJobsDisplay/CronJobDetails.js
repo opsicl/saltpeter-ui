@@ -20,6 +20,7 @@ class CronJobDetails extends React.Component {
       untilNextRun: "",
       hardTimeoutCounter: this.props.location.state.hard_timeout, // to do(per machine)
       softTimeoutCounter: this.props.location.state.soft_timeout,
+      started:"",
     }
     this.handleData.bind(this);
   }
@@ -41,10 +42,11 @@ class CronJobDetails extends React.Component {
           var key_running = result_running[keys_running[i]]["name"];
             if (key_running == this.state.name) {
               this.setState((prevState,props) => ({ 
-		runningOn: result_running[keys_running[i]]["machines"],
-	      }));
+		        runningOn: result_running[keys_running[i]]["machines"],
+                started: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
+	          }));
               break;
-          }
+            }
         }
     } else {
       // details
@@ -61,7 +63,7 @@ class CronJobDetails extends React.Component {
         } 
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
-	}
+	    }
       }
     }
   }
@@ -82,7 +84,7 @@ class CronJobDetails extends React.Component {
 
     function secondsDiffTimeout(d1, d2, t) {
       let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
-      if (Number.isFinite(secDiff)){
+      if (Number.isFinite(secDiff) && t){
         return secDiff + t
       } else {
 	return ""
@@ -145,8 +147,8 @@ class CronJobDetails extends React.Component {
       () => this.setState((prevState,props) => ({
 	      currentTime: Date.now(),
               untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
-	      hardTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.last_run), this.state.hard_timeout),
-	      softTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.last_run), this.state.soft_timeout),
+	      hardTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.started), this.state.hard_timeout),
+	      softTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.started), this.state.soft_timeout),
       })),
       1000
     );
@@ -180,22 +182,6 @@ class CronJobDetails extends React.Component {
 	        <td>{this.state.command}</td>
 	      </tr>
 	      <tr>
-                <th>Soft timeout</th>
-                <td>
-	            {this.state.runningOn ? this.state.runningOn.map((machine, i) => {
-			    return <p>{this.state.softTimeoutCounter}</p>;
-                    }) : ""}
-	        </td>
-              </tr>
-	      <tr>
-                <th>Hard timeout</th>
-                <td>
-                    {this.state.runningOn ? this.state.runningOn.map((machine, i) => {
-                          return <p>{this.state.hardTimeoutCounter}</p>;
-                    }) : ""}
-	        </td>
-              </tr>
-	      <tr>
                 <th>Next run</th>
                  <td>
 	           <div>
@@ -213,32 +199,34 @@ class CronJobDetails extends React.Component {
                 <td >
 	            <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
 		       return <div key={i}> 
-				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target} :: started at {new Date(this.state.results[target]["starttime"]).toLocaleString()} :: ended at {this.state.results[target]["endtime"] ? new Date(this.state.results[target]["endtime"]).toLocaleString(): "-"} :: ret code {this.state.results[target]["retcode"] !== "" ? this.state.results[target]["retcode"] : "-"} </p> 
+				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target}{this.state.results[target]["starttime"] ? " :: started at " + new Date(this.state.results[target]["starttime"]).toLocaleString() : ""}{this.state.results[target]["endtime"] ? " :: ended at " + new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}{this.state.results[target]["retcode"] !== "" ? " :: ret code " + this.state.results[target]["retcode"] : ""} </p> 
 				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
 				<p className="output" style={{color:"white"}}>
                                     <div>
                                       {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "4em"}}>{str}</p>)}
                                     </div>
                                 </p>
-			    <p>{i==Object.keys(this.state.results).length-1 ? "" : <br></br>}</p>
+			    <br></br>
 			    </div>;
 			}) : ""}
 	            </div>
 	        </td>
               </tr>
 	      <tr>
-	        <th>Targets</th>
-	        <td style={{ maxHeight:"50px", overflow:"auto"}}> 
-	          <ul>
-	             {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
+	        <th>Targets/Soft timeout/Hard timeout</th>
+            <td>
+	          <div style={{ maxHeight:"200px", overflow:"auto"}}> 
+	            <p>
+	               {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
                           if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
                             this.textColor = "#60CE80"
                           } else {
                             this.textColor = "white"
-			  }
-			  return <li key={i} className="output" style={{ color: this.textColor}} >{machine}</li>;
+			              }
+			              return <p className="output" style={{ color: this.textColor}} >{machine}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.softTimeoutCounter : ""}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.hardTimeoutCounter : ""}</p>;
                     }) : ""}
-	          </ul>
+	            </p>
+              </div>
 	        </td>
 	      </tr>
 	    </tbody>
