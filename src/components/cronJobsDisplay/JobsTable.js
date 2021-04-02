@@ -40,6 +40,13 @@ class JobsTable extends React.Component {
           targets: json_result_config[keys[i]]["targets"],
           target_type: json_result_config[keys[i]]["target_type"],
           number_of_targets: json_result_config[keys[i]]["number_of_targets"],
+          dom: json_result_config[keys[i]]["dom"],
+          dow: json_result_config[keys[i]]["dow"],
+          hour: json_result_config[keys[i]]["hour"],
+          min: json_result_config[keys[i]]["min"],
+          mon: json_result_config[keys[i]]["mon"],
+          sec: json_result_config[keys[i]]["sec"],
+          year: json_result_config[keys[i]]["year"],
           runningOn: [],
         });
       }

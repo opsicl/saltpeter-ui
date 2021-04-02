@@ -8,6 +8,47 @@
   src: url('../fonts/montserrat/Montserrat-Medium.ttf');
 }
 
+.sectionTitle {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.sectionTitle span{
+  background-image: linear-gradient(to right, rgba(199, 220, 96, 0.5), rgba(226,226,206,0));
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 50px;
+  font-family: Montserrat-Medium;
+  font-size: 18px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #8B8B8B;
+}
+
+.sectionDetails {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 40px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  font-family: Montserrat-Medium;
+  font-size: 14px;
+  line-height: 14px;
+  letter-spacing: 1px;
+  color: white;
+}
+
+
 .swal-button-confirm {
   font-family: Montserrat-Regular;
   padding: 7px 19px !important;
@@ -54,7 +95,7 @@
   font-size: 20px;
   line-height: 14px;
   text-transform: uppercase;
-  letter-spacing: 0px;
+  letter-spacing: 2px;
   color: #d6d6d6;
   text-shadow: 2px 2px 4px #000000;
 }

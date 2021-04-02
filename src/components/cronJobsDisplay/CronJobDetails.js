@@ -11,6 +11,18 @@ class CronJobDetails extends React.Component {
       command: this.props.location.state.command,
       hard_timeout: this.props.location.state.hard_timeout,
       soft_timeout: this.props.location.state.soft_timeout,
+      cwd: this.props.location.state.cwd,
+      user: this.props.location.state.user,
+      targets: this.props.location.state.targets,
+      target_type: this.props.location.state.target_type,
+      number_of_targets: this.props.location.state.number_of_targets,
+      dom: this.props.location.state.dom,
+      dow: this.props.location.state.dow,
+      hour: this.props.location.state.hour,
+      min: this.props.location.state.min,
+      mon: this.props.location.state.mon,
+      sec: this.props.location.state.sec,
+      year: this.props.location.state.year,
       runningOn: [],
       next_run: "",
       last_run: "",
@@ -169,68 +181,43 @@ class CronJobDetails extends React.Component {
 
   render(){
     return(
-      <div>
-	  <h1 className="detailsTableName">Details</h1>
-	  <table className="detailsTable">
-	    <tbody>
-	      <tr>
-	        <th>Name</th>
-	        <td>{this.state.name}</td>
-	      </tr>
-	      <tr>
-	        <th>Command</th>
-	        <td>{this.state.command}</td>
-	      </tr>
-	      <tr>
-                <th>Next run</th>
-                 <td>
-	           <div>
-	             <p>{this.state.next_run}</p>
-	             <p>{this.state.untilNextRun}</p>
-	          </div> 
-	        </td>
-              </tr>
-	      <tr>
-	        <th style={{ width: "20%" }} >Last run</th>
-	        <td>{this.state.last_run}</td>
-	      </tr>
-	      <tr>
-                <th>Last result</th>
-                <td >
-	            <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
-		       return <div key={i}> 
-				<p className="output" style={{color: "#FF7597u", fontWeight:"bold"}}>{target}{this.state.results[target]["starttime"] ? " :: started at " + new Date(this.state.results[target]["starttime"]).toLocaleString() : ""}{this.state.results[target]["endtime"] ? " :: ended at " + new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}{this.state.results[target]["retcode"] !== "" ? " :: ret code " + this.state.results[target]["retcode"] : ""} </p> 
-				<p className="output" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
-				<p className="output" style={{color:"white"}}>
+    <div>
+	   <h1 className="detailsTableName">{this.state.name}</h1>
+       
+       <h1 className="sectionTitle"><span> CONFIG </span></h1>
+       <p className="sectionDetails"> {this.state.sec} &nbsp; {this.state.min} &nbsp; {this.state.hour} &nbsp; {this.state.dom} &nbsp; {this.state.mon} &nbsp; {this.state.dow} &nbsp; {this.state.year} &emsp;&emsp; {this.state.command} </p>
+       <p className="sectionDetails"> {this.state.cwd} &emsp; {this.state.user} &emsp; {this.state.target_type} &emsp; {this.state.number_of_targets}</p>
+       
+       <h1 className="sectionTitle"><span> TIMES </span></h1>
+       <p className="sectionDetails"> {this.state.last_run} &emsp; {this.state.next_run}</p>
+       <p className="sectionDetails"> {this.state.untilNextRun} </p>
+
+       <h1 className="sectionTitle"><span> TARGETS </span></h1>
+       <div style={{ maxHeight:"200px", overflow:"auto"}}>
+            {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
+                if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
+                    this.textColor = "#60CE80"
+                } else {
+                    this.textColor = "white"
+                }
+                return <p className="sectionDetails" style={{ color: this.textColor}} >{machine}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.softTimeoutCounter : ""}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.hardTimeoutCounter : ""}</p>;
+            }) : ""}
+       </div>
+	  
+       <h1 className="sectionTitle"><span> LAST RUN </span></h1>
+       <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+               return <div key={i}>
+                <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}{this.state.results[target]["starttime"] ? " :: started at " + new Date(this.state.results[target]["starttime"]).toLocaleString() : ""}{this.state.results[target]["endtime"] ? " :: ended at " + new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}{this.state.results[target]["retcode"] !== "" ? " :: ret code " + this.state.results[target]["retcode"] : ""} </p>
+                <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
+                <p className="sectionDetails" style={{color:"white"}}>
                                     <div>
                                       {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "4em"}}>{str}</p>)}
                                     </div>
                                 </p>
-			    <br></br>
-			    </div>;
-			}) : ""}
-	            </div>
-	        </td>
-              </tr>
-	      <tr>
-	        <th>Targets/Soft timeout/Hard timeout</th>
-            <td>
-	          <div style={{ maxHeight:"200px", overflow:"auto"}}> 
-	            <p>
-	               {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
-                          if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
-                            this.textColor = "#60CE80"
-                          } else {
-                            this.textColor = "white"
-			              }
-			              return <p className="output" style={{ color: this.textColor}} >{machine}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.softTimeoutCounter : ""}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.hardTimeoutCounter : ""}</p>;
-                    }) : ""}
-	            </p>
-              </div>
-	        </td>
-	      </tr>
-	    </tbody>
-	  </table>
+                <br></br>
+                </div>;
+            }) : ""}
+                </div>
 	</div>
     )
   }
