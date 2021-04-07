@@ -11,8 +11,6 @@
 .sectionTitle {
   margin-top: 20px;
   margin-bottom: 10px;
-  width: 90%;
-  margin-left: auto;
   margin-right: auto;
   text-align: left;
 }
@@ -37,7 +35,6 @@
   padding-top: 5px;
   padding-bottom: 5px;
   padding-left: 40px;
-  width: 90%;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -85,8 +82,7 @@
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   padding-top: 12px;
-  padding-bottom: 12px;
-  width: 90%;
+  padding-bottom: 10px;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -97,12 +93,6 @@
   letter-spacing: 2px;
   color: #d6d6d6;
   text-shadow: 2px 2px 4px #000000;
-}
-
-.details h1{
-  font-family: Montserrat-Medium;
-  font-size: 15px;
-  text-align: left;
 }
 
 .detailsTable {
@@ -119,6 +109,21 @@
   border: 1px solid #6D6D6D;
 }
 
+.details1 {
+  margin-left: 80px;
+  text-align: left;
+  float: left;
+  width: 30%;
+}
+
+.details2 {
+  margin-left: 80px;
+  text-align: left;
+  float: left;
+  width: 40%
+}
+
+
 .detailsTable td,
 .detailsTable th {
   font-family: Montserrat-Medium;
@@ -134,18 +139,49 @@
   color: #8B8B8B;
 }
 
-ul {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.button {
+  position: relative;
+  background-color: #f44336;
+  border: none;
+  font-size: 12px;
+  color: #FFFFFF;
+  padding: 8px;
+  width: 80px;
+  text-align: center;
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: Montserrat-Medium;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-ul li {
-    float: left;
-    margin-right: 3%;
+.button:after {
+  content: "";
+  background: #f1f1f1;
+  display: block;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s;
 }
 
-ul li.right {
-    margin-right: 0;
+.button:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s
 }
+
+.button:disabled,
+.button[disabled]{
+  color: #d3d3d3;
+  cursor: inherit;
+  background-color: #505050;
+  background: #505050;
+}
+

@@ -1,6 +1,7 @@
 import React from "react";
 import { socket } from "./socket.js";
 import "./CronJobDetails.css";
+import { FaCircle } from 'react-icons/fa';
 
 class CronJobDetails extends React.Component {
 
@@ -38,6 +39,22 @@ class CronJobDetails extends React.Component {
     this.calculateHardTimeout.bind(this);
     this.calculateSoftTimeout.bind(this);
     this.showLastRun.bind(this);
+    this.runJob.bind(this);
+    this.killJob.bind(this);
+  }
+
+  runJob = () => {
+    var obj = {}
+    obj.run = this.state.name
+    var jsonString = JSON.stringify(obj)
+    socket.send(jsonString);
+  }
+
+  killJob = (machine) => {
+    var obj = {}
+    obj.kill = this.state.name + "-" + machine
+    var jsonString = JSON.stringify(obj)
+    socket.send(jsonString);  
   }
   
   showLastRun = (machine) => {
@@ -184,7 +201,7 @@ class CronJobDetails extends React.Component {
 
     socket.onclose = function(event) {
       self.setState({
-	name: "",
+	    name: "",
         command: "",
         runningOn: [],
         next_run: "",
@@ -221,36 +238,41 @@ class CronJobDetails extends React.Component {
   render(){
     return(
     <div>
-	   <h1 className="detailsTableName">{this.state.name}</h1>
+        <div style={{marginLeft:"80px"}}>
+            <h1 className="detailsTableName">{this.state.name}</h1>
+        </div>
+        <div>
+            <div className="details1">
+                <h1 className="sectionTitle"><span> CONFIG </span></h1>
+                <p className="sectionDetails"> {this.state.sec} &nbsp; {this.state.min} &nbsp; {this.state.hour} &nbsp; {this.state.dom} &nbsp; {this.state.mon} &nbsp; {this.state.dow} &nbsp; {this.state.year} &emsp;&emsp; {this.state.command} </p>
+                <p className="sectionDetails"> {this.state.cwd} &emsp; {this.state.user} &emsp; {this.state.target_type} &emsp; {this.state.number_of_targets}</p>
        
-       <h1 className="sectionTitle"><span> CONFIG </span></h1>
-       <p className="sectionDetails"> {this.state.sec} &nbsp; {this.state.min} &nbsp; {this.state.hour} &nbsp; {this.state.dom} &nbsp; {this.state.mon} &nbsp; {this.state.dow} &nbsp; {this.state.year} &emsp;&emsp; {this.state.command} </p>
-       <p className="sectionDetails"> {this.state.cwd} &emsp; {this.state.user} &emsp; {this.state.target_type} &emsp; {this.state.number_of_targets}</p>
-       
-       <h1 className="sectionTitle"><span> TIMES </span></h1>
-       <p className="sectionDetails"> {this.state.last_run} &emsp; {this.state.next_run}</p>
-       <p className="sectionDetails"> {this.state.untilNextRun} </p>
+                <h1 className="sectionTitle"><span> TIMES </span></h1>
+                <p className="sectionDetails"> {this.state.last_run} &emsp; {this.state.next_run}</p>
+                <p className="sectionDetails"> {this.state.untilNextRun} </p>
 
-       <h1 className="sectionTitle"><span> TARGETS </span></h1>
-       <div style={{ maxHeight:"200px", overflow:"auto"}}>
-            {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
-                if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
-                    this.textColor = "#60CE80"
-                    this.cursor = "pointer"
-                } else if (this.state.results.hasOwnProperty(machine)) {
-                    this.textColor = "#FFC308"
-                    this.cursor = "pointer"
-                } else {
-                    this.textColor = "white"
-                    this.cursor = "auto"
-                }
-                return <p className="sectionDetails" onClick={this.showLastRun.bind(this,machine)} style={{ color: this.textColor, cursor: this.cursor}} >{machine} </p>
+                <h1 className="sectionTitle"><span> TARGETS </span></h1>
+                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run</button>
+                <div style={{ maxHeight:"400px", overflow:"auto"}}>
+                    {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
+                        if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
+                            this.textColor = "#60CE80"
+                            this.cursor = "pointer"
+                    } else if (this.state.results.hasOwnProperty(machine)) {
+                        this.textColor = "#FFC308"
+                        this.cursor = "pointer"
+                    } else {
+                        this.textColor = "white"
+                        this.cursor = "auto"
+                    }
+                    return  <p className="sectionDetails" onClick={this.showLastRun.bind(this,machine)} style={{ cursor: this.cursor}} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} </p>
             }) : ""}
-       </div>
-
-       <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-       <div style={{ maxHeight:"2000px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
-               return <div id={target} style={{display:"none"}}>
+                </div>
+            </div>
+            <div className="details2">
+                <h1 className="sectionTitle"><span> LAST RUN </span></h1>
+                <div style={{ maxHeight:"700px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+                    return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
                         <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
                             started at: {this.state.results[target]["starttime"] ? new Date(this.state.results[target]["starttime"]).toLocaleString() : ""} 
@@ -266,17 +288,19 @@ class CronJobDetails extends React.Component {
                         </p>
                         <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
                             hard timeout: {this.state.hardTimeoutCounter.hasOwnProperty(target) ? this.state.hardTimeoutCounter[target] : ""}
-                        </p>  
+                        </p>
+                        <button disabled={!(Object.values(this.state.runningOn).indexOf(target) > -1)} className="button" style={{ marginLeft: "70px"}}onClick={this.killJob.bind(this,target)}>Kill</button>
                         <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
                         <p className="sectionDetails" style={{color:"white"}}>
                             <div>
                                 {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
                             </div>
                         </p>
-                    <br></br>
-                </div>;}) : ""}
-        </div>
-	</div>
+                    </div>;}) : ""}
+            </div>
+	    </div>
+     </div>
+    </div>
     )
   }
 }
