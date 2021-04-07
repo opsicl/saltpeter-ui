@@ -253,7 +253,7 @@ class CronJobDetails extends React.Component {
 
                 <h1 className="sectionTitle"><span> TARGETS </span></h1>
                 <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run</button>
-                <div style={{ maxHeight:"400px", overflow:"auto"}}>
+                <div style={{ maxHeight:"350px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
                             this.textColor = "#60CE80"
