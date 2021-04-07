@@ -253,7 +253,7 @@ class CronJobDetails extends React.Component {
 
                 <h1 className="sectionTitle"><span> TARGETS </span></h1>
                 <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run</button>
-                <div style={{ maxHeight:"300px", overflow:"auto"}}>
+                <div style={{ maxHeight:"400px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
                             this.textColor = "#60CE80"
@@ -271,7 +271,7 @@ class CronJobDetails extends React.Component {
             </div>
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div style={{ maxHeight:"500px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
                         <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
