@@ -303,6 +303,7 @@ class CronJobDetails extends React.Component {
                                 {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
                             </div>
                         </p>
+                        <br></br>
                     </div>;}) : ""}
             </div>
 	    </div>
