@@ -43,6 +43,7 @@
   line-height: 14px;
   letter-spacing: 1px;
   color: white;
+  font-weight: normal;
 }
 
 .swal-button-confirm {
