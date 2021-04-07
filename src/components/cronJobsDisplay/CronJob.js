@@ -1,4 +1,4 @@
-import React, {PureComponent} from "react";
+import React  from "react";
 import { withRouter } from 'react-router-dom';
 import "./CronJob.css";
 
@@ -35,7 +35,7 @@ class CronJob extends React.Component {
   };
 
   render() {
-    if (this.props.job.runningOn.length != 0) {
+    if (this.props.job.runningOn.length) {
       return (
         <tr
           key={this.props.job.id}

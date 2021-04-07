@@ -1,8 +1,8 @@
-import React, {PureComponent} from "react";
-import { withRouter } from 'react-router-dom';
+import React from "react";
+//import { withRouter } from 'react-router-dom';
 import CronJob from "./CronJob";
 import "./JobsTable.css";
-import ReconnectingWebSocket from 'reconnecting-websocket';
+//import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
 
 class JobsTable extends React.Component {
@@ -65,7 +65,7 @@ class JobsTable extends React.Component {
       for (i = 0; i < keys_running.length; i++) {
         var key_running = json_result_running[keys_running[i]]["name"];
         for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] == key_running) {
+          if (cronJobs[j]["name"] === key_running) {
             cronJobs[j]["runningOn"] =
               json_result_running[keys_running[i]]["machines"];
             break;

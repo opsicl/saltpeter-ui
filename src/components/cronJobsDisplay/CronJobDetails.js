@@ -26,16 +26,64 @@ class CronJobDetails extends React.Component {
       runningOn: [],
       next_run: "",
       last_run: "",
-      targets: [],
+      targetsJob: [],
       results: {},
       currentTime: Date.now(),
       untilNextRun: "",
-      hardTimeoutCounter: this.props.location.state.hard_timeout, // to do(per machine)
-      softTimeoutCounter: this.props.location.state.soft_timeout,
-      started:"",
+      hardTimeoutCounter: "",
+      softTimeoutCounter: "",
+      startedJob:"",
     }
     this.handleData.bind(this);
+    this.calculateHardTimeout.bind(this);
+    this.calculateSoftTimeout.bind(this);
+    this.showLastRun.bind(this);
   }
+  
+  showLastRun = (machine) => {
+    try {
+      var x = document.getElementById(machine);
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    } catch (err) {
+      // go on
+    }
+  }
+
+  calculateSoftTimeout() {
+    var currentTime = Date.now();
+    let secDiff = Math.floor( ((new Date(this.state.startedJob) - currentTime) % (1000*60))/1000 );
+    if (Number.isFinite(secDiff) && this.state.soft_timeout){
+      return secDiff +  this.state.soft_timeout;
+    }
+    else { 
+      return ""
+    }
+  }
+
+  calculateHardTimeout() {
+    var start_time;
+    var machinesTimeouts = {};
+    var currentTime = Date.now();
+    if (this.state.hard_timeout) { 
+      for (let machine in this.state.results) {
+        if (this.state.runningOn.includes(machine)) {
+          start_time = this.state.results[machine]["starttime"];
+          let secDiff = Math.floor( ((new Date(start_time) - currentTime) % (1000*60))/1000 );
+          if (Number.isFinite(secDiff) && this.state.hard_timeout){
+            machinesTimeouts[machine] = secDiff +  this.state.hard_timeout;
+          }
+        }
+      }
+      return machinesTimeouts;
+    } else {
+      return "";
+    }
+  }
+
 
   handleData(json) {
     let data = JSON.parse(json);
@@ -52,10 +100,10 @@ class CronJobDetails extends React.Component {
         var keys_running = Object.keys(result_running);
         for (var i = 0; i < keys_running.length; i++) {
           var key_running = result_running[keys_running[i]]["name"];
-            if (key_running == this.state.name) {
+            if (key_running === this.state.name) {
               this.setState((prevState,props) => ({ 
 		        runningOn: result_running[keys_running[i]]["machines"],
-                started: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
+                startedJob: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
 	          }));
               break;
             }
@@ -63,20 +111,20 @@ class CronJobDetails extends React.Component {
     } else {
       // details
       var name = Object.keys(data)[0];
-      if (name == this.state.name) {
+      if (name === this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
           this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("last_run")){
-	  this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
+	      this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("targets")){
-          this.setState({ targets : data[name]["targets"] });
+          this.setState({ targetsJob : data[name]["targets"] });
         } 
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
-	    }
-      }
+        }
+      } 
     }
   }
 
@@ -90,16 +138,7 @@ class CronJobDetails extends React.Component {
         return secDiff;
       }
       else {
-	return 0;
-      }
-    }
-
-    function secondsDiffTimeout(d1, d2, t) {
-      let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
-      if (Number.isFinite(secDiff) && t){
-        return secDiff + t
-      } else {
-	return ""
+     	return 0;
       }
     }
 
@@ -138,7 +177,7 @@ class CronJobDetails extends React.Component {
       self.handleData(event.data);
     };
 
-    var obj = new Object()
+    var obj = {}
     obj.subscribe = this.state.name
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
@@ -150,7 +189,7 @@ class CronJobDetails extends React.Component {
         runningOn: [],
         next_run: "",
         last_run: "",
-        targets: [],
+        targetsJob: [],
         results: {},
       });
     }
@@ -158,11 +197,11 @@ class CronJobDetails extends React.Component {
     this.interval = setInterval(
       () => this.setState((prevState,props) => ({
 	      currentTime: Date.now(),
-              untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
-	      hardTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.started), this.state.hard_timeout),
-	      softTimeoutCounter: secondsDiffTimeout(prevState.currentTime, new Date(prevState.started), this.state.soft_timeout),
+          untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
+          hardTimeoutCounter: self.calculateHardTimeout(),
+          softTimeoutCounter: self.calculateSoftTimeout(),
       })),
-      1000
+      2000
     );
 
 //    if (Object.keys(this.state.runningOn).length > 0){
@@ -171,7 +210,7 @@ class CronJobDetails extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedStateDetails', JSON.stringify(this.state))
-    var obj = new Object()
+    var obj = {}
     obj.unsubscribe = this.state.name
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
@@ -194,30 +233,49 @@ class CronJobDetails extends React.Component {
 
        <h1 className="sectionTitle"><span> TARGETS </span></h1>
        <div style={{ maxHeight:"200px", overflow:"auto"}}>
-            {this.state.targets !== [] ? this.state.targets.map((machine, i) => {
+            {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                 if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
                     this.textColor = "#60CE80"
+                    this.cursor = "pointer"
+                } else if (this.state.results.hasOwnProperty(machine)) {
+                    this.textColor = "#FFC308"
+                    this.cursor = "pointer"
                 } else {
                     this.textColor = "white"
+                    this.cursor = "auto"
                 }
-                return <p className="sectionDetails" style={{ color: this.textColor}} >{machine}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.softTimeoutCounter : ""}{Object.keys(this.state.runningOn).length > 0 ? " :: " + this.state.hardTimeoutCounter : ""}</p>;
+                return <p className="sectionDetails" onClick={this.showLastRun.bind(this,machine)} style={{ color: this.textColor, cursor: this.cursor}} >{machine} </p>
             }) : ""}
        </div>
-	  
+
        <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-       <div style={{ maxHeight:"400px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
-               return <div key={i}>
-                <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}{this.state.results[target]["starttime"] ? " :: started at " + new Date(this.state.results[target]["starttime"]).toLocaleString() : ""}{this.state.results[target]["endtime"] ? " :: ended at " + new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}{this.state.results[target]["retcode"] !== "" ? " :: ret code " + this.state.results[target]["retcode"] : ""} </p>
-                <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
-                <p className="sectionDetails" style={{color:"white"}}>
-                                    <div>
-                                      {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "4em"}}>{str}</p>)}
-                                    </div>
-                                </p>
-                <br></br>
-                </div>;
-            }) : ""}
-                </div>
+       <div style={{ maxHeight:"2000px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+               return <div id={target} style={{display:"none"}}>
+                        <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
+                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
+                            started at: {this.state.results[target]["starttime"] ? new Date(this.state.results[target]["starttime"]).toLocaleString() : ""} 
+                        </p>
+                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
+                            ended at: {this.state.results[target]["endtime"] ? new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}
+                        </p>
+                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
+                            ret code: {this.state.results[target]["retcode"] !== "" ? this.state.results[target]["retcode"] : ""} 
+                        </p>
+                        <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
+                            soft timeout: {Object.keys(this.state.runningOn).length !== 0  ? this.state.softTimeoutCounter : ""}
+                        </p>
+                        <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
+                            hard timeout: {this.state.hardTimeoutCounter.hasOwnProperty(target) ? this.state.hardTimeoutCounter[target] : ""}
+                        </p>  
+                        <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
+                        <p className="sectionDetails" style={{color:"white"}}>
+                            <div>
+                                {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
+                            </div>
+                        </p>
+                    <br></br>
+                </div>;}) : ""}
+        </div>
 	</div>
     )
   }
