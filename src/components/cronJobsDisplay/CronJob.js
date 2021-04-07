@@ -45,9 +45,11 @@ class CronJob extends React.Component {
           <td>{this.props.job.name}</td>
           <td>{this.props.job.command}</td>
           <td>
-            {this.props.job.runningOn.map((machine, i) => {
-              return <p key={i} className="output">{machine}</p>;
-            })}
+            <div style={{ maxHeight:"100px", overflow:"auto"}} >
+              {this.props.job.runningOn.map((machine, i) => {
+                return <p key={i} className="output">{machine}</p>;
+              })}
+            </div>
           </td>
         </tr>
       );
