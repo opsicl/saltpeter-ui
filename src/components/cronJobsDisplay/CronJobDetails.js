@@ -67,10 +67,10 @@ class CronJobDetails extends React.Component {
       }
 
       var y = document.getElementById(i);
-      if (y.style.fontWeight === "normal") {
-        y.style.fontWeight = "bold";
+      if (y.style.color === "white") {
+        y.style.color = "#888888";
       } else {
-        y.style.fontWeight = "normal";
+        y.style.color = "white";
       }
     } catch (err) {
       // go on
@@ -272,7 +272,7 @@ class CronJobDetails extends React.Component {
                         this.textColor = "white"
                         this.cursor = "auto"
                     }
-                    return  <p id={i} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,i)} style={{ cursor: this.cursor, fontWeight: "normal"}} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} </p>
+                    return  <p id={i} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,i)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} </p>
             }) : ""}
                 </div>
             </div>
