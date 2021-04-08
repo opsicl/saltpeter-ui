@@ -2,6 +2,7 @@ import React from "react";
 import { socket } from "./socket.js";
 import "./CronJobDetails.css";
 import { FaCircle } from 'react-icons/fa';
+import { FiInfo } from 'react-icons/fi';
 
 class CronJobDetails extends React.Component {
 
@@ -11,7 +12,7 @@ class CronJobDetails extends React.Component {
       name: this.props.location.state.name,
       command: this.props.location.state.command,
       hard_timeout: this.props.location.state.hard_timeout,
-      soft_timeout: this.props.location.state.soft_timeout,
+      //soft_timeout: this.props.location.state.soft_timeout,
       cwd: this.props.location.state.cwd,
       user: this.props.location.state.user,
       targets: this.props.location.state.targets,
@@ -32,12 +33,12 @@ class CronJobDetails extends React.Component {
       currentTime: Date.now(),
       untilNextRun: "",
       hardTimeoutCounter: "",
-      softTimeoutCounter: "",
+      //softTimeoutCounter: "",
       startedJob:"",
     }
     this.handleData.bind(this);
     this.calculateHardTimeout.bind(this);
-    this.calculateSoftTimeout.bind(this);
+    //this.calculateSoftTimeout.bind(this);
     this.showLastRun.bind(this);
     this.runJob.bind(this);
     this.killJob.bind(this);
@@ -59,7 +60,7 @@ class CronJobDetails extends React.Component {
   
   showLastRun = (machine, i) => {
     try {
-      var x = document.getElementById(machine,i);
+      var x = document.getElementById(machine);
       if (x.style.display === "none") {
         x.style.display = "block";
       } else {
@@ -76,7 +77,7 @@ class CronJobDetails extends React.Component {
       // go on
     }
   }
-
+/*
   calculateSoftTimeout() {
     var currentTime = Date.now();
     let secDiff = Math.floor( ((new Date(this.state.startedJob) - currentTime) % (1000*60))/1000 );
@@ -87,7 +88,7 @@ class CronJobDetails extends React.Component {
       return ""
     }
   }
-
+*/
   calculateHardTimeout() {
     var start_time;
     var machinesTimeouts = {};
@@ -223,7 +224,7 @@ class CronJobDetails extends React.Component {
 	      currentTime: Date.now(),
           untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
           hardTimeoutCounter: self.calculateHardTimeout(),
-          softTimeoutCounter: self.calculateSoftTimeout(),
+          //softTimeoutCounter: self.calculateSoftTimeout(),
       })),
       2000
     );
@@ -255,11 +256,11 @@ class CronJobDetails extends React.Component {
                 <p className="sectionDetails"> {this.state.cwd} &emsp; {this.state.user} &emsp; {this.state.target_type} &emsp; {this.state.number_of_targets}</p>
        
                 <h1 className="sectionTitle"><span> TIMES </span></h1>
-                <p className="sectionDetails"> {this.state.last_run} &emsp; {this.state.next_run}</p>
-                <p className="sectionDetails"> {this.state.untilNextRun} </p>
+                <p className="sectionDetails"> last run:{this.state.last_run}</p>
+                <p className="sectionDetails"> next run:{this.state.next_run} &emsp; ({this.state.untilNextRun})</p>
 
                 <h1 className="sectionTitle"><span> TARGETS </span></h1>
-                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run</button>
+                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run now</button>
                 <div style={{ maxHeight:"320px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
@@ -272,7 +273,7 @@ class CronJobDetails extends React.Component {
                         this.textColor = "white"
                         this.cursor = "auto"
                     }
-                    return  <p id={i} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,i)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} </p>
+                    return  <p id={i} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,i)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} <FiInfo style ={{marginLeft: "7px"}}/></p>
             }) : ""}
                 </div>
             </div>
@@ -289,9 +290,6 @@ class CronJobDetails extends React.Component {
                         </p>
                         <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
                             ret code: {this.state.results[target]["retcode"] !== "" ? this.state.results[target]["retcode"] : ""} 
-                        </p>
-                        <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
-                            soft timeout: {Object.keys(this.state.runningOn).length !== 0  ? this.state.softTimeoutCounter : ""}
                         </p>
                         <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
                             hard timeout: {this.state.hardTimeoutCounter.hasOwnProperty(target) ? this.state.hardTimeoutCounter[target] : ""}
