@@ -57,8 +57,8 @@ class CronJobDetails extends React.Component {
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);  
   }
-  
-  showLastRun = (machine, i) => {
+
+  showLastRun = (machine, details1_id) => {
     try {
       var x = document.getElementById(machine);
       if (x.style.display === "none") {
@@ -67,7 +67,7 @@ class CronJobDetails extends React.Component {
         x.style.display = "none";
       }
 
-      var y = document.getElementById(i);
+      var y = document.getElementById(details1_id);
       if (y.style.color === "white") {
         y.style.color = "#888888";
       } else {
@@ -144,7 +144,7 @@ class CronJobDetails extends React.Component {
 	      this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("targets")){
-          this.setState({ targetsJob : data[name]["targets"] });
+          this.setState({ targetsJob : data[name]["targets"].sort() });
         } 
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
@@ -259,27 +259,33 @@ class CronJobDetails extends React.Component {
                 <p className="sectionDetails"> last run:{this.state.last_run}</p>
                 <p className="sectionDetails"> next run:{this.state.next_run} &emsp; ({this.state.untilNextRun})</p>
 
-                <h1 className="sectionTitle"><span> TARGETS </span></h1>
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  style ={{marginLeft: "20px"}}/> </span></h1>
                 <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run now</button>
                 <div style={{ maxHeight:"320px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
+                        var id1 = machine + "1"; 
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
-                            this.textColor = "#60CE80"
+                            this.circleColor = "#60CE80"
                             this.cursor = "pointer"
-                    } else if (this.state.results.hasOwnProperty(machine)) {
-                        this.textColor = "#FFC308"
-                        this.cursor = "pointer"
-                    } else {
-                        this.textColor = "white"
-                        this.cursor = "auto"
-                    }
-                    return  <p id={i} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,i)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.textColor, marginRight:"7px"}} />{machine} <FiInfo style ={{marginLeft: "7px"}}/></p>
-            }) : ""}
+                        } else if (this.state.results.hasOwnProperty(machine)) {
+                            this.circleColor = "#FFC308"
+                            this.cursor = "pointer"
+                        } else {
+                            this.circleColor = "white"
+                            this.cursor = "auto"
+                         }
+                        if (this.circleColor !== "white") {
+                            return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                        } else {
+                            return  <p id={id1} className="sectionDetails" style={{ cursor: this.cursor, color: "white"}} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                        }
+                    }) : ""}
                 </div>
             </div>
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.results !== {} ? Object.keys(this.state.results).map((target, i) => {
+                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.targetsJob !== {} ? this.state.targetsJob.map((target, i) => {
+                  if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
                         <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
@@ -294,7 +300,7 @@ class CronJobDetails extends React.Component {
                         <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
                             hard timeout: {this.state.hardTimeoutCounter.hasOwnProperty(target) ? this.state.hardTimeoutCounter[target] : ""}
                         </p>
-                        <button disabled={!(Object.values(this.state.runningOn).indexOf(target) > -1)} className="button" style={{ marginLeft: "70px"}}onClick={this.killJob.bind(this,target)}>Kill</button>
+                        <button disabled={!(Object.values(this.state.runningOn).indexOf(target) > -1)} className="button" style={{ marginLeft: "70px"}} onClick={this.killJob.bind(this,target)}>Kill</button>
                         <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
                         <p className="sectionDetails" style={{color:"white"}}>
                             <div>
@@ -302,7 +308,16 @@ class CronJobDetails extends React.Component {
                             </div>
                         </p>
                         <br></br>
-                    </div>;}) : ""}
+                    </div>
+                  } else { 
+                        try {
+                            var y = document.getElementById(target+"1");
+                            y.style.color = "white";
+                        } catch {
+                        }
+                        //return <div id={target} style={{display:"none"}}></div>
+                    }
+                ;}) : ""}
             </div>
 	    </div>
      </div>
