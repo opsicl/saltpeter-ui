@@ -332,7 +332,7 @@ class CronJobDetails extends React.Component {
                 </table>
 
 
-                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "20px"}}/> </span></h1>
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
                 <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px", width: "150px"}} onClick={this.runJob.bind(this)}>Run cron now</button>
                 <div style={{ maxHeight:"150px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
