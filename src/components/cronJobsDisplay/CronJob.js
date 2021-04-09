@@ -31,6 +31,7 @@ class CronJob extends React.Component {
         sec: this.props.job.sec,
         year: this.props.job.year,
         group: this.props.job.group,
+        batch_size: this.props.job.batch_size,
       }
     });
   };
@@ -54,7 +55,7 @@ class CronJob extends React.Component {
             </div>
           </td>
           <td>
-            <div style={{ maxHeight:"100px", overflow:"auto"}} >
+            <div style={{ maxHeight:"100px", overflow:"auto", textAlign:"center"}} >
               {this.props.job.runningOn.map((machine, i) => {
                 return <p key={i} className="output">{machine}</p>;
               })}
@@ -72,7 +73,7 @@ class CronJob extends React.Component {
       style = {{cursor: "pointer"}}>
           <td>{this.props.job.name}</td>
           <td>{this.props.job.command}</td>
-          <td> - </td>
+          <td style={{textAlign:"center"}}> - </td>
           <td>{this.props.job.group}</td>  
         </tr>
       );

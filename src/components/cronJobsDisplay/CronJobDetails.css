@@ -185,3 +185,25 @@
   background: #505050;
 }
 
+.configTable {
+  width: 100%;
+  text-align: center;
+  font-family: Montserrat-Regular;
+  color: white;
+  font-size: 14px;
+  line-height: 14px;
+  letter-spacing: 1px;
+  margin-left: 37px;
+}
+
+.configTable td{
+  font-family: Montserrat-Regular !important;
+  padding: 3px !important;
+}
+
+.configTable th {
+  font-family: Montserrat-Regular !important;
+  padding: 3px !important;
+}
+
+

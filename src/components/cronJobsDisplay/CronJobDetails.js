@@ -3,6 +3,7 @@ import { socket } from "./socket.js";
 import "./CronJobDetails.css";
 import { FaCircle } from 'react-icons/fa';
 import { FiInfo } from 'react-icons/fi';
+import { BsExclamationCircleFill } from 'react-icons/bs';
 
 class CronJobDetails extends React.Component {
 
@@ -18,6 +19,7 @@ class CronJobDetails extends React.Component {
       targets: this.props.location.state.targets,
       target_type: this.props.location.state.target_type,
       number_of_targets: this.props.location.state.number_of_targets,
+      batch_size: this.props.location.state.batch_size,
       dom: this.props.location.state.dom,
       dow: this.props.location.state.dow,
       hour: this.props.location.state.hour,
@@ -250,21 +252,89 @@ class CronJobDetails extends React.Component {
     return(
     <div>
         <div style={{marginLeft:"80px"}}>
-            <h1 className="detailsTableName">{this.state.name}</h1>
+            <h1 className="detailsTableName">{this.state.name} {this.state.overlap ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
             <div className="details1">
                 <h1 className="sectionTitle"><span> CONFIG </span></h1>
-                <p className="sectionDetails"> {this.state.sec} &nbsp; {this.state.min} &nbsp; {this.state.hour} &nbsp; {this.state.dom} &nbsp; {this.state.mon} &nbsp; {this.state.dow} &nbsp; {this.state.year} &emsp;&emsp; {this.state.command} </p>
-                <p className="sectionDetails"> {this.state.cwd} &emsp; {this.state.user} &emsp; {this.state.target_type} &emsp; {this.state.number_of_targets}</p>
-       
-                <h1 className="sectionTitle"><span> TIMES </span></h1>
-                <p className="sectionDetails"> last run:{this.state.last_run}</p>
-                <p className="sectionDetails"> next run:{this.state.next_run} &emsp; ({this.state.untilNextRun})</p>
 
-                <h1 className="sectionTitle"><span> TARGETS <FiInfo  style ={{marginLeft: "20px"}}/> </span></h1>
-                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px"}} onClick={this.runJob.bind(this)}>Run now</button>
-                <div style={{ maxHeight:"320px", overflow:"auto"}}>
+                <table className="configTable" style = {{marginLeft:"30px"}}>
+                    <tbody>
+                        <tr>
+                            <th>sec</th>
+                            <th>min</th>
+                            <th>hour</th>
+                            <th>dow</th>
+                            <th>dom</th>
+                            <th>mon</th>
+                            <th>year</th>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.sec}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.min}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.hour}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.dow}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.dom}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.mon}</div></td>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.year}</div></td>
+                        </tr>
+                    </tbody>
+                </table> 
+
+                <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
+                        <tr>
+                            <th style={{width:"25%"}}>cmd</th>
+                            <td><div style={{ maxHeight:"80px", overflow:"auto"}} >{this.state.command}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%"}}>user</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.user}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%"}}>cwd</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.cwd}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%"}}>targets</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.targets}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%"}}>target type</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.target_type}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.number_of_targets}</div></td>
+                        </tr>
+                        <tr>
+                            <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
+                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.batch_size}</div></td>
+                        </tr>
+                </table>
+
+
+                <h1 className="sectionTitle"><span> TIMES </span></h1>
+                <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
+                    <tr>
+                        <th style={{width:"25%"}}>last run</th>
+                        <td>{this.state.last_run}</td>
+                    </tr>
+                    <tr>
+                        <th style={{width:"25%"}}>next run</th>
+                        <td>{this.state.next_run}</td>
+                    </tr>
+                    <tr>
+                        <th style={{width:"25%"}}>remaining</th>
+                        <td>{this.state.untilNextRun}</td>
+                    </tr>
+                </table>
+
+
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "20px"}}/> </span></h1>
+                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px", width: "150px"}} onClick={this.runJob.bind(this)}>Run cron now</button>
+                <div style={{ maxHeight:"150px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = machine + "1"; 
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
@@ -285,6 +355,8 @@ class CronJobDetails extends React.Component {
                     }) : ""}
                 </div>
             </div>
+
+
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
                 <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.targetsJob !== {} ? this.state.targetsJob.map((target, i) => {

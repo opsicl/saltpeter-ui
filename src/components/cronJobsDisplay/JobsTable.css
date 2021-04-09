@@ -15,7 +15,7 @@ body {
 .data {
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  text-align: center;
+  text-align: left;
   padding-left: 10px;
   font-size: 13px;
   border-collapse: collapse;
@@ -32,7 +32,9 @@ body {
 
 .data td,
 .data th {
-  padding: 7px;
+  padding-top: 7px;
+  padding-right: 30px;
+  padding-left: 30px;
   padding-bottom: 15px;
   font-family: Montserrat-Regular;
 }
