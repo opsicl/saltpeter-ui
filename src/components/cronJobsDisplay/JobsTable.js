@@ -17,7 +17,7 @@ class JobsTable extends React.Component {
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
   }
- 
+
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
   }
@@ -51,7 +51,24 @@ class JobsTable extends React.Component {
           runningOn: [],
         });
       }
-      this.setState({ jobs: cronJobs });
+      
+      function compare(a, b) {
+        const groupA = a.group.toUpperCase();
+        const groupB = b.group.toUpperCase();
+
+        let comparison = 0;
+        if (groupA > groupB) {
+            comparison = 1;
+        } else if (groupA < groupB) {
+            comparison = -1;
+        }
+        return comparison;
+      }
+
+      console.log(cronJobs.sort(compare));     
+
+ 
+      this.setState({ jobs: cronJobs});
     }
     //running
     if (JSON.parse(data).hasOwnProperty("running")) {
@@ -108,7 +125,8 @@ class JobsTable extends React.Component {
       return (
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
           -1 ||
-        job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+        job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
+        job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
