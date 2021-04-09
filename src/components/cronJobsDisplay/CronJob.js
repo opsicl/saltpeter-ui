@@ -30,6 +30,7 @@ class CronJob extends React.Component {
         mon: this.props.job.mon,
         sec: this.props.job.sec,
         year: this.props.job.year,
+        group: this.props.job.group,
       }
     });
   };
@@ -59,6 +60,7 @@ class CronJob extends React.Component {
               })}
             </div>
           </td>
+          <td>{this.props.job.group}</td>
         </tr>
       );
     } else {
@@ -71,6 +73,7 @@ class CronJob extends React.Component {
           <td>{this.props.job.name}</td>
           <td>{this.props.job.command}</td>
           <td> - </td>
+          <td>{this.props.job.group}</td>  
         </tr>
       );
     }

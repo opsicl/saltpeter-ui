@@ -47,6 +47,7 @@ class JobsTable extends React.Component {
           mon: json_result_config[keys[i]]["mon"],
           sec: json_result_config[keys[i]]["sec"],
           year: json_result_config[keys[i]]["year"],
+          group: json_result_config[keys[i]]["group"],
           runningOn: [],
         });
       }
@@ -142,9 +143,10 @@ class JobsTable extends React.Component {
           <table id="cronsTable" className="data">
 	    <tbody>  
               <tr>
-                <th style={{ width: "25%" }}>Name</th>
-                <th style={{ width: "50%" }}>Command</th>
-                <th style={{ width: "25%" }}>Running on</th>
+                <th style={{ width: "20%" }}>Name</th>
+                <th style={{ width: "40%" }}>Command</th>
+                <th style={{ width: "20%" }}>Running on</th>
+                <th style={{ width: "20%" }}>Group</th>
               </tr>
 	    </tbody>
           <tbody>{tableData}</tbody>

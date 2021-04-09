@@ -53,9 +53,12 @@ class CronJobDetails extends React.Component {
 
   killJob = (machine) => {
     var obj = {}
-    obj.kill = this.state.name + "-" + machine
-    var jsonString = JSON.stringify(obj)
-    socket.send(jsonString);  
+    obj.cron = this.state.name
+    obj.machine = machine
+    var obj_main = {}
+    obj_main.kill = obj
+    var jsonString = JSON.stringify(obj_main)
+    socket.send(jsonString)  
   }
 
   showLastRun = (machine, details1_id) => {
