@@ -65,10 +65,7 @@ class JobsTable extends React.Component {
         return comparison;
       }
 
-      console.log(cronJobs.sort(compare));     
-
- 
-      this.setState({ jobs: cronJobs});
+      this.setState({ jobs: cronJobs.sort(compare)});
     }
     //running
     if (JSON.parse(data).hasOwnProperty("running")) {
