@@ -32,6 +32,7 @@ class CronJobDetails extends React.Component {
       last_run: "",
       targetsJob: [],
       results: {},
+      overlap: "",
       currentTime: Date.now(),
       untilNextRun: "",
       hardTimeoutCounter: "",
@@ -154,6 +155,9 @@ class CronJobDetails extends React.Component {
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
         }
+        if (data[name].hasOwnProperty("overlap")){
+           this.setState({ overlap : data[name]["overlap"]});
+        }
       } 
     }
   }
@@ -252,7 +256,7 @@ class CronJobDetails extends React.Component {
     return(
     <div>
         <div style={{marginLeft:"80px"}}>
-            <h1 className="detailsTableName">{this.state.name} {this.state.overlap ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
+            <h1 className="detailsTableName">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
             <div className="details1">
