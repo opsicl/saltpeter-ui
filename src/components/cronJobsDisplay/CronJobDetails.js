@@ -272,13 +272,13 @@ class CronJobDetails extends React.Component {
                     </tbody>
                     <tbody>
                         <tr>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.sec}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.min}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.hour}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.dow}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.dom}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.mon}</div></td>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.year}</div></td>
+                            <td>{this.state.sec}</td>
+                            <td>{this.state.min}</td>
+                            <td>{this.state.hour}</td>
+                            <td>{this.state.dow}</td>
+                            <td>{this.state.dom}</td>
+                            <td>{this.state.mon}</td>
+                            <td>{this.state.year}</td>
                         </tr>
                     </tbody>
                 </table> 
@@ -290,27 +290,27 @@ class CronJobDetails extends React.Component {
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.user}</div></td>
+                            <td>{this.state.user}</td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>cwd</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.cwd}</div></td>
+                            <td>{this.state.cwd}</td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>targets</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.targets}</div></td>
+                            <td>{this.state.targets}</td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>target type</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.target_type}</div></td>
+                            <td>{this.state.target_type}</td>
                         </tr>
                         <tr>
                             <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.number_of_targets}</div></td>
+                            <td>{this.state.number_of_targets}</td>
                         </tr>
                         <tr>
                             <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
-                            <td><div style={{ maxHeight:"30px", overflow:"auto"}}>{this.state.batch_size}</div></td>
+                            <td>{this.state.batch_size}</td>
                         </tr>
                 </table>
 
