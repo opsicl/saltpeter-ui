@@ -11,7 +11,7 @@ class JobsTable extends React.Component {
     this.state = {
       jobs: [],
       search: "",
-      currentTime: new Date().toLocaleString(),
+//      currentTime: new Date().toLocaleString(),
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
@@ -107,15 +107,15 @@ class JobsTable extends React.Component {
     }
 
 
-    this.interval = setInterval(
-      () => this.setState({ currentTime: new Date().toLocaleString() }),
-      1000
-    );
+  //  this.interval = setInterval(
+    //  () => this.setState({ currentTime: new Date().toLocaleString() }),
+     // 1000
+    //);
   }
 
   componentWillUnmount() {
     localStorage.setItem('savedState', JSON.stringify(this.state))
-    clearInterval(this.interval);
+    //clearInterval(this.interval);
   }
 
   render() { 
@@ -138,9 +138,6 @@ class JobsTable extends React.Component {
 	  <tbody>
             <tr>
               <th>Cron Jobs</th>
-            </tr>
-            <tr>
-              <td id="date" className="date">{this.state.currentTime}</td>
             </tr>
             <tr>
               <th>
