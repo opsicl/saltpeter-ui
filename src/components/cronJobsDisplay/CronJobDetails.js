@@ -357,14 +357,16 @@ class CronJobDetails extends React.Component {
                             <th style={{width:"25%"}}>target type</th>
                             <td>{this.state.target_type}</td>
                         </tr>
-                        <tr>
-                            <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
-                            <td>{this.state.number_of_targets}</td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
-                            <td>{this.state.batch_size}</td>
-                        </tr>
+                        {this.state.number_of_targets ? 
+                            <tr>
+                                <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
+                                <td>{this.state.number_of_targets}</td>
+                            </tr> : ""}
+                        {this.state.batch_size ? 
+                            <tr>
+                                <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
+                                <td>{this.state.batch_size}</td>
+                            </tr> : ""}
                 </table>
 
 
