@@ -36,6 +36,7 @@ class CronJobDetails extends React.Component {
       currentTime: Date.now(),
       untilNextRun: "",
       hardTimeoutCounter: "",
+      ranForCounter: "",
       //softTimeoutCounter: "",
       startedJob:"",
     }
@@ -45,6 +46,8 @@ class CronJobDetails extends React.Component {
     this.showLastRun.bind(this);
     this.runJob.bind(this);
     this.killJob.bind(this);
+    this.killCron.bind(this);
+    this.calculateRanFor.bind(this);
   }
 
   runJob = () => {
@@ -62,6 +65,13 @@ class CronJobDetails extends React.Component {
     obj_main.kill = obj
     var jsonString = JSON.stringify(obj_main)
     socket.send(jsonString)  
+  }
+
+  killCron = () => {
+    var obj = {}
+    obj.killCron = this.state.name
+    var jsonString = JSON.stringify(obj)
+    socket.send(jsonString);
   }
 
   showLastRun = (machine, details1_id) => {
@@ -103,10 +113,17 @@ class CronJobDetails extends React.Component {
       for (let machine in this.state.results) {
         if (this.state.runningOn.includes(machine)) {
           start_time = this.state.results[machine]["starttime"];
-          let secDiff = Math.floor( ((new Date(start_time) - currentTime) % (1000*60))/1000 );
-          if (Number.isFinite(secDiff) && this.state.hard_timeout){
-            machinesTimeouts[machine] = secDiff +  this.state.hard_timeout;
-          }
+          //let secDiff = Math.floor( ((new Date(start_time) - currentTime) % (1000*60))/1000 );
+          //if (Number.isFinite(secDiff) && this.state.hard_timeout){
+          //  machinesTimeouts[machine] = secDiff +  this.state.hard_timeout;
+          //}
+          let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60))/1000 );
+          let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60*60)) / (1000*60) );
+          let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          if (secondsDiff < 0) { secondsDiff = 0; }
+          if (minutesDiff < 0) { minutesDiff = 0 }
+          if (hoursDiff < 0) {hoursDiff = 0 }
+          machinesTimeouts[machine] = "hard timeout: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
         }
       }
       return machinesTimeouts;
@@ -114,6 +131,37 @@ class CronJobDetails extends React.Component {
       return "";
     }
   }
+
+    calculateRanFor() {
+        var start_time;
+        var machinesRanFor = {};
+        var currentTime = Date.now();
+        var secondsDiff = 0;
+        var minutesDiff = 0;
+        var hoursDiff = 0;
+        for (let machine in this.state.results) {
+          start_time = this.state.results[machine]["starttime"];
+          if (this.state.runningOn.includes(machine)) {
+              secondsDiff = Math.floor( ((currentTime - new Date(start_time)) % (1000*60))/1000 );
+              minutesDiff = Math.floor( ((currentTime - new Date(start_time)) % (1000*60*60)) / (1000*60) );
+              hoursDiff = Math.floor( ((currentTime - new Date(start_time)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              if (secondsDiff < 0) { secondsDiff = 0; }
+              if (minutesDiff < 0) { minutesDiff = 0 }
+              if (hoursDiff < 0) {hoursDiff = 0 }
+          }
+          if (this.state.results[machine]["endtime"]){
+              let end_time = this.state.results[machine]["endtime"]
+              secondsDiff = Math.floor( ((new Date(end_time) - new Date(start_time)) % (1000*60))/1000 );
+              minutesDiff = Math.floor( ((new Date(end_time) - new Date(start_time)) % (1000*60*60)) / (1000*60) );
+              hoursDiff = Math.floor( ((new Date(end_time) - new Date(start_time)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              if (secondsDiff < 0) { secondsDiff = 0; }
+              if (minutesDiff < 0) { minutesDiff = 0 }
+              if (hoursDiff < 0) {hoursDiff = 0 }
+          }
+          machinesRanFor[machine] = "ran for: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
+        }
+        return machinesRanFor;
+    }
 
 
   handleData(json) {
@@ -233,9 +281,10 @@ class CronJobDetails extends React.Component {
 	      currentTime: Date.now(),
           untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
           hardTimeoutCounter: self.calculateHardTimeout(),
+          ranForCounter: self.calculateRanFor(),
           //softTimeoutCounter: self.calculateSoftTimeout(),
       })),
-      2000
+      1000
     );
 
 //    if (Object.keys(this.state.runningOn).length > 0){
@@ -334,10 +383,13 @@ class CronJobDetails extends React.Component {
                         <td>{this.state.untilNextRun}</td>
                     </tr>
                 </table>
+                <div>
+                    <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px", width: "120px"}} onClick={this.runJob.bind(this)}>Run cron now</button>
+                    {Object.keys(this.state.runningOn).length > 0 ? <button className="button" style={{ marginLeft: "30px"}} onClick={this.killCron.bind(this)}>Kill cron</button> : ""}
+                </div>
 
 
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
-                <button className="button" style={{backgroundColor: "#4CAF50", marginLeft: "40px", width: "150px"}} onClick={this.runJob.bind(this)}>Run cron now</button>
                 <div style={{ maxHeight:"150px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = machine + "1"; 
@@ -367,20 +419,18 @@ class CronJobDetails extends React.Component {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
-                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
-                            started at: {this.state.results[target]["starttime"] ? new Date(this.state.results[target]["starttime"]).toLocaleString() : ""} 
-                        </p>
-                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
-                            ended at: {this.state.results[target]["endtime"] ? new Date(this.state.results[target]["endtime"]).toLocaleString(): ""}
-                        </p>
-                        <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>
-                            ret code: {this.state.results[target]["retcode"] !== "" ? this.state.results[target]["retcode"] : ""} 
-                        </p>
-                        <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>
-                            hard timeout: {this.state.hardTimeoutCounter.hasOwnProperty(target) ? this.state.hardTimeoutCounter[target] : ""}
-                        </p>
-                        <button disabled={!(Object.values(this.state.runningOn).indexOf(target) > -1)} className="button" style={{ marginLeft: "70px"}} onClick={this.killJob.bind(this,target)}>Kill</button>
-                        <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p>
+                        {this.state.results[target]["starttime"] ?
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>started at: {new Date(this.state.results[target]["starttime"]).toLocaleString()}</p> : ""} 
+                        {this.state.results[target]["endtime"] ? 
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>ended at: {new Date(this.state.results[target]["endtime"]).toLocaleString()}</p>: ""}
+                        {this.state.results[target]["starttime"] ?
+                            <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>{this.state.ranForCounter[target]}</p> : ""}
+                        {this.state.results[target]["retcode"] !== "" ? 
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>ret code: {this.state.results[target]["retcode"]}</p> : ""} 
+                        {this.state.hardTimeoutCounter.hasOwnProperty(target) ?
+                            <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>{this.state.hardTimeoutCounter[target]}</p> : ""}
+                        {(Object.values(this.state.runningOn).indexOf(target) > -1) ? <button className="button" style={{ marginLeft: "70px"}} onClick={this.killJob.bind(this,target)}>Kill</button> : ""}
+                        {this.state.results[target]["ret"] ? <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p> : "" }
                         <p className="sectionDetails" style={{color:"white"}}>
                             <div>
                                 {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
