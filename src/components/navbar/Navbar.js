@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { SidebarData } from "./SidebarData";
+import { NavbarData } from "./NavbarData";
 import "./Navbar.css";
 
 class Navbar extends React.Component{
@@ -30,7 +30,7 @@ class Navbar extends React.Component{
                     SALTPETER
                 </h1>
 	            <ul style={{width: "90%", marginRight:"auto", marginLeft:"auto"}}>
-                    {SidebarData.map((item, index) => {
+                    {NavbarData.map((item, index) => {
                         return (
                             <p key={index} className={item.cName}>
                                 <Link to={item.path}>
