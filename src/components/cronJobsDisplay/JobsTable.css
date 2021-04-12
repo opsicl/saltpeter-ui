@@ -105,3 +105,15 @@ body {
   margin-right: auto;
   border-collapse: collapse;
 }
+
+.versions {
+  margin:10px;
+  width: 98%;
+  color: #5a5a5a;
+  text-align:right;
+  font-style:italic;
+  font-family: Montserrat-Regular;
+  font-size: 12px;
+  position:fixed; 
+  bottom:0;
+}

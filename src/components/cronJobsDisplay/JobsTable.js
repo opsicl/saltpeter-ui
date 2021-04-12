@@ -5,6 +5,9 @@ import "./JobsTable.css";
 //import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
 
+let apis = require("../../version.json");
+const UI_VERSION = apis.version;
+
 class JobsTable extends React.Component {
   constructor(props) {
     super(props);
@@ -175,6 +178,10 @@ class JobsTable extends React.Component {
         >
           {filteredJobs == "" ? "No Data Available" : ""}
         </p>
+        <div className = "versions">
+            <p>UI: {UI_VERSION}</p>
+            <p>Backend: vx.y.z</p>
+        </div>
       </div>
     );
   }

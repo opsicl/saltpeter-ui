@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { SidebarData } from "./SidebarData";
 import "./Navbar.css";
 
-//function Navbar() {
 class Navbar extends React.Component{
   constructor(props) {
     super(props);
