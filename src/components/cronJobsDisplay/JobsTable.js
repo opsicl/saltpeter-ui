@@ -140,7 +140,7 @@ class JobsTable extends React.Component {
         <table className="tableName">
 	  <tbody>
             <tr>
-              <th>Cron Jobs</th>
+              <th>Crons</th>
             </tr>
             <tr>
               <th>
