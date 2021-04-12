@@ -5,6 +5,9 @@ import { FaCircle } from 'react-icons/fa';
 import { FiInfo } from 'react-icons/fi';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 
+let apis = require("../../version.json");
+const UI_VERSION = apis.version;
+
 class CronJobDetails extends React.Component {
 
   constructor(props){
@@ -166,7 +169,7 @@ class CronJobDetails extends React.Component {
 
   handleData(json) {
     let data = JSON.parse(json);
-    console.log(data)    
+    //console.log(data)    
     if(data.hasOwnProperty("config")){
       // do nothing
     }
@@ -305,7 +308,7 @@ class CronJobDetails extends React.Component {
     return(
     <div>
         <div style={{marginLeft:"80px"}}>
-            <h1 className="detailsTableName">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
+            <h1 className="cronTitle">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
             <div className="details1">
@@ -452,6 +455,10 @@ class CronJobDetails extends React.Component {
             </div>
 	    </div>
      </div>
+        <div className="versions">
+            <p>UI: {UI_VERSION}</p>
+            <p>Backend: vx.y.z</p>
+        </div>
     </div>
     )
   }
