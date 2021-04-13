@@ -360,7 +360,7 @@ class CronJobDetails extends React.Component {
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
-                            <td><div style={{ maxHeight:"80px", overflow:"auto"}} >{this.state.command}</div></td>
+                            <td><div style={{ maxHeight:"80px", maxWidth: "500px", overflow:"auto"}} >{this.state.command}</div></td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>
