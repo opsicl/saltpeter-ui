@@ -12,7 +12,7 @@ class CronJob extends React.Component {
     const { history } = this.props;
     //console.log(this.props.job.name);
     history.push({
-      pathname: "/details",
+      pathname: "/details/" + this.props.job.name,
       state: { 
 	    name: this.props.job.name,
 	    command: this.props.job.command,
@@ -41,7 +41,7 @@ class CronJob extends React.Component {
       return (
         <tr
           key={this.props.job.id}
-	  className="output"
+	      className="output"
           style={{ color: "#60CE80", cursor: "pointer"}}
           onClick={this.handleHistory}>
           <td>
