@@ -12,24 +12,25 @@ class CronJobDetails extends React.Component {
 
   constructor(props){
     super(props);
+    const { id } = props.match.params;
     this.state = {
-      name: this.props.location.state.name,
-      command: this.props.location.state.command,
-      hard_timeout: this.props.location.state.hard_timeout,
+      name: id,
+      command: this.props.location.state !== undefined ? this.props.location.state.command : "",
+      hard_timeout: this.props.location.state !== undefined ? this.props.location.state.hard_timeout : "",
       //soft_timeout: this.props.location.state.soft_timeout,
-      cwd: this.props.location.state.cwd,
-      user: this.props.location.state.user,
-      targets: this.props.location.state.targets,
-      target_type: this.props.location.state.target_type,
-      number_of_targets: this.props.location.state.number_of_targets,
-      batch_size: this.props.location.state.batch_size,
-      dom: this.props.location.state.dom,
-      dow: this.props.location.state.dow,
-      hour: this.props.location.state.hour,
-      min: this.props.location.state.min,
-      mon: this.props.location.state.mon,
-      sec: this.props.location.state.sec,
-      year: this.props.location.state.year,
+      cwd: this.props.location.state !== undefined ? this.props.location.state.cwd : "",
+      user: this.props.location.state !== undefined ? this.props.location.state.user: "",
+      targets: this.props.location.state !== undefined ? this.props.location.state.targets : "",
+      target_type: this.props.location.state !== undefined ? this.props.location.state.target_type : "",
+      number_of_targets: this.props.location.state !== undefined ? this.props.location.state.number_of_targets : "",
+      batch_size: this.props.location.state !== undefined ? this.props.location.state.batch_size : "",
+      dom: this.props.location.state !== undefined ? this.props.location.state.dom : "", 
+      dow: this.props.location.state !== undefined ? this.props.location.state.dow : "",
+      hour: this.props.location.state !== undefined ? this.props.location.state.hour : "",
+      min: this.props.location.state !== undefined ?  this.props.location.state.min : "",
+      mon: this.props.location.state !== undefined ? this.props.location.state.mon : "",
+      sec: this.props.location.state !== undefined ? this.props.location.state.sec : "",
+      year: this.props.location.state !== undefined ? this.props.location.state.year : "",
       runningOn: [],
       next_run: "",
       last_run: "",
@@ -169,9 +170,26 @@ class CronJobDetails extends React.Component {
 
   handleData(json) {
     let data = JSON.parse(json);
-    //console.log(data)    
     if(data.hasOwnProperty("config")){
-      // do nothing
+      var json_result_config = data.config.crons;
+      this.setState({
+          command: json_result_config[this.state.name]["command"],
+          cwd: json_result_config[this.state.name]["cwd"],
+          user: json_result_config[this.state.name]["user"],
+          //soft_timeout: json_result_config[this.state.name]["soft_timeout"],
+          hard_timeout: json_result_config[this.state.name]["hard_timeout"],
+          targets: json_result_config[this.state.name]["targets"],
+          target_type: json_result_config[this.state.name]["target_type"],
+          number_of_targets: json_result_config[this.state.name]["number_of_targets"],
+          dom: json_result_config[this.state.name]["dom"],
+          dow: json_result_config[this.state.name]["dow"],
+          hour: json_result_config[this.state.name]["hour"],
+          min: json_result_config[this.state.name]["min"],
+          mon: json_result_config[this.state.name]["mon"],
+          sec: json_result_config[this.state.name]["sec"],
+          year: json_result_config[this.state.name]["year"],
+          batch_size: json_result_config[this.state.name]["batch_size"],
+      });
     }
     // running
     else if(data.hasOwnProperty("running")){

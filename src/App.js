@@ -13,7 +13,7 @@ function App(){
           <Navbar />
           <Switch>
             <Route path="/" exact component={JobsTable} />
-	    <Route path="/details" exact component={CronJobDetails} />
+	        <Route path="/details/:id" render={(props) => <CronJobDetails {...props} />} />
           </Switch>
         </Router>
       </div>
