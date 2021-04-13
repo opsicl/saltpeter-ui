@@ -39,9 +39,10 @@
   width: 100%;
   padding-left: 0px;
   padding-top: 5px;
+  padding-bottom: 10px;
   margin-bottom: 20px;
   background-color: #292929;
-  height: 88px;
+  height: auto;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -70,21 +71,24 @@
 .nav-text a:hover {
   color: white;
   text-shadow: 2px 2px 4px #000000;
-  border-bottom: 2px solid white;
-  padding-bottom: 4px;
 }
 
 .nav-left {
   text-align: right;
+  width: auto;
   float: left;
-  width: 70%;
+  padding-left: 80px;
 }
 
 .nav-right {
+  text-align: right;
   padding-top: 50px;
   margin-left: 20px;
-  float: left;
-  width: 25%
+  float: right;
+  width: auto;
+  padding-right: 150px;
+  white-space: nowrap;
+  padding-left: 80px;
 }
 
 .date {
