@@ -117,10 +117,6 @@ class CronJobDetails extends React.Component {
       for (let machine in this.state.results) {
         if (this.state.runningOn.includes(machine)) {
           start_time = this.state.results[machine]["starttime"];
-          //let secDiff = Math.floor( ((new Date(start_time) - currentTime) % (1000*60))/1000 );
-          //if (Number.isFinite(secDiff) && this.state.hard_timeout){
-          //  machinesTimeouts[machine] = secDiff +  this.state.hard_timeout;
-          //}
           let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60))/1000 );
           let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60*60)) / (1000*60) );
           let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -325,14 +321,14 @@ class CronJobDetails extends React.Component {
   render(){
     return(
     <div>
-        <div style={{marginLeft:"80px"}}>
+        <div style={{marginLeft:"4%"}}>
             <h1 className="cronTitle">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
             <div className="details1">
                 <h1 className="sectionTitle"><span> CONFIG </span></h1>
 
-                <table className="configTable" style = {{marginLeft:"30px"}}>
+                <table className="configTable" style = {{marginLeft:"2%"}}>
                     <tbody>
                         <tr>
                             <th>sec</th>
@@ -452,7 +448,7 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>ret code: {this.state.results[target]["retcode"]}</p> : ""} 
                         {this.state.hardTimeoutCounter.hasOwnProperty(target) ?
                             <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>{this.state.hardTimeoutCounter[target]}</p> : ""}
-                        {(Object.values(this.state.runningOn).indexOf(target) > -1) ? <button className="button" style={{ marginLeft: "70px"}} onClick={this.killJob.bind(this,target)}>Kill</button> : ""}
+                        {(Object.values(this.state.runningOn).indexOf(target) > -1) ? <button className="button" style={{ marginLeft: "8%"}} onClick={this.killJob.bind(this,target)}>Kill</button> : ""}
                         {this.state.results[target]["ret"] ? <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p> : "" }
                         <p className="sectionDetails" style={{color:"white"}}>
                             <div>
