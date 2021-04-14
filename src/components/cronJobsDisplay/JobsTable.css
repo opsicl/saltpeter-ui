@@ -19,13 +19,13 @@ body {
   padding-left: 10px;
   font-size: 13px;
   border-collapse: collapse;
-  width: 78%;
+  width: 80%;
   color: #d6d6d6;
   margin-top: 0px;
   margin-left: auto;
   margin-right: auto;
   background-color: #292929;
-  margin-bottom: 30px;
+  margin-bottom: 5%;
   margin-top: 1px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
 }
@@ -62,7 +62,6 @@ body {
   border-top-left-radius: 5px;
   border-collapse: collapse;
   width: 100%;
-  margin-top: 20px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -99,7 +98,7 @@ body {
 
 .tableName {
   background-color: #292929;
-  width: 78%;
+  width: 80%;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
