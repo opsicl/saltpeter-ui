@@ -53,7 +53,7 @@ server {
 
 ```
 ln -s /etc/nginx/sites-available/saltpeter /etc/nginx/sites-enabled/saltpeter
-sudo service ngxin restart
+sudo service nginx restart
 ```
 
 The UI will be available on the specified port [http://localhost:7501](http://localhost:7501)
