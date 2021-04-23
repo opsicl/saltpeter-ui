@@ -15,7 +15,7 @@ cd /var/www/
 git clone https://github.com/opsicl/saltpeter-ui.git
 ```
 
-Add the websocket address(the address where Saltpeter is running):
+Add the websocket address(the address where [Saltpeter](https://github.com/syscollective/saltpeter) is running):
 
 ```
 vim /var/www/saltpeter-ui/src/apis.json
