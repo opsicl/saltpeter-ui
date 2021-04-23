@@ -1,47 +1,67 @@
-import React, {PureComponent} from "react";
+import React  from "react";
 import { withRouter } from 'react-router-dom';
-import CronParser from "./CronParser";
 import "./CronJob.css";
 
 class CronJob extends React.Component {
   constructor(props){
     super(props);
-    this.convertDate.bind(this);
     this.handleHistory.bind(this);
   }
 
-  convertDate(date){
-    let date_full = new Date(date).toString();
-    return date_full.substring(0, date_full.indexOf("+"));    
-  }
-  
   handleHistory = () => {
     const { history } = this.props;
     //console.log(this.props.job.name);
     history.push({
-      pathname: "/details",
+      pathname: "/details/" + this.props.job.name,
       state: { 
-	name: this.props.job.name,
-	command: this.props.job.command,
+	    name: this.props.job.name,
+	    command: this.props.job.command,
+	    soft_timeout: this.props.job.soft_timeout,
+	    hard_timeout: this.props.job.hard_timeout,
+        cwd: this.props.job.cwd,
+        user: this.props.job.user,
+        targets: this.props.job.targets,
+        target_type: this.props.job.target_type,
+        number_of_targets: this.props.job.number_of_targets,
+        dom: this.props.job.dom,
+        dow: this.props.job.dow,
+        hour: this.props.job.hour,
+        min: this.props.job.min,
+        mon: this.props.job.mon,
+        sec: this.props.job.sec,
+        year: this.props.job.year,
+        group: this.props.job.group,
+        batch_size: this.props.job.batch_size,
       }
     });
   };
 
   render() {
-    if (this.props.job.runningOn.length != 0) {
+    if (this.props.job.runningOn.length) {
       return (
         <tr
           key={this.props.job.id}
-	  className="output"
-          style={{ color: "#f78fa4"}}
+	      className="output"
+          style={{ color: "#60CE80", cursor: "pointer"}}
           onClick={this.handleHistory}>
-          <td>{this.props.job.name}</td>
-          <td>{this.props.job.command}</td>
           <td>
-            {this.props.job.runningOn.map((machine, i) => {
-              return <p key={i} className="output">{machine}</p>;
-            })}
+            <div style={{ maxHeight:"100px", overflow:"auto"}} >
+              {this.props.job.name}
+            </div>
           </td>
+          <td>
+            <div style={{ maxHeight:"100px", overflow:"auto"}} >
+              {this.props.job.command}
+            </div>
+          </td>
+          <td>
+            <div style={{ maxHeight:"100px", overflow:"auto", textAlign:"center"}} >
+              {this.props.job.runningOn.map((machine, i) => {
+                return <p key={i} className="output">{machine}</p>;
+              })}
+            </div>
+          </td>
+          <td>{this.props.job.group}</td>
         </tr>
       );
     } else {
@@ -49,10 +69,12 @@ class CronJob extends React.Component {
         <tr
           key={this.props.job.id}
 	  className="output" 
-	  onClick = {this.handleHistory}>
+	  onClick = {this.handleHistory}
+      style = {{cursor: "pointer"}}>
           <td>{this.props.job.name}</td>
           <td>{this.props.job.command}</td>
-          <td> - </td>
+          <td style={{textAlign:"center"}}> - </td>
+          <td>{this.props.job.group}</td>  
         </tr>
       );
     }

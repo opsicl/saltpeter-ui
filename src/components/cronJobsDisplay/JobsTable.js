@@ -1,9 +1,12 @@
-import React, {PureComponent} from "react";
-import { withRouter } from 'react-router-dom';
+import React from "react";
+//import { withRouter } from 'react-router-dom';
 import CronJob from "./CronJob";
 import "./JobsTable.css";
-import ReconnectingWebSocket from 'reconnecting-websocket';
+//import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
+
+let apis = require("../../version.json");
+const UI_VERSION = apis.version;
 
 class JobsTable extends React.Component {
   constructor(props) {
@@ -11,13 +14,13 @@ class JobsTable extends React.Component {
     this.state = {
       jobs: [],
       search: "",
-      currentTime: new Date().toUTCString(),
+//      currentTime: new Date().toLocaleString(),
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
   }
- 
+
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
   }
@@ -40,10 +43,33 @@ class JobsTable extends React.Component {
           targets: json_result_config[keys[i]]["targets"],
           target_type: json_result_config[keys[i]]["target_type"],
           number_of_targets: json_result_config[keys[i]]["number_of_targets"],
+          dom: json_result_config[keys[i]]["dom"],
+          dow: json_result_config[keys[i]]["dow"],
+          hour: json_result_config[keys[i]]["hour"],
+          min: json_result_config[keys[i]]["min"],
+          mon: json_result_config[keys[i]]["mon"],
+          sec: json_result_config[keys[i]]["sec"],
+          year: json_result_config[keys[i]]["year"],
+          group: json_result_config[keys[i]]["group"],
+          batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
         });
       }
-      this.setState({ jobs: cronJobs });
+      
+      function compare(a, b) {
+        const groupA = a.group.toUpperCase();
+        const groupB = b.group.toUpperCase();
+
+        let comparison = 0;
+        if (groupA > groupB) {
+            comparison = 1;
+        } else if (groupA < groupB) {
+            comparison = -1;
+        }
+        return comparison;
+      }
+
+      this.setState({ jobs: cronJobs.sort(compare)});
     }
     //running
     if (JSON.parse(data).hasOwnProperty("running")) {
@@ -58,7 +84,7 @@ class JobsTable extends React.Component {
       for (i = 0; i < keys_running.length; i++) {
         var key_running = json_result_running[keys_running[i]]["name"];
         for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] == key_running) {
+          if (cronJobs[j]["name"] === key_running) {
             cronJobs[j]["runningOn"] =
               json_result_running[keys_running[i]]["machines"];
             break;
@@ -84,15 +110,15 @@ class JobsTable extends React.Component {
     }
 
 
-    this.interval = setInterval(
-      () => this.setState({ currentTime: new Date().toLocaleString('en-US', {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone}) }),
-      1000
-    );
+  //  this.interval = setInterval(
+    //  () => this.setState({ currentTime: new Date().toLocaleString() }),
+     // 1000
+    //);
   }
 
   componentWillUnmount() {
     localStorage.setItem('savedState', JSON.stringify(this.state))
-    clearInterval(this.interval);
+    //clearInterval(this.interval);
   }
 
   render() { 
@@ -100,7 +126,8 @@ class JobsTable extends React.Component {
       return (
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
           -1 ||
-        job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+        job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
+        job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
@@ -113,10 +140,7 @@ class JobsTable extends React.Component {
         <table className="tableName">
 	  <tbody>
             <tr>
-              <th>Cron Jobs</th>
-            </tr>
-            <tr>
-              <td id="date" className="date">{this.state.currentTime}</td>
+              <th>Crons</th>
             </tr>
             <tr>
               <th>
@@ -135,9 +159,10 @@ class JobsTable extends React.Component {
           <table id="cronsTable" className="data">
 	    <tbody>  
               <tr>
-                <th style={{ width: "25%" }}>Name</th>
-                <th style={{ width: "50%" }}>Command</th>
-                <th style={{ width: "25%" }}>Running on</th>
+                <th style={{ width: "15%" }}>Name</th>
+                <th style={{ width: "55%" }}>Command</th>
+                <th style={{ width: "20%" }}>Running on</th>
+                <th style={{ width: "10%" }}>Group</th>
               </tr>
 	    </tbody>
           <tbody>{tableData}</tbody>
@@ -153,6 +178,10 @@ class JobsTable extends React.Component {
         >
           {filteredJobs == "" ? "No Data Available" : ""}
         </p>
+        <div className = "versions">
+            <p>UI: {UI_VERSION}</p>
+            <p>Backend: vx.y.z</p>
+        </div>
       </div>
     );
   }
