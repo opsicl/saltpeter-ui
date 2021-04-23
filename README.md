@@ -2,6 +2,10 @@
 
 User interface for [Saltpeter](https://github.com/syscollective/saltpeter)
 
+<img src="screenshots/table.png" width="800" >
+<img src="screenshots/run.png" width="800" >
+<img src="screenshots/results.png" width="800" >
+
 ### Installation:
 
 Clone the git repository:
