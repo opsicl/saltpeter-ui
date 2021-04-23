@@ -66,7 +66,7 @@ class CronJobDetails extends React.Component {
     obj.cron = this.state.name
     obj.machine = machine
     var obj_main = {}
-    obj_main.kill = obj
+    obj_main.killMachine = obj
     var jsonString = JSON.stringify(obj_main)
     socket.send(jsonString)  
   }
@@ -281,15 +281,37 @@ class CronJobDetails extends React.Component {
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
 
+    socket.onopen = function(event) {
+      socket.send(jsonString);
+    }
+
     socket.onclose = function(event) {
       self.setState({
-	    name: "",
         command: "",
         runningOn: [],
         next_run: "",
         last_run: "",
         targetsJob: [],
         results: {},
+        cwd: "",
+        user: "",
+        targets: [],
+        target_type: "",
+        number_of_targets: "",
+        batch_size: "",
+        dom: "",
+        dow: "",
+        hour: "",
+        min: "",
+        mon: "",
+        sec: "",
+        year: "",
+        overlap: "",
+        untilNextRun: "",
+        hardTimeoutCounter: "",
+        ranForCounter: "",
+        startedJob: "",
+        hard_timeout: "",
       });
     }
 
