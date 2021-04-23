@@ -1,6 +1,6 @@
 ### Description:
 
-User interface for [Saltpeter](https://github.com/syscollective/saltpeter)
+User interface for [Saltpeter](https://github.com/syscollective/saltpeter):
 
 <img src="screenshots/table.png" width="800" >
 <img src="screenshots/run.png" width="800" >
@@ -15,7 +15,7 @@ cd /var/www/
 git clone https://github.com/opsicl/saltpeter-ui.git
 ```
 
-Add the websocket address(the address where Saltpeter is running)
+Add the websocket address(the address where Saltpeter is running):
 
 ```
 vim /var/www/saltpeter-ui/src/apis.json
