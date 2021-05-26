@@ -445,7 +445,7 @@ class CronJobDetails extends React.Component {
                             this.circleColor = "#FFC308"
                             this.cursor = "pointer"
                             this.sign = "stopped"
-                            if (this.state.results[machine]["retcode"] !== 0) {
+                            if (this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) {
                                 this.circleColor = "#FF0000"
                                 this.cursor = "pointer"
                                 this.sign = "warning"
