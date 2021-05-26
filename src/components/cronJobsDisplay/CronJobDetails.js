@@ -2,6 +2,9 @@ import React from "react";
 import { socket } from "./socket.js";
 import "./CronJobDetails.css";
 import { FaCircle } from 'react-icons/fa';
+import { FaStop } from 'react-icons/fa';
+import { FaPlay } from 'react-icons/fa';
+import { MdWarning } from 'react-icons/md';
 import { FiInfo } from 'react-icons/fi';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 
@@ -433,19 +436,34 @@ class CronJobDetails extends React.Component {
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
                 <div style={{ maxHeight:"150px", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
-                        var id1 = machine + "1"; 
+                        var id1 = i;
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
                             this.circleColor = "#60CE80"
                             this.cursor = "pointer"
+                            this.sign = "start"
                         } else if (this.state.results.hasOwnProperty(machine)) {
                             this.circleColor = "#FFC308"
                             this.cursor = "pointer"
+                            this.sign = "stopped"
+                            if (this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) {
+                                this.circleColor = "#FF0000"
+                                this.cursor = "pointer"
+                                this.sign = "warning"
+                            }
                         } else {
                             this.circleColor = "white"
                             this.cursor = "auto"
-                         }
+                        }
                         if (this.circleColor !== "white") {
-                            return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "white" }} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                            if (this.sign === "start") {
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "white" }} > <FaPlay style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                            }
+                            if (this.sign === "stopped") {
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "white" }} > <FaStop style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                            }
+                            if (this.sign === "warning") {
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "white" }} > <MdWarning size = {20} style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                            }
                         } else {
                             return  <p id={id1} className="sectionDetails" style={{ cursor: this.cursor, color: "white"}} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                         }
@@ -456,7 +474,7 @@ class CronJobDetails extends React.Component {
 
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.targetsJob !== {} ? this.state.targetsJob.map((target, i) => {
+                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
@@ -485,7 +503,7 @@ class CronJobDetails extends React.Component {
                             y.style.color = "white";
                         } catch {
                         }
-                        //return <div id={target} style={{display:"none"}}></div>
+                        return <div id={target} style={{display:"none"}}></div>
                     }
                 ;}) : ""}
             </div>
