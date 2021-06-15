@@ -381,7 +381,7 @@ class CronJobDetails extends React.Component {
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
-                            <td><div style={{ maxHeight:"80px", maxWidth: "500px", overflow:"auto"}} >{this.state.command}</div></td>
+                            <td><div style={{ maxHeight:"5vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command}</div></td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>
@@ -434,15 +434,15 @@ class CronJobDetails extends React.Component {
 
 
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
-                <div style={{ maxHeight:"150px", overflow:"auto"}}>
+                <div style={{ maxHeight:"27vh", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
-                            this.circleColor = "#60CE80"
+                            this.circleColor = "#6666FF"
                             this.cursor = "pointer"
                             this.sign = "start"
                         } else if (this.state.results.hasOwnProperty(machine)) {
-                            this.circleColor = "#FFC308"
+                            this.circleColor = "#60CE80"
                             this.cursor = "pointer"
                             this.sign = "stopped"
                             if (this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) {
@@ -474,7 +474,7 @@ class CronJobDetails extends React.Component {
 
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div style={{ maxHeight:"650px", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
+                <div style={{ maxHeight: "70vh", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
