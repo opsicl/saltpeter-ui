@@ -99,7 +99,8 @@ class JobsTable extends React.Component {
   componentDidMount() {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
-    
+    this.setState({ search: "" });
+
     var self = this;
     socket.onmessage =  function(event) {
       self.handleData(event.data);
@@ -122,6 +123,13 @@ class JobsTable extends React.Component {
   }
 
   render() { 
+    window.addEventListener("keydown",function (e) {             
+    if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {        
+        e.preventDefault();         
+        document.getElementById("searchBarInput").focus()
+      }      
+    })
+
     let filteredJobs = this.state.jobs.filter((job) => {
       return (
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
@@ -151,6 +159,7 @@ class JobsTable extends React.Component {
                   value={this.state.search}
                   onChange={this.updateSearch.bind(this)}
                   placeholder="Search"
+	          autoFocus
                 />
               </th>
             </tr>
