@@ -99,7 +99,8 @@ class JobsTable extends React.Component {
   componentDidMount() {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
-    
+    this.setState({ search: "" });
+
     var self = this;
     socket.onmessage =  function(event) {
       self.handleData(event.data);
