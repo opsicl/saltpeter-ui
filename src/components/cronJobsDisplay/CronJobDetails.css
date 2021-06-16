@@ -69,14 +69,16 @@
 }
 
 .details1 {
+  height: 80vh;
   margin-left: 4%;
   text-align: left;
   float: left;
-  width:40%;
+  max-width: 40%;
   scrollbar-color: #1D3E14 #292929;
 }
 
 .details2 {
+  height: 85vh;
   margin-left: 4%;
   text-align: left;
   float: left;
@@ -131,7 +133,7 @@
 }
 
 .configTable {
-  width: 100%;
+  width: 90%;
   text-align: center;
   font-family: Montserrat-Regular;
   color: white;
