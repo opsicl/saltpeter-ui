@@ -432,7 +432,7 @@ class CronJobDetails extends React.Component {
                     {Object.keys(this.state.runningOn).length > 0 ? <button className="button" style={{ marginLeft: "30px"}} onClick={this.killCron.bind(this)}>Kill cron</button> : ""}
                 </div>
 
-                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
                 <div style={{ resize:"both", height:"20vh", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
