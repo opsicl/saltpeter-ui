@@ -350,7 +350,7 @@ class CronJobDetails extends React.Component {
             <h1 className="cronTitle">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
-            <div className="details1">
+        <div className="details1">
                 <h1 className="sectionTitle"><span> CONFIG </span></h1>
 
                 <table className="configTable" style = {{marginLeft:"2%"}}>
@@ -381,7 +381,7 @@ class CronJobDetails extends React.Component {
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
-                            <td><div style={{ maxHeight:"5vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command}</div></td>
+                            <td><div style={{ resize:"both", height:"8vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command}</div></td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>
@@ -432,9 +432,8 @@ class CronJobDetails extends React.Component {
                     {Object.keys(this.state.runningOn).length > 0 ? <button className="button" style={{ marginLeft: "30px"}} onClick={this.killCron.bind(this)}>Kill cron</button> : ""}
                 </div>
 
-
-                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
-                <div style={{ maxHeight:"27vh", overflow:"auto"}}>
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
+                <div style={{ resize:"both", height:"20vh", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
@@ -469,12 +468,12 @@ class CronJobDetails extends React.Component {
                         }
                     }) : ""}
                 </div>
-            </div>
+            </div> 
 
 
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div style={{ maxHeight: "70vh", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
+                <div style={{ resize:"both", height: "70vh", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
@@ -492,7 +491,7 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["ret"] ? <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p> : "" }
                         <p className="sectionDetails" style={{color:"white"}}>
                             <div>
-                                {this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
+				{this.state.results[target]["ret"].split('\n').map(str => <p style={{textIndent: "3em"}}>{str}</p>)}
                             </div>
                         </p>
                         <br></br>
