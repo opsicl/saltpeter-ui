@@ -350,7 +350,7 @@ class CronJobDetails extends React.Component {
             <h1 className="cronTitle">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
         </div>
         <div>
-            <div className="details1">
+        <div className="details1">
                 <h1 className="sectionTitle"><span> CONFIG </span></h1>
 
                 <table className="configTable" style = {{marginLeft:"2%"}}>
@@ -432,7 +432,6 @@ class CronJobDetails extends React.Component {
                     {Object.keys(this.state.runningOn).length > 0 ? <button className="button" style={{ marginLeft: "30px"}} onClick={this.killCron.bind(this)}>Kill cron</button> : ""}
                 </div>
 
-
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;yellow - ran in the last run&#10;green - running now" style ={{marginLeft: "2px"}}/> </span></h1>
                 <div style={{ resize:"both", height:"20vh", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
@@ -469,7 +468,7 @@ class CronJobDetails extends React.Component {
                         }
                     }) : ""}
                 </div>
-            </div>
+            </div> 
 
 
             <div className="details2">
