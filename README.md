@@ -55,7 +55,9 @@ server{
         }
 }
 ```
-
+```
+ln -s /etc/nginx/sites-available/saltpeter /etc/nginx/sites-enabled/saltpeter
+```
 Restart nginx
 ```
 service nginx restart
