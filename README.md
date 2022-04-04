@@ -7,57 +7,58 @@ User interface for [Saltpeter](https://github.com/syscollective/saltpeter):
 <img src="screenshots/results.png" width="800" >
 
 ### Installation:
-
-Clone the git repository:
-
 ```
-cd /var/www/
-git clone https://github.com/opsicl/saltpeter-ui.git
+cd /opt
 ```
 
-Add the websocket address(the address where [Saltpeter](https://github.com/syscollective/saltpeter) is running):
-
+Download the latest release and unzip it
 ```
-vim /var/www/saltpeter-ui/src/apis.json
-```
-
-```
-{
-  "saltpeter_ws": "ws://localhost:8888/ws"
-}
+unzip build.zip
+rm build.zip
+mv build saltpeter-ui
 ```
 
-Build the project:
-
-```
-cd /var/www/saltpeter-ui
-sudo npm install
-sudo npm build
-
-```
-
-Add the nginx configuration:
-
+Add the nginx configuration(update with your websocket address)
 ```
 vim /etc/nginx/sites-available/saltpeter
 ```
-
 ```
-server {
-  listen 7501;
-  server_name localhost;
-  root /var/www/saltpeter-ui/build;
-  index index.html;
-  # Other config you desire (TLS, logging, etc)...
-  location / {
-    try_files $uri /index.html;
-  }
+upstream websocket{
+        # update with your websocket address
+        server local_ip_address:8889;
+}
+
+server{
+        listen 80;
+        server_name localhost;
+        location / {
+            root /opt/saltpeter-ui;
+            index index.html;
+            # Other config you desire (TLS, logging, etc)...
+            try_files $uri /index.html;
+        }
+
+        location /ws {
+                proxy_pass http://websocket;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+                proxy_set_header Host $host;
+
+    		proxy_set_header X-Real-IP $remote_addr;
+    		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    		proxy_set_header X-Forwarded-Proto https;
+
+    		proxy_read_timeout  36000s;
+
+    		proxy_redirect off;
+        }
 }
 ```
 
+Restart nginx
 ```
-ln -s /etc/nginx/sites-available/saltpeter /etc/nginx/sites-enabled/saltpeter
-sudo service nginx restart
+service nginx restart
 ```
 
-The UI will be available on the specified port [http://localhost:7501](http://localhost:7501)
+Now the UI will run on port 80, on localhost
