@@ -321,7 +321,7 @@ class CronJobDetails extends React.Component {
     this.interval = setInterval(
       () => this.setState((prevState,props) => ({
 	      currentTime: Date.now(),
-          untilNextRun:  daysDiff(prevState.currentTime, new Date(prevState.next_run)) + "d " + hoursDiff(prevState.currentTime, new Date(prevState.next_run))+"h " + minutesDiff(prevState.currentTime, new Date(prevState.next_run)) + "m " + secondsDiff(prevState.currentTime, new Date(prevState.next_run))+"s",
+          untilNextRun:  String(daysDiff(prevState.currentTime, new Date(prevState.next_run))) + "d " + String(hoursDiff(prevState.currentTime, new Date(prevState.next_run)))+"h " + String(minutesDiff(prevState.currentTime, new Date(prevState.next_run))) + "m " + String(secondsDiff(prevState.currentTime, new Date(prevState.next_run)))+"s",
           hardTimeoutCounter: self.calculateHardTimeout(),
           ranForCounter: self.calculateRanFor(),
           //softTimeoutCounter: self.calculateSoftTimeout(),
