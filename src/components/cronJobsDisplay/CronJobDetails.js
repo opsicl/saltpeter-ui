@@ -381,7 +381,7 @@ class CronJobDetails extends React.Component {
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
-                            <td><div style={{ resize:"both", height:"8vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command}</div></td>
+                            <td><div style={{ resize:"both", height:"8vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command.split('\\').map(str => <p>{str}</p>)}</div></td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>

@@ -51,7 +51,7 @@ class CronJob extends React.Component {
           </td>
           <td>
             <div style={{ maxHeight:"100px", overflow:"auto"}} >
-              {this.props.job.command}
+              {this.props.job.command.split('\\').map(str => <p>{str}</p>)}
             </div>
           </td>
           <td>
@@ -72,7 +72,7 @@ class CronJob extends React.Component {
 	  onClick = {this.handleHistory}
       style = {{cursor: "pointer"}}>
           <td>{this.props.job.name}</td>
-          <td>{this.props.job.command}</td>
+          <td>{this.props.job.command.split('\\').map(str => <p>{str}</p>)}</td>
           <td style={{textAlign:"center"}}> - </td>
           <td>{this.props.job.group}</td>  
         </tr>
