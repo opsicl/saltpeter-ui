@@ -63,8 +63,8 @@ class CronJob extends React.Component {
               })}
             </div>
           </td>
-          <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
-          <td>{this.props.job.group}</td>
+          <td style={{textAlign:"center"}}>{new Date(this.props.job.last_run).toLocaleString()}</td>
+          <td style={{textAlign:"center"}}>{this.props.job.group}</td>
         </tr>
       );
     } else if (this.props.job.result == 1) {
@@ -77,8 +77,8 @@ class CronJob extends React.Component {
             <td>{this.props.job.name}</td>
             <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
             <td style={{textAlign:"center"}}> - </td>
-            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
-            <td>{this.props.job.group}</td>  
+            <td style={{textAlign:"center"}}>{new Date(this.props.job.last_run).toLocaleString()}</td>
+            <td style={{textAlign:"center"}}>{this.props.job.group}</td>  
         </tr>
       );
     } else if (this.props.job.result == 2) {
@@ -91,8 +91,8 @@ class CronJob extends React.Component {
             <td>{this.props.job.name}</td>
             <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
             <td style={{textAlign:"center"}}> - </td>
-            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
-            <td>{this.props.job.group}</td>
+            <td style={{textAlign:"center"}}>{new Date(this.props.job.last_run).toLocaleString()}</td>
+            <td style={{textAlign:"center"}}>{this.props.job.group}</td>
         </tr>
       );
     } else {
@@ -105,8 +105,8 @@ class CronJob extends React.Component {
             <td>{this.props.job.name}</td>
             <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
             <td style={{textAlign:"center"}}> - </td>
-            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
-            <td>{this.props.job.group}</td>
+            <td style={{textAlign:"center"}}> - </td>
+            <td style={{textAlign:"center"}}>{this.props.job.group}</td>
         </tr>
       );
     }
