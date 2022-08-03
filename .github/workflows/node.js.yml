@@ -18,8 +18,12 @@ jobs:
       packages: write 
 
     steps:
-    - name: Add SHORT_SHA env property with commit short sha      
-      run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-6`" >> $GITHUB_ENV
+    - name: Set outputs        
+      id: vars        
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"      
+    - name: Check outputs        
+      run: echo ${{ steps.vars.outputs.sha_short }}
+    
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v1
