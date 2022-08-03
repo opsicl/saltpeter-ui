@@ -25,10 +25,6 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - name: Set env
-      run: echo "RELEASE_VERSION='{"version": ${GITHUB_REPOSITORY#*\/}" >> $GITHUB_ENV
-    - name: Test
-      run: echo $REPOSITORY_NAME
     - name: npm install and build
       run: |
         echo '{"version": "${{SHORT_SHA}}"}' > src/version.json
