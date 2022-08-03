@@ -32,6 +32,8 @@ class CronJob extends React.Component {
         year: this.props.job.year,
         group: this.props.job.group,
         batch_size: this.props.job.batch_size,
+        result: this.props.job.result,
+        last_run: this.props.job.last_run,
       }
     });
   };
@@ -61,20 +63,50 @@ class CronJob extends React.Component {
               })}
             </div>
           </td>
+          <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
           <td>{this.props.job.group}</td>
+        </tr>
+      );
+    } else if (this.props.job.result == 1) {
+      return (
+        <tr
+          key={this.props.job.id}
+	      className="output" 
+	      onClick = {this.handleHistory}
+          style = {{ color: "#60CE80", cursor: "pointer"}}>
+            <td>{this.props.job.name}</td>
+            <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
+            <td style={{textAlign:"center"}}> - </td>
+            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
+            <td>{this.props.job.group}</td>  
+        </tr>
+      );
+    } else if (this.props.job.result == 2) {
+      return (
+        <tr
+          key={this.props.job.id}
+          className="output"
+          onClick = {this.handleHistory}
+          style = {{ color: "#FF0000", cursor: "pointer"}}>
+            <td>{this.props.job.name}</td>
+            <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
+            <td style={{textAlign:"center"}}> - </td>
+            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
+            <td>{this.props.job.group}</td>
         </tr>
       );
     } else {
       return (
         <tr
           key={this.props.job.id}
-	  className="output" 
-	  onClick = {this.handleHistory}
-      style = {{cursor: "pointer"}}>
-          <td>{this.props.job.name}</td>
-          <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
-          <td style={{textAlign:"center"}}> - </td>
-          <td>{this.props.job.group}</td>  
+          className="output"
+          onClick = {this.handleHistory}
+          style = {{cursor: "pointer"}}>
+            <td>{this.props.job.name}</td>
+            <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
+            <td style={{textAlign:"center"}}> - </td>
+            <td>{new Date(this.props.job.last_run).toLocaleString()}</td>
+            <td>{this.props.job.group}</td>
         </tr>
       );
     }

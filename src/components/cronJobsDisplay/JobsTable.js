@@ -32,6 +32,11 @@ class JobsTable extends React.Component {
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
       for (var i = 0; i < keys.length; i++) {
+        var obj = {}
+        obj.subscribe = keys[i]
+        var jsonString = JSON.stringify(obj)
+        socket.send(jsonString);
+
         cronJobs.push({
           id: i,
           name: keys[i],
@@ -53,6 +58,8 @@ class JobsTable extends React.Component {
           group: json_result_config[keys[i]]["group"],
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
+          result: 0, //0-did not run/ 1-success/ 2-fail
+          last_run: "",
         });
       }
       
@@ -70,9 +77,7 @@ class JobsTable extends React.Component {
       }
 
       this.setState({ jobs: cronJobs.sort(compare)});
-    }
-    //running
-    if (JSON.parse(data).hasOwnProperty("running")) {
+    } else if (JSON.parse(data).hasOwnProperty("running")) {
       cronJobs = this.state.jobs;
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
@@ -85,14 +90,40 @@ class JobsTable extends React.Component {
         var key_running = json_result_running[keys_running[i]]["name"];
         for (var j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_running) {
-            cronJobs[j]["runningOn"] =
-              json_result_running[keys_running[i]]["machines"];
+            cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
             break;
           }
         }
       }
 
       this.setState({ jobs: cronJobs });
+    } else {
+        // details
+        var crons = this.state.jobs
+        var json_result = JSON.parse(data);
+        var name = Object.keys(json_result)[0];
+
+        if ("results" in json_result[name]){
+          var result = json_result[name]["results"]
+          for (var i = 0; i < crons.length; i++) {
+             if (name == crons[i]["name"]){
+               var result_machines = Object.keys(result)
+               var run_result = 1
+               crons[i]["result"] = run_result
+               crons[i]["last_run"] = json_result[name]["last_run"]
+               for (var i = 0; i < result_machines.length; i++) {
+                   if (result[result_machines[i]]["retcode"] !== "" && result[result_machines[i]]["retcode"] !== 0){
+                       run_result = 2
+                       crons[i]["result"] = run_result
+                       crons[i]["last_run"] = json_result[name]["last_run"]
+                       break
+                   }
+               }
+               break
+             }
+          }
+        }
+        this.setState({ jobs: crons });
     }
   }
 
@@ -169,8 +200,9 @@ class JobsTable extends React.Component {
 	    <tbody>  
               <tr>
                 <th style={{ width: "15%" }}>Name</th>
-                <th style={{ width: "55%" }}>Command</th>
+                <th style={{ width: "40%" }}>Command</th>
                 <th style={{ width: "20%" }}>Running on</th>
+                <th style={{ width: "15%" }}>Last run </th>
                 <th style={{ width: "10%" }}>Group</th>
               </tr>
 	    </tbody>
