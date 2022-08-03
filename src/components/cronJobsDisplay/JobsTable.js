@@ -15,6 +15,7 @@ class JobsTable extends React.Component {
       jobs: [],
       search: "",
 //      currentTime: new Date().toLocaleString(),
+      backend_version:""
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
@@ -26,16 +27,20 @@ class JobsTable extends React.Component {
   }
 
   handleData(data) {
+    if (JSON.parse(data).hasOwnProperty("sp_version")){
+        var json_result_version = JSON.parse(data).sp_version;
+        this.setState({ backend_version: json_result_version});
+    }
     //config
     if (JSON.parse(data).hasOwnProperty("config")) {
       var json_result_config = JSON.parse(data).config.crons;
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
       for (var i = 0; i < keys.length; i++) {
-        var obj = {}
-        obj.subscribe = keys[i]
-        var jsonString = JSON.stringify(obj)
-        socket.send(jsonString);
+        //var obj = {}
+        //obj.subscribe = keys[i]
+        //var jsonString = JSON.stringify(obj)
+        //socket.send(jsonString);
 
         cronJobs.push({
           id: i,
@@ -77,7 +82,8 @@ class JobsTable extends React.Component {
       }
 
       this.setState({ jobs: cronJobs.sort(compare)});
-    } else if (JSON.parse(data).hasOwnProperty("running")) {
+    }
+    if (JSON.parse(data).hasOwnProperty("running")) {
       cronJobs = this.state.jobs;
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
@@ -97,34 +103,34 @@ class JobsTable extends React.Component {
       }
 
       this.setState({ jobs: cronJobs });
-    } else {
-        // details
-        var crons = this.state.jobs
-        var json_result = JSON.parse(data);
-        var name = Object.keys(json_result)[0];
-
-        if ("results" in json_result[name]){
-          var result = json_result[name]["results"]
-          for (var i = 0; i < crons.length; i++) {
-             if (name == crons[i]["name"]){
-               var result_machines = Object.keys(result)
-               var run_result = 1
-               for (var i = 0; i < result_machines.length; i++) {
-                   if (result[result_machines[i]]["retcode"] !== "" && result[result_machines[i]]["retcode"] !== 0){
-                       run_result = 2
-                       crons[i]["result"] = run_result
-                       crons[i]["last_run"] = json_result[name]["last_run"]
-                       break
-                   }
-               }
-               crons[i]["result"] = run_result
-               crons[i]["last_run"] = json_result[name]["last_run"]
-               break
-             }
-          }
-        }
-        this.setState({ jobs: crons });
     }
+
+    if (JSON.parse(data).hasOwnProperty("last_state")) {
+      cronJobs = this.state.jobs;
+      //clear previous data
+      for (i = 0; i < cronJobs.length; i++) {
+        cronJobs[i]["result"] = 0;
+        cronJobs[i]["last_run"] = "";
+      }
+
+      var json_result_last_state = JSON.parse(data).last_state;
+      var keys_last_state = Object.keys(json_result_last_state);
+      for (i = 0; i < keys_last_state.length; i++) {
+          var key_name = keys_last_state[i]
+          for (var j = 0; j < cronJobs.length; j++) {
+            if (cronJobs[j]["name"] === key_name) {
+              if (json_result_last_state[key_name]["result_ok"] === false) {
+                  cronJobs[j]["result"] = 2
+              } else {
+                  cronJobs[j]["result"] = 1
+              }
+              cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
+              break;
+            }
+          }
+      }
+    }
+
   }
 
   componentDidMount() {
@@ -221,7 +227,7 @@ class JobsTable extends React.Component {
         </p>
         <div className = "versions">
             <p>UI: {UI_VERSION}</p>
-            <p>Backend: vx.y.z</p>
+            <p>Backend: {this.state.backend_version}</p>
         </div>
       </div>
     );

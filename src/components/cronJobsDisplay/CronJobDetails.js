@@ -223,7 +223,7 @@ class CronJobDetails extends React.Component {
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
         }
-	if (data[name].hasOwnProperty("overlap")){
+	    if (data[name].hasOwnProperty("overlap")){
           this.setState({ overlap : data[name]["overlap"]});
         }
       } 

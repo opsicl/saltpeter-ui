@@ -101,7 +101,7 @@ class CronJob extends React.Component {
           key={this.props.job.id}
           className="output"
           onClick = {this.handleHistory}
-          style = {{cursor: "pointer"}}>
+          style = {{color: "#FFFFFF", cursor: "pointer"}}>
             <td>{this.props.job.name}</td>
             <td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>
             <td style={{textAlign:"center"}}> - </td>
