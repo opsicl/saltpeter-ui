@@ -7,7 +7,6 @@ on:
     branches: [ master ]
     
 env:
-    SHA6: ${GITHUB_SHA::6}
     NODE_VERSION: '12.x'  # set this to the node version to use
 
 jobs:
@@ -26,32 +25,10 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: npm install and build
       run: |
-        echo '{"version": "${{ env.SHA6 }}" }' > src/version.json
+        echo '{"version": "${{ github.sha::6 }}" }' > src/version.json
         cat src/version.json
         npm install 
         npm run build --if-present
       env:
          CI: false
-    - name: Compress build to build.zip
-      run: |
-          zip -r build build/*
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@main
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          tag_name: release_${{ env.SHA6 }}
-          release_name: Release ${{ env.SHA6 }}
-          draft: false
-          prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./build.zip
-          asset_name: build.zip
-          asset_content_type: application/zip
+
