@@ -25,6 +25,8 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: npm install and build
       run: |
+        ls
+        pwd
         npm install 
         npm run build --if-present
       env:
