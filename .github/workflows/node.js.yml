@@ -25,7 +25,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: npm install and build
       run: |
-        echo "{"version": ${{ github.sha }} } " > src/version.json
+        echo '{"version": "${{ github.sha }} }"' > src/version.json
         cat src/version.json
         npm install 
         npm run build --if-present
