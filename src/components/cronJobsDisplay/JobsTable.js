@@ -109,8 +109,6 @@ class JobsTable extends React.Component {
              if (name == crons[i]["name"]){
                var result_machines = Object.keys(result)
                var run_result = 1
-               crons[i]["result"] = run_result
-               crons[i]["last_run"] = json_result[name]["last_run"]
                for (var i = 0; i < result_machines.length; i++) {
                    if (result[result_machines[i]]["retcode"] !== "" && result[result_machines[i]]["retcode"] !== 0){
                        run_result = 2
@@ -119,6 +117,8 @@ class JobsTable extends React.Component {
                        break
                    }
                }
+               crons[i]["result"] = run_result
+               crons[i]["last_run"] = json_result[name]["last_run"]
                break
              }
           }
