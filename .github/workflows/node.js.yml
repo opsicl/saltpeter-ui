@@ -26,7 +26,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: npm install and build
       run: |
-        echo '{"version": "$SHA6" }' > src/version.json
+        echo '{"version": "${{ env.SHA6 }}" }' > src/version.json
         cat src/version.json
         npm install 
         npm run build --if-present
@@ -41,8 +41,8 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          tag_name: release_$SHA6
-          release_name: Release $SHA6
+          tag_name: release_${{ env.SHA6 }}
+          release_name: Release ${{ env.SHA6 }}
           draft: false
           prerelease: false
     - name: Upload Release Asset
