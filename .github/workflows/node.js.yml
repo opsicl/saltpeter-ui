@@ -43,8 +43,8 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          tag_name: release_ ${{ steps.vars.outputs.sha_short }}
-          release_name: Release  ${{ steps.vars.outputs.sha_short }}
+          tag_name: release_ ${{ github.sha }}
+          release_name: Release  ${{ github.sha }}
           draft: false
           prerelease: false
     - name: Upload Release Asset
