@@ -64,6 +64,7 @@ class JobsTable extends React.Component {
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
           result: 0, //0-did not run/ 1-success/ 2-fail
+          result-string: '#notrun',
           last_run: "",
         });
       }
@@ -111,6 +112,7 @@ class JobsTable extends React.Component {
       for (i = 0; i < cronJobs.length; i++) {
         cronJobs[i]["result"] = 0;
         cronJobs[i]["last_run"] = "";
+	cronJobs[i]["result-string"] = "#notrun";
       }
 
       var json_result_last_state = JSON.parse(data).last_state;
@@ -121,8 +123,10 @@ class JobsTable extends React.Component {
             if (cronJobs[j]["name"] === key_name) {
               if (json_result_last_state[key_name]["result_ok"] === false) {
                   cronJobs[j]["result"] = 2
+		  cronJobs[j]["result-string"] = "#fail"
               } else {
                   cronJobs[j]["result"] = 1
+                  cronJobs[j]["result-string"] = "#pass"
               }
               cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
               break;
@@ -172,7 +176,8 @@ class JobsTable extends React.Component {
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
           -1 ||
         job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
-        job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+        job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
+	job.result-string.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
