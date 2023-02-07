@@ -15,7 +15,32 @@ class JobsTable extends React.Component {
       jobs: [],
       search: "",
 //      currentTime: new Date().toLocaleString(),
-      backend_version:""
+      backend_version:"",
+      settings: {
+	      column_name_checked: true, 
+	      column_command_checked: true,
+	      column_cwd_checked: false,
+	      column_user_checked: false,
+	      column_soft_timeout_checked: false,
+	      column_hard_timeout_checked: false,
+	      column_targets_checked: false,
+	      column_target_type_checked: false,
+	      column_number_of_targets_checked: false,
+	      column_dom_checked: false,
+	      column_dow_checked: false,
+	      column_hour_checked: false,
+	      column_min_checked: false,
+	      column_mon_checked: false,
+	      column_sec_checked: false,
+	      column_year_checked: false,
+	      column_batch_size_checked: false,
+	      column_running_on_checked: true, 
+	      column_last_run_checked: true, 
+	      column_group_checked: true, 
+	      column_result_checked: false,
+	      columns_width:"15%",
+	      column_command_width:"40%"
+      }
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
@@ -151,11 +176,9 @@ class JobsTable extends React.Component {
       self.setState({jobs: []});
     }
 
-
-  //  this.interval = setInterval(
-    //  () => this.setState({ currentTime: new Date().toLocaleString() }),
-     // 1000
-    //);
+    if (window.localStorage.getItem('settingsState')){
+      this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
+    }
   }
 
   componentWillUnmount() {
@@ -182,7 +205,7 @@ class JobsTable extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item}/>
+      <CronJob key={item.id} job={item} settings={this.state.settings}/>
     ));
 
     return (
@@ -210,11 +233,27 @@ class JobsTable extends React.Component {
           <table id="cronsTable" className="data">
 	    <tbody>  
               <tr>
-                <th style={{ width: "15%" }}>Name</th>
-                <th style={{ width: "40%" }}>Command</th>
-                <th style={{ width: "20%" }}>Running on</th>
-                <th style={{ width: "15%" }}>Last run </th>
-                <th style={{ width: "10%" }}>Group</th>
+                {this.state.settings['column_name_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Name</th>:""}
+	        {this.state.settings['column_command_checked']?<th style={{ width: this.state.settings['column_command_width'] }}>Command</th>:""}
+	    	{this.state.settings['column_cwd_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Cwd</th>:""}
+	        {this.state.settings['column_user_checked']?<th style={{ width: this.state.settings['columns_width'] }}>User</th>:""}
+	        {this.state.settings['column_soft_timeout_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Soft Timeout</th>:""}
+	        {this.state.settings['column_hard_timeout_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Hard Timeout</th>:""}
+	        {this.state.settings['column_targets_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Targets</th>:""}
+	        {this.state.settings['column_target_type_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Target Type</th>:""}
+	        {this.state.settings['column_number_of_targets_checked']?<th style={{ width: this.state.settings['columns_width'] }}>No of targets</th>:""}
+	        {this.state.settings['column_dom_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Dom</th>:""}
+	        {this.state.settings['column_dow_checked']?<th style={{ width: this.state.settings['columns_width'] }}>Dow</th>:""}
+	        {this.state.settings['column_hour_checked']?<th style={{ width: this.state.settings['columns_width'] }}>hour</th>:""}
+	        {this.state.settings['column_min_checked']?<th style={{ width: this.state.settings['columns_width'] }}>min</th>:""}
+	        {this.state.settings['column_mon_checked']?<th style={{ width: this.state.settings['columns_width'] }}>mon</th>:""}
+	        {this.state.settings['column_sec_checked']?<th style={{ width: this.state.settings['columns_width'] }}>sec</th>:""}
+	        {this.state.settings['column_year_checked']?<th style={{ width: this.state.settings['columns_width'] }}>year</th>:""}
+	        {this.state.settings['column_group_checked']?<th style={{ width: this.state.settings['columns_width'] }}>group</th>:""}
+	        {this.state.settings['column_batch_size_checked']?<th style={{ width: this.state.settings['columns_width'] }}>batch size</th>:""}
+	        {this.state.settings['column_running_on_checked']?<th style={{ width: this.state.settings['columns_width'] }}>running on</th>:""}
+	        {this.state.settings['column_result_checked']?<th style={{ width: this.state.settings['columns_width'] }}>result</th>:""}
+	        {this.state.settings['column_last_run_checked']?<th style={{ width: this.state.settings['columns_width'] }}>last run</th>:""}
               </tr>
 	    </tbody>
           <tbody>{tableData}</tbody>

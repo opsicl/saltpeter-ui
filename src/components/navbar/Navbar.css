@@ -52,10 +52,10 @@
 }
 
 .nav-text {
-  display: flex;
-  justify-content: flex-start;
+  float: left;
   list-style: none;
   padding-top: 10px;
+  padding-right: 5%;
 }
 
 .nav-text a {
@@ -75,7 +75,7 @@
 
 .nav-left {
   text-align: right;
-  width: auto;
+  width: 50%;
   float: left;
   padding-left: 4%;
 }

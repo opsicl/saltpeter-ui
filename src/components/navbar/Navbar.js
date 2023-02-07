@@ -29,7 +29,7 @@ class Navbar extends React.Component{
                 <h1 id="title" className="title" style={{ width: "90%", marginRight:"auto", marginLeft:"auto"}}>
                     SALTPETER
                 </h1>
-	            <ul style={{width: "90%", marginRight:"auto", marginLeft:"auto"}}>
+	        <ul style={{width: "90%", marginRight:"auto", marginLeft:"auto"}}>
                     {NavbarData.map((item, index) => {
                         return (
                             <p key={index} className={item.cName}>
