@@ -304,100 +304,98 @@ class Settings extends React.Component {
     <div>
         <h1 className="sectionSettings"><span> COLUMNS </span></h1>
         <div className = "settingsText">
-	        <div>
-	    	    <input type="checkbox" id="name" name="name"/>
-	            <label for="name">name</label>
-	        </div>
-	        <div>
+            <label class="container">name
+                <input type="checkbox" id="name" name="name"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">command
                 <input type="checkbox" id="command" name="command"/>
-                <label for="command">command</label>
-            </div>
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">cwd
                 <input type="checkbox" id="cwd" name="cwd"/>
-                <label for="cwd">cwd</label>
-            </div>
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">user
                 <input type="checkbox" id="user" name="user"/>
-                <label for="user">user</label>
-            </div>
-        </div>
-        <div className = "settingsText">
-	        <div>
-                <input type="checkbox" id="soft_timeout" name="soft_timeout"/>
-                <label for="soft_timeout">soft timeout</label>
-            </div>
-            <div>
-                <input type="checkbox" id="hard_timeout" name="hard_timeout"/>
-                <label for="hard_timeout">hard timeout</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="targets" name="targets"/>
-                <label for="targets">targets</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="target_type" name="target_type"/>
-                <label for="target_type">target type</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="number_of_targets" name="number_of_targets"/>
-                <label for="number_of_targets">number of targets</label>
-            </div>
-        </div>
-        <div className = "settingsText">
-	        <div>
-                <input type="checkbox" id="dom" name="dom"/>
-                <label for="dom">dom</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="dow" name="dow"/>
-                <label for="dow">dow</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="hour" name="hour"/>
-                <label for="hour">hour</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="min" name="min"/>
-                <label for="min">min</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="mon" name="mon"/>
-                <label for="mon">mon</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="sec" name="sec"/>
-                <label for="sec">sec</label>
-            </div>
-	        <div>
-                <input type="checkbox" id="year" name="year"/>
-                <label for="year">year</label>
-            </div>
-        </div>
-        <div className = "settingsText">
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">group
                 <input type="checkbox" id="group" name="group"/>
-                <label for="group">group</label>
-            </div>
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">soft timeout
+                <input type="checkbox" id="soft_timeout" name="soft_timeout"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">hard timeout
+                <input type="checkbox" id="hard_timeout" name="hard_timeout"/>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div className = "settingsText">
+            <label class="container">targets
+                <input type="checkbox" id="targets" name="targets"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">target type
+                <input type="checkbox" id="target_type" name="target_type"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">no. of targets
+                <input type="checkbox" id="number_of_targets" name="number_of_targets"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">batch size
                 <input type="checkbox" id="batch_size" name="batch_size"/>
-                <label for="batch_size">batch size</label>
-            </div>
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">running on
                 <input type="checkbox" id="running_on" name="running_on"/>
-                <label for="running_on">running on</label>
-            </div>
-	        <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">result
                 <input type="checkbox" id="result" name="result"/>
-                <label for="result">result</label>
-            </div>
-            <div>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">last run
                 <input type="checkbox" id="last_run" name="last_run"/>
-                <label for="last_run">last run</label>
-            </div>
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div className = "settingsText">
+            <label class="container">day of month(dom)
+                <input type="checkbox" id="dom" name="dom"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">day of week(dow)
+                <input type="checkbox" id="dow" name="dow"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">hour
+                <input type="checkbox" id="hour" name="hour"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">min
+                <input type="checkbox" id="min" name="min"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">sec
+                <input type="checkbox" id="sec" name="sec"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">month(mon)
+                <input type="checkbox" id="mon" name="mon"/>
+                <span class="checkmark"></span>
+            </label>
+            <label class="container">year
+                <input type="checkbox" id="year" name="year"/>
+                <span class="checkmark"></span>
+            </label>
         </div>
         <div style={{width:"100%", position:"fixed",bottom: "10%",left: "4%"}}>
-            <button className="button" style={{backgroundColor: "#ffffff", color:"#383838"}} onClick={this.submitSettings.bind(this)}>Save</button>
-            <button className="button" style={{backgroundColor: "#ffffff", color:"#383838"}} onClick={this.cancelSettings.bind(this)}>Cancel</button>
+            <button className="button" style={{backgroundColor: "#292929", color:"#ffffff"}} onClick={this.submitSettings.bind(this)}>Save</button>
+            <button className="button" style={{backgroundColor: "#292929", color:"#ffffff"}} onClick={this.cancelSettings.bind(this)}>Cancel</button>
         </div>
     </div>
     );
