@@ -1,4 +1,6 @@
 import React from "react";
+import "./Settings.css";
+import { withRouter } from 'react-router-dom';
 let apis = require("../../version.json");
 const UI_VERSION = apis.version;
 
@@ -33,6 +35,7 @@ class Settings extends React.Component {
     };
     this.handleData.bind(this);
     this.submitSettings.bind(this);
+    this.cancelSettings.bind(this);
   }
 
   setState(state) {
@@ -232,6 +235,15 @@ class Settings extends React.Component {
 	     columns_width: columns_width, 
 	     column_command_width: column_command_width
      });
+     const { history } = this.props;
+     history.push({
+      pathname: "/"})
+  }
+
+  cancelSettings() {
+     const { history } = this.props;
+     history.push({
+     pathname: "/"})
   }
 
   componentDidMount() {
@@ -289,26 +301,28 @@ class Settings extends React.Component {
 
   render() { 
     return (
-      <div style={{color:"white"}}>
-	    <div>Settings</div>
-	    <div>Columns</div>
-	    <div>
-	    	<input type="checkbox" id="name" name="name"/>
-	        <label for="name">name</label>
-	    </div>
-	    <div>
+    <div>
+        <h1 className="sectionSettings"><span> COLUMNS </span></h1>
+        <div className = "settingsText">
+	        <div>
+	    	    <input type="checkbox" id="name" name="name"/>
+	            <label for="name">name</label>
+	        </div>
+	        <div>
                 <input type="checkbox" id="command" name="command"/>
                 <label for="command">command</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="cwd" name="cwd"/>
                 <label for="cwd">cwd</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="user" name="user"/>
                 <label for="user">user</label>
             </div>
-	    <div>
+        </div>
+        <div className = "settingsText">
+	        <div>
                 <input type="checkbox" id="soft_timeout" name="soft_timeout"/>
                 <label for="soft_timeout">soft timeout</label>
             </div>
@@ -316,59 +330,63 @@ class Settings extends React.Component {
                 <input type="checkbox" id="hard_timeout" name="hard_timeout"/>
                 <label for="hard_timeout">hard timeout</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="targets" name="targets"/>
                 <label for="targets">targets</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="target_type" name="target_type"/>
                 <label for="target_type">target type</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="number_of_targets" name="number_of_targets"/>
-                <label for="number_of_targets">number_of_targets</label>
+                <label for="number_of_targets">number of targets</label>
             </div>
-	    <div>
+        </div>
+        <div className = "settingsText">
+	        <div>
                 <input type="checkbox" id="dom" name="dom"/>
                 <label for="dom">dom</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="dow" name="dow"/>
                 <label for="dow">dow</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="hour" name="hour"/>
                 <label for="hour">hour</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="min" name="min"/>
                 <label for="min">min</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="mon" name="mon"/>
                 <label for="mon">mon</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="sec" name="sec"/>
                 <label for="sec">sec</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="year" name="year"/>
                 <label for="year">year</label>
             </div>
-	    <div>
+        </div>
+        <div className = "settingsText">
+	        <div>
                 <input type="checkbox" id="group" name="group"/>
                 <label for="group">group</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="batch_size" name="batch_size"/>
                 <label for="batch_size">batch size</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="running_on" name="running_on"/>
                 <label for="running_on">running on</label>
             </div>
-	    <div>
+	        <div>
                 <input type="checkbox" id="result" name="result"/>
                 <label for="result">result</label>
             </div>
@@ -376,9 +394,12 @@ class Settings extends React.Component {
                 <input type="checkbox" id="last_run" name="last_run"/>
                 <label for="last_run">last run</label>
             </div>
-
-	    <button onClick={this.submitSettings.bind(this)}>Submit</button>
-      </div>
+        </div>
+        <div style={{width:"100%", position:"fixed",bottom: "10%",left: "4%"}}>
+            <button className="button" style={{backgroundColor: "#ffffff", color:"#383838"}} onClick={this.submitSettings.bind(this)}>Save</button>
+            <button className="button" style={{backgroundColor: "#ffffff", color:"#383838"}} onClick={this.cancelSettings.bind(this)}>Cancel</button>
+        </div>
+    </div>
     );
   }
 }
