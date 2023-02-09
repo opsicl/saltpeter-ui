@@ -240,6 +240,7 @@ class JobsTable extends React.Component {
       }
   }
 
+
   componentDidMount() {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
