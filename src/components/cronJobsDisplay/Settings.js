@@ -235,9 +235,9 @@ class Settings extends React.Component {
 	     columns_width: columns_width, 
 	     column_command_width: column_command_width
      });
-     const { history } = this.props;
-     history.push({
-      pathname: "/"})
+     //const { history } = this.props;
+     //history.push({
+     // pathname: "/"})
   }
 
   cancelSettings() {
@@ -305,97 +305,93 @@ class Settings extends React.Component {
         <h1 className="sectionSettings"><span> COLUMNS </span></h1>
         <div className = "settingsText">
             <label class="container">name
-                <input type="checkbox" id="name" name="name"/>
+                <input type="checkbox" id="name" name="name" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">command
-                <input type="checkbox" id="command" name="command"/>
+                <input type="checkbox" id="command" name="command" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">cwd
-                <input type="checkbox" id="cwd" name="cwd"/>
+                <input type="checkbox" id="cwd" name="cwd" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">user
-                <input type="checkbox" id="user" name="user"/>
+                <input type="checkbox" id="user" name="user" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">group
-                <input type="checkbox" id="group" name="group"/>
+                <input type="checkbox" id="group" name="group" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">soft timeout
-                <input type="checkbox" id="soft_timeout" name="soft_timeout"/>
+                <input type="checkbox" id="soft_timeout" name="soft_timeout" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">hard timeout
-                <input type="checkbox" id="hard_timeout" name="hard_timeout"/>
+                <input type="checkbox" id="hard_timeout" name="hard_timeout" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
         </div>
         <div className = "settingsText">
             <label class="container">targets
-                <input type="checkbox" id="targets" name="targets"/>
+                <input type="checkbox" id="targets" name="targets" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">target type
-                <input type="checkbox" id="target_type" name="target_type"/>
+                <input type="checkbox" id="target_type" name="target_type" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">no. of targets
-                <input type="checkbox" id="number_of_targets" name="number_of_targets"/>
+                <input type="checkbox" id="number_of_targets" name="number_of_targets" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">batch size
-                <input type="checkbox" id="batch_size" name="batch_size"/>
+                <input type="checkbox" id="batch_size" name="batch_size" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">running on
-                <input type="checkbox" id="running_on" name="running_on"/>
+                <input type="checkbox" id="running_on" name="running_on" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">result
-                <input type="checkbox" id="result" name="result"/>
+                <input type="checkbox" id="result" name="result" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">last run
-                <input type="checkbox" id="last_run" name="last_run"/>
+                <input type="checkbox" id="last_run" name="last_run" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
         </div>
         <div className = "settingsText">
             <label class="container">day of month(dom)
-                <input type="checkbox" id="dom" name="dom"/>
+                <input type="checkbox" id="dom" name="dom" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">day of week(dow)
-                <input type="checkbox" id="dow" name="dow"/>
+                <input type="checkbox" id="dow" name="dow" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">hour
-                <input type="checkbox" id="hour" name="hour"/>
+                <input type="checkbox" id="hour" name="hour" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">min
-                <input type="checkbox" id="min" name="min"/>
+                <input type="checkbox" id="min" name="min" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">sec
-                <input type="checkbox" id="sec" name="sec"/>
+                <input type="checkbox" id="sec" name="sec" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">month(mon)
-                <input type="checkbox" id="mon" name="mon"/>
+                <input type="checkbox" id="mon" name="mon" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">year
-                <input type="checkbox" id="year" name="year"/>
+                <input type="checkbox" id="year" name="year" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
-        </div>
-        <div style={{width:"100%", position:"fixed",bottom: "10%",left: "4%"}}>
-            <button className="button" style={{backgroundColor: "#292929", color:"#ffffff"}} onClick={this.submitSettings.bind(this)}>Save</button>
-            <button className="button" style={{backgroundColor: "#292929", color:"#ffffff"}} onClick={this.cancelSettings.bind(this)}>Cancel</button>
         </div>
     </div>
     );

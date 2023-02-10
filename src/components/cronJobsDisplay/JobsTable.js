@@ -4,6 +4,7 @@ import CronJob from "./CronJob";
 import "./JobsTable.css";
 //import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
+import { Link } from "react-router-dom";
 
 let apis = require("../../version.json");
 const UI_VERSION = apis.version;
@@ -13,10 +14,10 @@ class JobsTable extends React.Component {
     super(props);
     this.state = {
       jobs: [],
-      search: "",
+        search: "",
 //      currentTime: new Date().toLocaleString(),
-      backend_version:"",
-      settings: {
+        backend_version:"",
+        settings: {
 	      column_name_checked: true, 
 	      column_command_checked: true,
 	      column_cwd_checked: false,
@@ -43,15 +44,39 @@ class JobsTable extends React.Component {
       },
       column_asc_sort:"",
       column_desc_sort:"",
+      active_columns:[],
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
     this.sortColumn.bind(this);
+    this.sendToSettings.bind(this)
+  }
+
+  sendToSettings(){
+      const nextTitle = 'Saltpeter';
+      const nextURL = "settings";
+      const nextState = { additionalInformation: 'Updated the URL with JS' };
+      window.history.pushState(nextState,nextTitle,nextURL);
   }
 
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
+    console.log(event.target.value.substr(0, 20)) 
+    if (event.target.value.substr(0, 20)) {
+        const nextTitle = 'Saltpeter';
+        const nextURL = "?search=" + event.target.value.substr(0, 20);
+        const nextState = { additionalInformation: 'Updated the URL with JS' };
+        // This will create a new entry in the browser's history, without reloading
+        window.history.replaceState(nextState,nextTitle,nextURL);
+    } else {
+        const nextURL = "/"
+        const nextTitle = 'Saltpeter';
+        const nextState = { additionalInformation: 'Updated the URL with JS' };
+        // This will create a new entry in the browser's history, without reloading
+        window.history.replaceState(nextState,nextTitle,nextURL);
+    }
+
   }
 
   handleData(data) {
@@ -65,11 +90,6 @@ class JobsTable extends React.Component {
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
       for (var i = 0; i < keys.length; i++) {
-        //var obj = {}
-        //obj.subscribe = keys[i]
-        //var jsonString = JSON.stringify(obj)
-        //socket.send(jsonString);
-
         cronJobs.push({
           id: i,
           name: keys[i],
@@ -96,22 +116,6 @@ class JobsTable extends React.Component {
           last_run: ""
         });
       }
-      /*
-      function compare(a, b) {
-        const groupA = a.group.toUpperCase();
-        const groupB = b.group.toUpperCase();
-
-        let comparison = 0;
-        if (groupA > groupB) {
-            comparison = 1;
-        } else if (groupA < groupB) {
-            comparison = -1;
-        }
-        return comparison;
-      }
-
-      this.setState({ jobs: cronJobs.sort(compare)});
-      */
       this.setState({jobs: cronJobs})
     }
     if (JSON.parse(data).hasOwnProperty("running")) {
@@ -244,7 +248,11 @@ class JobsTable extends React.Component {
   componentDidMount() {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
-    this.setState({ search: "" });
+    if (window.location.href.split("=")[1]){
+        this.setState({ search: window.location.href.split("=")[1] });
+    } else {
+        this.setState({ search:""})
+    }
 
     var self = this;
     socket.onmessage =  function(event) {
@@ -258,6 +266,23 @@ class JobsTable extends React.Component {
     if (window.localStorage.getItem('settingsState')){
       this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
     }
+    
+    var settings = JSON.parse(window.localStorage.getItem('settingsState'))
+    var active_columns = []
+    if (settings) {
+        for (const col in settings) {
+            if (settings[col]){
+                if ((col != "column_command_width") && (col != "columns_width")) {
+                    //var col_name = col.replace("column_","").replace("_checked","").replace("_"," ")
+                    var col_name = col.replace("column_","").replace("_checked","")
+                    active_columns.push(col_name)
+                }
+            }
+        }
+    } else {
+        active_columns=["name","command","group","running_on","last_run"]
+    }
+    this.setState({ active_columns: active_columns})
   }
 
   componentWillUnmount() {
@@ -265,21 +290,20 @@ class JobsTable extends React.Component {
     //clearInterval(this.interval);
   }
 
-  render() { 
+  render() {
     window.addEventListener("keydown",function (e) {             
     if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {        
         e.preventDefault();         
         document.getElementById("searchBarInput").focus()
       }      
     })
-
     let filteredJobs = this.state.jobs.filter((job) => {
       return (
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
           -1 ||
         job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
         job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
-	job.resultstring.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+	    job.resultstring.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
@@ -294,15 +318,24 @@ class JobsTable extends React.Component {
             <tr>
               <th>Crons</th>
             </tr>
-            <tr>
-              <th>
+     </tbody>
+        </table>
+        <table className="tableName2">
+     <tbody>
+            <tr style={{textAlign:"left"}}>
+                <Link to="/settings">
+                    <th style={{cursor:"pointer",paddingLeft:"20%",textAlign:"left",width:"30%", fontSize:"12px", color:"#576AE2"}}>
+                        COLUMNS
+                    </th>
+                </Link>
+              <th style={{width:"70%", textAlign:"left"}}>
                 <input
                   type="text"
                   id="searchBarInput"
                   className="searchBar"
+                  placeholder="Search"
                   value={this.state.search}
                   onChange={this.updateSearch.bind(this)}
-                  placeholder="Search"
 	          autoFocus
                 />
               </th>

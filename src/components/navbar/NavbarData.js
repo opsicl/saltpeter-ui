@@ -4,8 +4,4 @@ export const NavbarData = [
     path: "/",
     cName: "nav-text",
   },
-  { title: "Settings",
-    path: "/settings",
-    cName: "nav-text",
-  }
 ];

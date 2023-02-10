@@ -9,7 +9,7 @@
 }
 
 body {
-  background-color: #121212;
+  background-color: #000000;
 }
 
 .data {
@@ -20,11 +20,11 @@ body {
   font-size: 13px;
   border-collapse: collapse;
   width: 80%;
-  color: #d6d6d6;
+  color: #DFD9F5;
   margin-top: 0px;
   margin-left: auto;
   margin-right: auto;
-  background-color: #292929;
+  background-color: #120524;
   margin-bottom: 5%;
   margin-top: 1px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
@@ -40,8 +40,7 @@ body {
 }
 
 .data tr:hover {
-  color: white;
-  font-weight: bold;
+  background-color: #383838;
 }
 
 .data th {
@@ -52,8 +51,8 @@ body {
   line-height: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background-color: #292929;
-  color: #e2e2e2;
+  background-color: #120524;
+  color: #6AC3EC;
   text-shadow: 2px 2px 4px #000000;
 }
 
@@ -62,7 +61,6 @@ body {
   border-top-left-radius: 5px;
   border-collapse: collapse;
   width: 100%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
 }
 
 .tableName th {
@@ -76,10 +74,41 @@ body {
   line-height: 14px;
   text-transform: uppercase;
   letter-spacing: 0px;
-  background-color: #292929;
-  color: #d6d6d6;
+  background-color: #120524;
+  color: #BA4FD9;
   text-shadow: 2px 2px 4px #000000;
 }
+
+.tableName2 {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tableName2 th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  font-family: Montserrat-Regular;
+  font-size: 20px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  background-color: #120524;
+  color: #C252E2;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName2 {
+  background-color: #120524;
+  width: 80%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+}
+
 
 .searchBar {
   border-radius: 5px;
@@ -89,7 +118,7 @@ body {
   background-position: left center;
   background-position-x: 5px;
   background-size: 1.5rem 1.5rem;
-  width: 40%;
+  width: 60%;
   font-size: 13px;
   font-family: Montserrat-Medium;
   padding: 12px 20px 12px 40px;

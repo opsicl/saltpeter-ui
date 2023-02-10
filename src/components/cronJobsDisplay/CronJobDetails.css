@@ -8,6 +8,11 @@
   src: url('../fonts/montserrat/Montserrat-Medium.ttf');
 }
 
+@font-face {
+  font-family: Mono-space;
+  src: url('../fonts/monospace/Monospace.ttf');
+}
+
 .sectionTitle {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -24,7 +29,7 @@
   line-height: 14px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #2a7316;
+  color: #C252E2;
 }
 
 .sectionDetails {
@@ -40,7 +45,23 @@
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;
-  color: white;
+  color: #DFD9F5;
+}
+
+.sectionDetailsOutput {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  font-family: Mono-space;
+  font-size: 18px;
+  line-height: 14px;
+  letter-spacing: 1px;
+  color: #DFD9F5;
 }
 
 .cronTitle {
@@ -55,7 +76,7 @@
   font-size: 20px;
   line-height: 14px;
   letter-spacing: 2px;
-  color: #d6d6d6;
+  color: #6ECBF6;
   text-shadow: 2px 2px 4px #000000;
 }
 
@@ -136,7 +157,7 @@
   width: 90%;
   text-align: center;
   font-family: Montserrat-Regular;
-  color: white;
+  color: #DFD9F5;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;

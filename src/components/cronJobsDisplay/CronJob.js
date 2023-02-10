@@ -45,7 +45,7 @@ class CronJob extends React.Component {
         <tr
           key={this.props.job.id}
 	      className="output"
-          style={{ color: "#6666FF", cursor: "pointer"}}
+          style={{ color: "#6666ff", cursor: "pointer"}}
           onClick={this.handleHistory}>
 	     {this.props.settings['column_name_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.name}</div></td>:""}
              {this.props.settings['column_command_checked']?<td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>:""}
@@ -143,7 +143,7 @@ class CronJob extends React.Component {
           key={this.props.job.id}
           className="output"
           onClick = {this.handleHistory}
-          style = {{color: "#FFFFFF", cursor: "pointer"}}>
+          style = {{color: "#DFD9F5", cursor: "pointer"}}>
 	    {this.props.settings['column_name_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.name}</div></td>:""}
              {this.props.settings['column_command_checked']?<td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>:""}
              {this.props.settings['column_cwd_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.cwd}</div></td>:""}
