@@ -10,14 +10,14 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 function App(){
     return (
       <div>
-        <Router>
-          <Navbar />
-          <Switch>
-            <Route path="/" exact component={JobsTable} />
-	    <Route path="/settings" exact component={Settings} />
-	    <Route path="/details/:id" render={(props) => <CronJobDetails {...props} />} />
-          </Switch>
-        </Router>
+         <Router>
+           <Navbar />
+           <Switch>
+             <Route path="/" exact component={JobsTable} />
+	         <Route path="/settings" exact component={Settings} />
+	         <Route path="/details/:id" render={(props) => <CronJobDetails {...props} />} />
+           </Switch>
+         </Router>
       </div>
     );
 }
