@@ -138,7 +138,7 @@
   width: 40%;
   overflow: auto;
   scrollbar-color: #1D3E14 #292929;
-  background-color: #220524;
+  #background-color: #220524;
 }
 
 .details2 {
@@ -148,7 +148,7 @@
   float: left;
   width: 50%;
   scrollbar-color: #1D3E14 #292929;
-  background-color: #220524;
+  #background-color: #220524;
   overflow: auto;
 }
 
