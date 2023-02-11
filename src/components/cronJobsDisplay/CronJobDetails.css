@@ -45,24 +45,65 @@
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;
+  color: #6ECBF5;
+  text-indent: 2em;
+  font-style: italic;
+}
+
+.machineNameLeft {
+  font-style: normal;
+  text-indent: 3em;
+  font-weight: bold;
+  #color: #DEFE47;
+}
+
+.machineNameRight {
+  font-style: normal;
+  text-indent: 2em;
+  font-weight: bold;
+  color: #DEFE47;
+}
+
+
+#machineOutput {
+  text-indent: 4em;
+  color: #6ECBF5;
+}
+
+.sectionDetails span {
+  font-style: normal;
   color: #DFD9F5;
 }
 
 .sectionDetailsOutput {
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
+  padding-left: 5%;
   padding-top: 5px;
   padding-bottom: 5px;
-  padding-left: 5%;
+}
+.sectionDetailsOutput textarea{
+  padding: 10px;
+  border-radius: 5px;
+  width: 95%;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
   font-family: Mono-space;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;
+  border-color: #BA4FD9;
+  background-color: #000;
   color: #DFD9F5;
+  overflow: auto;
+  #overflow-x: scroll;
+  #overflow-y: scroll;
 }
+
+.sectionDetailsOutput textarea:focus {
+  outline-color: #BA4FD9;
+  outline-style: solid;
+}
+
 
 .cronTitle {
   border-top-right-radius: 5px;
@@ -76,7 +117,7 @@
   font-size: 20px;
   line-height: 14px;
   letter-spacing: 2px;
-  color: #6ECBF6;
+  color: #6ECBF5;
   text-shadow: 2px 2px 4px #000000;
 }
 
@@ -95,16 +136,24 @@
   text-align: left;
   float: left;
   width: 40%;
+  overflow: auto;
   scrollbar-color: #1D3E14 #292929;
+  background-color: #220524;
 }
 
 .details2 {
-  height: 85vh;
+  height: 80vh;
   margin-left: 4%;
   text-align: left;
   float: left;
   width: 50%;
   scrollbar-color: #1D3E14 #292929;
+  background-color: #220524;
+  overflow: auto;
+}
+
+.targetsList {
+  max-height: 20px;
 }
 
 .button {
@@ -172,6 +221,9 @@
 .configTable th {
   font-family: Montserrat-Regular !important;
   padding: 3px !important;
+  color: #6AC3EC;
+
+
 }
 
 

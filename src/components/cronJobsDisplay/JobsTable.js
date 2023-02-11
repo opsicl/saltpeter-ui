@@ -14,33 +14,33 @@ class JobsTable extends React.Component {
     super(props);
     this.state = {
       jobs: [],
-        search: "",
-//      currentTime: new Date().toLocaleString(),
-        backend_version:"",
-        settings: {
-	      column_name_checked: true, 
-	      column_command_checked: true,
-	      column_cwd_checked: false,
-	      column_user_checked: false,
-	      column_soft_timeout_checked: false,
-	      column_hard_timeout_checked: false,
-	      column_targets_checked: false,
-	      column_target_type_checked: false,
-	      column_number_of_targets_checked: false,
-	      column_dom_checked: false,
-	      column_dow_checked: false,
-	      column_hour_checked: false,
-	      column_min_checked: false,
-	      column_mon_checked: false,
-	      column_sec_checked: false,
-	      column_year_checked: false,
-	      column_batch_size_checked: false,
-	      column_running_on_checked: true, 
-	      column_last_run_checked: true, 
-	      column_group_checked: true, 
-	      column_result_checked: false,
-	      columns_width:"15%",
-	      column_command_width:"40%"
+      search: "",
+//    currentTime: new Date().toLocaleString(),
+      backend_version:"",
+      settings: {
+        column_name_checked: true, 
+        column_command_checked: true,
+        column_cwd_checked: false,
+        column_user_checked: false,
+        column_soft_timeout_checked: false,
+        column_hard_timeout_checked: false,
+        column_targets_checked: false,
+        column_target_type_checked: false,
+        column_number_of_targets_checked: false,
+        column_dom_checked: false,
+        column_dow_checked: false,
+        column_hour_checked: false,
+        column_min_checked: false,
+        column_mon_checked: false,
+        column_sec_checked: false,
+        column_year_checked: false,
+        column_batch_size_checked: false,
+        column_running_on_checked: true, 
+        column_last_run_checked: true, 
+        column_group_checked: true, 
+        column_result_checked: false,
+        columns_width:"15%",
+        column_command_width:"40%"
       },
       column_asc_sort:"",
       column_desc_sort:"",
@@ -111,8 +111,7 @@ class JobsTable extends React.Component {
           group: json_result_config[keys[i]]["group"],
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
-          result: 0, //0-did not run/ 1-success/ 2-fail
-          resultstring: '#notrun',
+          result: 'Notrun',
           last_run: ""
         });
       }
@@ -132,6 +131,7 @@ class JobsTable extends React.Component {
         for (var j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_running) {
             cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
+            cronJobs[j]["result"] = "Running";
             break;
           }
         }
@@ -145,27 +145,24 @@ class JobsTable extends React.Component {
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
         cronJobs[i]["result"] = 0;
-        cronJobs[i]["last_run"] = "";
-	cronJobs[i]["resultstring"] = "#notrun";
+        cronJobs[i]["result"] = "Notrun";
       }
 
       var json_result_last_state = JSON.parse(data).last_state;
       var keys_last_state = Object.keys(json_result_last_state);
       for (i = 0; i < keys_last_state.length; i++) {
-          var key_name = keys_last_state[i]
-          for (var j = 0; j < cronJobs.length; j++) {
-            if (cronJobs[j]["name"] === key_name) {
-              if (json_result_last_state[key_name]["result_ok"] === false) {
-                  cronJobs[j]["result"] = 2
-		  cronJobs[j]["resultstring"] = "#fail"
-              } else {
-                  cronJobs[j]["result"] = 1
-                  cronJobs[j]["resultstring"] = "#pass"
-              }
-              cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
-              break;
+        var key_name = keys_last_state[i]
+        for (var j = 0; j < cronJobs.length; j++) {
+          if (cronJobs[j]["name"] === key_name) {
+            if (json_result_last_state[key_name]["result_ok"] === false) {
+                cronJobs[j]["result"] = "Fail"
+            } else {
+                cronJobs[j]["result"] = "Success"
             }
+            cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
+            break;
           }
+        }
       }
     }
 
@@ -209,7 +206,7 @@ class JobsTable extends React.Component {
       }
   
       var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","soft_timeout","hard_timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","result","last_run"]
+      var keys = ["name","command","cwd","user","soft_timeout","hard_timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","resultst","last_run"]
       for (let i=0; i < keys.length; i++) {
           var column_name = keys[i]
           if (keys[i].includes("_")) {
@@ -249,6 +246,7 @@ class JobsTable extends React.Component {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
     if (window.location.href.split("=")[1]){
+        //this needs to be fixed - use proper GET parameters logic, dont parse manually
         this.setState({ search: window.location.href.split("=")[1] });
     } else {
         this.setState({ search:""})
@@ -303,7 +301,7 @@ class JobsTable extends React.Component {
           -1 ||
         job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
         job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
-	    job.resultstring.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+        job.result.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
@@ -314,20 +312,18 @@ class JobsTable extends React.Component {
     return (
       <div>
         <table className="tableName">
-	  <tbody>
+          <tbody>
             <tr>
               <th>Crons</th>
             </tr>
-     </tbody>
+          </tbody>
         </table>
         <table className="tableName2">
-     <tbody>
+          <tbody>
             <tr style={{textAlign:"left"}}>
-                <Link to="/settings">
-                    <th style={{cursor:"pointer",paddingLeft:"20%",textAlign:"left",width:"30%", fontSize:"12px", color:"#576AE2"}}>
-                        COLUMNS
-                    </th>
-                </Link>
+              <th style={{cursor:"pointer",paddingLeft:"30px",textAlign:"left",verticalAlign:"bottom",width:"30%", fontSize:"9px", color:"#576AE2"}}>
+                <Link className="cols" to="/settings">set columns</Link>
+              </th>
               <th style={{width:"70%", textAlign:"left"}}>
                 <input
                   type="text"
@@ -336,39 +332,43 @@ class JobsTable extends React.Component {
                   placeholder="Search"
                   value={this.state.search}
                   onChange={this.updateSearch.bind(this)}
-	          autoFocus
+                  autoFocus
                 />
               </th>
             </tr>
-	  </tbody>
+          </tbody>
         </table>
-          <table id="cronsTable" className="data">
-	    <tbody>  
-              <tr style={{cursor:"pointer"}}>
-                {this.state.settings['column_name_checked']?<th id="name" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'name')}>Name</th>:""}
-	        {this.state.settings['column_command_checked']?<th id="command" style={{ width: this.state.settings['column_command_width']}} onClick={this.sortColumn.bind(this,'command')}>Command</th>:""}
-	    	{this.state.settings['column_cwd_checked']?<th id="cwd" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'cwd')}>Cwd</th>:""}
-	        {this.state.settings['column_user_checked']?<th id="user" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'user')}>User</th>:""}
-	        {this.state.settings['column_soft_timeout_checked']?<th id="soft_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'soft_timeout')}>Soft Timeout</th>:""}
-	        {this.state.settings['column_hard_timeout_checked']?<th id="hard_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'hard_timeout')}>Hard Timeout</th>:""}
-	        {this.state.settings['column_targets_checked']?<th id="targets"style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'targets')}>Targets</th>:""}
-	        {this.state.settings['column_target_type_checked']?<th id="target_type" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'target_type')}>Target Type</th>:""}
-	        {this.state.settings['column_number_of_targets_checked']?<th id="number_of_targets" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'number_of_targets')}>No of targets</th>:""}
-	        {this.state.settings['column_dom_checked']?<th id="dom" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dom')}>Dom</th>:""}
-	        {this.state.settings['column_dow_checked']?<th id="dow" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dow')}>Dow</th>:""}
-	        {this.state.settings['column_hour_checked']?<th id="hour" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'hour')}>hour</th>:""}
-	        {this.state.settings['column_min_checked']?<th id="min" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'min')}>min</th>:""}
-	        {this.state.settings['column_mon_checked']?<th id="mon" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'mon')}>mon</th>:""}
-	        {this.state.settings['column_sec_checked']?<th id="sec" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'sec')}>sec</th>:""}
-	        {this.state.settings['column_year_checked']?<th id="year" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'year')}>year</th>:""}
-	        {this.state.settings['column_group_checked']?<th id="group" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'group')}>group</th>:""}
-	        {this.state.settings['column_batch_size_checked']?<th id="batch_size" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'batch_size')}>batch size</th>:""}
-	        {this.state.settings['column_running_on_checked']?<th id="running_on" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'running_on')}>running on</th>:""}
-	        {this.state.settings['column_result_checked']?<th id="result" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'result')}>result</th>:""}
-	        {this.state.settings['column_last_run_checked']?<th id="last_run" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'last_run')}>last run</th>:""}
-              </tr>
-	    </tbody>
-          <tbody>{tableData}</tbody>
+        <table id="cronsTable" className="data">
+        <div className="cronsdiv">
+          <tbody>  
+            <tr style={{cursor:"pointer"}}>
+              {this.state.settings['column_name_checked']?<th id="name" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'name')}>Name</th>:""}
+              {this.state.settings['column_command_checked']?<th id="command" style={{ width: this.state.settings['column_command_width']}} onClick={this.sortColumn.bind(this,'command')}>Command</th>:""}
+              {this.state.settings['column_cwd_checked']?<th id="cwd" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'cwd')}>Cwd</th>:""}
+              {this.state.settings['column_user_checked']?<th id="user" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'user')}>User</th>:""}
+              {this.state.settings['column_soft_timeout_checked']?<th id="soft_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'soft_timeout')}>Soft Timeout</th>:""}
+              {this.state.settings['column_hard_timeout_checked']?<th id="hard_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'hard_timeout')}>Hard Timeout</th>:""}
+              {this.state.settings['column_targets_checked']?<th id="targets"style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'targets')}>Targets</th>:""}
+              {this.state.settings['column_target_type_checked']?<th id="target_type" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'target_type')}>Target Type</th>:""}
+              {this.state.settings['column_number_of_targets_checked']?<th id="number_of_targets" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'number_of_targets')}>No of targets</th>:""}
+              {this.state.settings['column_dom_checked']?<th id="dom" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dom')}>Dom</th>:""}
+              {this.state.settings['column_dow_checked']?<th id="dow" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dow')}>Dow</th>:""}
+              {this.state.settings['column_hour_checked']?<th id="hour" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'hour')}>hour</th>:""}
+              {this.state.settings['column_min_checked']?<th id="min" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'min')}>min</th>:""}
+              {this.state.settings['column_mon_checked']?<th id="mon" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'mon')}>mon</th>:""}
+              {this.state.settings['column_sec_checked']?<th id="sec" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'sec')}>sec</th>:""}
+              {this.state.settings['column_year_checked']?<th id="year" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'year')}>year</th>:""}
+              {this.state.settings['column_group_checked']?<th id="group" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'group')}>group</th>:""}
+              {this.state.settings['column_batch_size_checked']?<th id="batch_size" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'batch_size')}>batch size</th>:""}
+              {this.state.settings['column_running_on_checked']?<th id="running_on" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'running_on')}>running on</th>:""}
+              {this.state.settings['column_result_checked']?<th id="result" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'result')}>result</th>:""}
+              {this.state.settings['column_last_run_checked']?<th id="last_run" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'last_run')}>last run</th>:""}
+            </tr>
+          </tbody>
+          <tbody>
+              {tableData}
+          </tbody>
+        </div>
         </table>
         <p
           style={{
@@ -376,7 +376,7 @@ class JobsTable extends React.Component {
             fontSize: "12px",
             textAlign: "center",
             columnSpan: "all",
-	    color:"#d6d6d6"
+            color:"#d6d6d6"
           }}
         >
           {filteredJobs == "" ? "No Data Available" : ""}

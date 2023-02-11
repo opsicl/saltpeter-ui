@@ -7,7 +7,6 @@ import { FaPlay } from 'react-icons/fa';
 import { MdWarning } from 'react-icons/md';
 import { FiInfo } from 'react-icons/fi';
 import { BsExclamationCircleFill } from 'react-icons/bs';
-import TextareaAutosize from 'react-autosize-textarea';
 
 let apis = require("../../version.json");
 const UI_VERSION = apis.version;
@@ -64,8 +63,6 @@ class CronJobDetails extends React.Component {
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
   }
-
-
 /*
   killJob = (machine) => {
     var obj = {}
@@ -165,7 +162,7 @@ class CronJobDetails extends React.Component {
               if (minutesDiff < 0) { minutesDiff = 0 }
               if (hoursDiff < 0) {hoursDiff = 0 }
           }
-          machinesRanFor[machine] = hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
+          machinesRanFor[machine] = "ran for: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
         }
         return machinesRanFor;
     }
@@ -385,7 +382,7 @@ class CronJobDetails extends React.Component {
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
-                            <td><div>{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
+                            <td><div style={{ resize:"both", height:"8vh", maxWidth: "auto", overflow:"auto"}} >{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>user</th>
@@ -437,7 +434,7 @@ class CronJobDetails extends React.Component {
                 </div>
 
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
-                <div ClassName="targetsList">
+                <div style={{ resize:"both", height:"20vh", overflow:"auto"}}>
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
@@ -459,16 +456,16 @@ class CronJobDetails extends React.Component {
                         }
                         if (this.circleColor !== "white") {
                             if (this.sign === "start") {
-                                return  <p id={id1} className="machineNameLeft" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <FaPlay style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <FaPlay style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                             }
                             if (this.sign === "stopped") {
-                                return  <p id={id1} className="machineNameLeft" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <FaStop style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <FaStop style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                             }
                             if (this.sign === "warning") {
-                                return  <p id={id1} className="machineNameLeft" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <MdWarning size = {20} style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                                return  <p id={id1} className="sectionDetails" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <MdWarning size = {20} style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                             }
                         } else {
-                            return  <p id={id1} className="machineNameLeft" style={{ cursor: this.cursor, color: "#DFD9F5"}} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
+                            return  <p id={id1} className="sectionDetails" style={{ cursor: this.cursor, color: "#DFD9F5"}} > <FaCircle style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                         }
                     }) : ""}
                 </div>
@@ -477,43 +474,40 @@ class CronJobDetails extends React.Component {
 
             <div className="details2">
                 <h1 className="sectionTitle"><span> LAST RUN </span></h1>
-                <div> {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
+                <div style={{ resize:"both", height: "70vh", overflow:"auto"}} > {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
-                        <p className="machineNameRight">{target}</p>
+                        <p className="sectionDetails" style={{fontWeight:"bold"}}>{target}</p>
                         {this.state.results[target]["starttime"] ?
-                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toLocaleString()}</span></p> : ""} 
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>started at: {new Date(this.state.results[target]["starttime"]).toLocaleString()}</p> : ""} 
                         {this.state.results[target]["endtime"] ? 
-                            <p className="sectionDetails" >ended at: <span>{new Date(this.state.results[target]["endtime"]).toLocaleString()}</span></p>: ""}
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>ended at: {new Date(this.state.results[target]["endtime"]).toLocaleString()}</p>: ""}
                         {this.state.results[target]["starttime"] ?
-                            <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
+                            <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>{this.state.ranForCounter[target]}</p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 
-                            <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""} 
+                            <p className="sectionDetails" style={{fontStyle:"italic", textIndent: "2em"}}>ret code: {this.state.results[target]["retcode"]}</p> : ""} 
                         {this.state.hardTimeoutCounter.hasOwnProperty(target) ?
-                            <p className="sectionDetails" >{this.state.hardTimeoutCounter[target]}</p> : ""}
-                        {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
-                        {this.state.results[target]["ret"] ? <p>
+                            <p className="sectionDetails" style={{textIndent: "2em", color:"#d5ff00", fontStyle:"italic"}}>{this.state.hardTimeoutCounter[target]}</p> : ""}
+                        {this.state.results[target]["ret"] ? <p className="sectionDetails" style={{textIndent: "2em", color:"#018786"}}>Output:</p> : "" }
+                        <p>
                             <div className="sectionDetailsOutput">
-                              <TextareaAutosize wrap="off" maxRows={15}>
-                                {this.state.results[target]["ret"]}
-                              </TextareaAutosize>
+  {this.state.results[target]["ret"].split('\n').map(str => <p>{str}</p>)}
                             </div>
-                          </p> : "" }
-
+                        </p>
                         <br></br>
                     </div>
                   } else { 
                         try {
                             var y = document.getElementById(target+"1");
-                            y.style.color = "#DEFE47";
+                            y.style.color = "white";
                         } catch {
                         }
                         return <div id={target} style={{display:"none"}}></div>
                     }
                 ;}) : ""}
             </div>
-      </div>
-    </div>
+	    </div>
+     </div>
         <div className="versions">
             <p>UI: {UI_VERSION}</p>
             <p>Backend: vx.y.z</p>
