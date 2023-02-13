@@ -297,7 +297,6 @@ class JobsTable extends React.Component {
         column_command_width:"40%"
       }
     }
-    console.log(settings)
     this.setState({ settings: settings})
     var active_columns = []
     if (settings) {
