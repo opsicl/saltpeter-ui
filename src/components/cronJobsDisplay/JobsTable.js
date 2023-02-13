@@ -111,7 +111,7 @@ class JobsTable extends React.Component {
           group: json_result_config[keys[i]]["group"],
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
-          result: 'Notrun',
+          result: 'NotRun',
           last_run: ""
         });
       }
@@ -245,9 +245,10 @@ class JobsTable extends React.Component {
   componentDidMount() {
     const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     this.setState(rehydrate)
-    if (window.location.href.split("=")[1]){
-        //this needs to be fixed - use proper GET parameters logic, dont parse manually
-        this.setState({ search: window.location.href.split("=")[1] });
+    const queryParams = new URLSearchParams(window.location.search);
+    const search_word = queryParams.get('search');
+    if (search_word){
+        this.setState({ search: search_word });
     } else {
         this.setState({ search:""})
     }
