@@ -294,7 +294,7 @@ class Settings extends React.Component {
   }
 
   componentWillUnmount() {
-    //localStorage.setItem('settingsState', JSON.stringify(this.state))
+    localStorage.setItem('settingsState', JSON.stringify(this.state))
   }
 
   render() { 
