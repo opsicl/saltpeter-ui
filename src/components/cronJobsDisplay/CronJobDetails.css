@@ -8,6 +8,11 @@
   src: url('../fonts/montserrat/Montserrat-Medium.ttf');
 }
 
+@font-face {
+  font-family: Mono-space;
+  src: url('../fonts/monospace/Monospace.ttf');
+}
+
 .sectionTitle {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -24,7 +29,7 @@
   line-height: 14px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #2a7316;
+  color: #C252E2;
 }
 
 .sectionDetails {
@@ -40,8 +45,63 @@
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;
-  color: white;
+  color: #6ECBF5;
+  text-indent: 2em;
+  font-style: italic;
 }
+
+.machineNameLeft {
+  font-style: normal;
+  text-indent: 3em;
+  font-weight: bold;
+  #color: #DEFE47;
+}
+
+.machineNameRight {
+  font-style: normal;
+  text-indent: 2em;
+  font-weight: bold;
+  color: #DEFE47;
+}
+
+
+#machineOutput {
+  text-indent: 4em;
+  color: #6ECBF5;
+}
+
+.sectionDetails span {
+  font-style: normal;
+  color: #DFD9F5;
+}
+
+.sectionDetailsOutput {
+  padding-left: 5%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.sectionDetailsOutput textarea{
+  padding: 10px;
+  border-radius: 5px;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  font-family: Mono-space;
+  font-size: 14px;
+  line-height: 14px;
+  letter-spacing: 1px;
+  border-color: #BA4FD9;
+  background-color: #000;
+  color: #DFD9F5;
+  overflow: auto !important;
+}
+
+.sectionDetailsOutput textarea:focus {
+  outline-color: #BA4FD9;
+  outline-style: solid;
+}
+
 
 .cronTitle {
   border-top-right-radius: 5px;
@@ -55,17 +115,17 @@
   font-size: 20px;
   line-height: 14px;
   letter-spacing: 2px;
-  color: #d6d6d6;
+  color: #6ECBF5;
   text-shadow: 2px 2px 4px #000000;
 }
 
 ::-webkit-scrollbar {
   width: 8px;
-  background-color: #292929;
+  background-color: #BA4FD9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1D3E14;
+  background: #BA4FD9;
 }
 
 .details1 {
@@ -74,16 +134,24 @@
   text-align: left;
   float: left;
   width: 40%;
-  scrollbar-color: #1D3E14 #292929;
+  overflow: auto;
+  scrollbar-color: #6ECBF5 #000000;
+  #background-color: #220524;
 }
 
 .details2 {
-  height: 85vh;
+  height: 80vh;
   margin-left: 4%;
   text-align: left;
   float: left;
   width: 50%;
-  scrollbar-color: #1D3E14 #292929;
+  scrollbar-color: #6ECBF5 #000000;
+  #background-color: #220524;
+  overflow: auto;
+}
+
+.targetsList {
+  max-height: 20px;
 }
 
 .button {
@@ -136,7 +204,7 @@
   width: 90%;
   text-align: center;
   font-family: Montserrat-Regular;
-  color: white;
+  color: #DFD9F5;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 1px;
@@ -151,6 +219,9 @@
 .configTable th {
   font-family: Montserrat-Regular !important;
   padding: 3px !important;
+  color: #6AC3EC;
+
+
 }
 
 
