@@ -40,7 +40,6 @@ class Settings extends React.Component {
 
   setState(state) {
     window.localStorage.setItem('settingsState', JSON.stringify(state));
-    console.log(state)
     super.setState(state);
   }
 
@@ -247,9 +246,8 @@ class Settings extends React.Component {
   }
 
   componentDidMount() {
-    //const rehydrate = JSON.parse(localStorage.getItem('settingsState'))
-    //this.setState(rehydrate)
-    console.log(this.state)
+    const rehydrate = JSON.parse(localStorage.getItem('settingsState'))
+    this.setState(rehydrate)
     var column_name = document.getElementById("name")
     var column_command = document.getElementById("command")
     var column_cwd = document.getElementById("cwd")

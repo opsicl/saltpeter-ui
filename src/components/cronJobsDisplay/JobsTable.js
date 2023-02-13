@@ -80,6 +80,8 @@ class JobsTable extends React.Component {
   }
 
   handleData(data) {
+    //localStorage.setItem('savedState', JSON.stringify(this.state))
+    sessionStorage.setItem('savedState', JSON.stringify(this.state))
     if (JSON.parse(data).hasOwnProperty("sp_version")){
         var json_result_version = JSON.parse(data).sp_version;
         this.setState({ backend_version: json_result_version});
@@ -243,7 +245,8 @@ class JobsTable extends React.Component {
 
 
   componentDidMount() {
-    const rehydrate = JSON.parse(localStorage.getItem('savedState'))
+    //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
+    const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
     this.setState(rehydrate)
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
@@ -261,12 +264,13 @@ class JobsTable extends React.Component {
     socket.onclose = function(event) {
       self.setState({jobs: []});
     }
-
     if (window.localStorage.getItem('settingsState')){
       this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
     }
+
     
-    var settings = JSON.parse(window.localStorage.getItem('settingsState'))
+   // var settings = JSON.parse(window.localStorage.getItem('settingsState'))
+    var settings = JSON.parse(window.sessionStorage.getItem('settingsState'))
     var active_columns = []
     if (settings) {
         for (const col in settings) {
@@ -285,7 +289,8 @@ class JobsTable extends React.Component {
   }
 
   componentWillUnmount() {
-    localStorage.setItem('savedState', JSON.stringify(this.state))
+    //localStorage.setItem('savedState', JSON.stringify(this.state))
+    sessionStorage.setItem('savedState', JSON.stringify(this.state))
     //clearInterval(this.interval);
   }
 

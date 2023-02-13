@@ -219,7 +219,7 @@ class CronJobDetails extends React.Component {
           this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("last_run")){
-	      this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
+          this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
         }
         if (data[name].hasOwnProperty("targets")){
           this.setState({ targetsJob : data[name]["targets"].sort() });
@@ -227,7 +227,7 @@ class CronJobDetails extends React.Component {
         if (data[name].hasOwnProperty("results")){
           this.setState({ results : data[name]["results"]});
         }
-	    if (data[name].hasOwnProperty("overlap")){
+      if (data[name].hasOwnProperty("overlap")){
           this.setState({ overlap : data[name]["overlap"]});
         }
       } 
@@ -244,7 +244,7 @@ class CronJobDetails extends React.Component {
         return secDiff;
       }
       else {
-     	return 0;
+        return 0;
       }
     }
 

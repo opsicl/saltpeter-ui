@@ -94,9 +94,7 @@
   border-color: #BA4FD9;
   background-color: #000;
   color: #DFD9F5;
-  overflow: auto;
-  #overflow-x: scroll;
-  #overflow-y: scroll;
+  overflow: auto !important;
 }
 
 .sectionDetailsOutput textarea:focus {
@@ -123,11 +121,11 @@
 
 ::-webkit-scrollbar {
   width: 8px;
-  background-color: #292929;
+  background-color: #BA4FD9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1D3E14;
+  background: #BA4FD9;
 }
 
 .details1 {
@@ -137,7 +135,7 @@
   float: left;
   width: 40%;
   overflow: auto;
-  scrollbar-color: #1D3E14 #292929;
+  scrollbar-color: #6ECBF5 #000000;
   #background-color: #220524;
 }
 
@@ -147,7 +145,7 @@
   text-align: left;
   float: left;
   width: 50%;
-  scrollbar-color: #1D3E14 #292929;
+  scrollbar-color: #6ECBF5 #000000;
   #background-color: #220524;
   overflow: auto;
 }

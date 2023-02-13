@@ -18,6 +18,7 @@ body {
   box-sizing: border-box;
   overflow: auto;
   #background-color: #220524;
+  scrollbar-color: #6ECBF5 #000000;
 }
 
 .data {
