@@ -270,7 +270,61 @@ class JobsTable extends React.Component {
 
     
    // var settings = JSON.parse(window.localStorage.getItem('settingsState'))
-    var settings = JSON.parse(window.sessionStorage.getItem('settingsState'))
+    var settings = {
+        column_name_checked: true,
+        column_command_checked: true,
+        column_cwd_checked: false,
+        column_user_checked: false,
+        column_soft_timeout_checked: false,
+        column_hard_timeout_checked: false,
+        column_targets_checked: false,
+        column_target_type_checked: false,
+        column_number_of_targets_checked: false,
+        column_dom_checked: false,
+        column_dow_checked: false,
+        column_hour_checked: false,
+        column_min_checked: false,
+        column_mon_checked: false,
+        column_sec_checked: false,
+        column_year_checked: false,
+        column_batch_size_checked: false,
+        column_running_on_checked: true,
+        column_last_run_checked: true,
+        column_group_checked: true,
+        column_result_checked: false,
+        columns_width:"15%",
+        column_command_width:"40%"
+      }
+    settings = JSON.parse(window.localStorage.getItem('settingsState'))
+    if (settings == null) {
+      settings = {
+        column_name_checked: true,
+        column_command_checked: true,
+        column_cwd_checked: false,
+        column_user_checked: false,
+        column_soft_timeout_checked: false,
+        column_hard_timeout_checked: false,
+        column_targets_checked: false,
+        column_target_type_checked: false,
+        column_number_of_targets_checked: false,
+        column_dom_checked: false,
+        column_dow_checked: false,
+        column_hour_checked: false,
+        column_min_checked: false,
+        column_mon_checked: false,
+        column_sec_checked: false,
+        column_year_checked: false,
+        column_batch_size_checked: false,
+        column_running_on_checked: true,
+        column_last_run_checked: true,
+        column_group_checked: true,
+        column_result_checked: false,
+        columns_width:"15%",
+        column_command_width:"40%"
+      }
+    }
+    console.log(settings)
+    this.setState({ settings: settings})
     var active_columns = []
     if (settings) {
         for (const col in settings) {
