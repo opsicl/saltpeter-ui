@@ -188,6 +188,8 @@ class JobsTable extends React.Component {
 	    }
 
             let comparison = 0;
+	    console.log(groupA, groupB)
+            console.log(groupA>groupB)
             if (groupA > groupB) {
                 comparison = 1;  
             } else if (groupA < groupB) {
