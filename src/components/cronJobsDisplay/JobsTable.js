@@ -96,8 +96,10 @@ class JobsTable extends React.Component {
 	// set default number of target to 0
         var no_of_targets = json_result_config[keys[i]]["number_of_targets"]
         if (!no_of_targets) {
-            no_of_targets = "0"
-        }
+            no_of_targets = 0
+        } else {
+	    no_of_targets = parseInt(no_of_targets)
+	}
 
         cronJobs.push({
           id: i,
@@ -341,7 +343,8 @@ class JobsTable extends React.Component {
           -1 ||
         job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
         job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
-        job.result.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
+        job.result.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
+	job.number_of_targets.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1
       );
     });
 
