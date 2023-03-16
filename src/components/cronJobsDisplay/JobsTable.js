@@ -94,7 +94,7 @@ class JobsTable extends React.Component {
 
       for (var i = 0; i < keys.length; i++) {
 	// set default number of target to 0
-        no_of_targets = json_result_config[keys[i]]["number_of_targets"]
+        var no_of_targets = json_result_config[keys[i]]["number_of_targets"]
         if (!no_of_targets) {
             no_of_targets = "0"
         }
