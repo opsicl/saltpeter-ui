@@ -180,8 +180,8 @@ class JobsTable extends React.Component {
   sortColumn(column){
       function compareAsc(a, b) {
         try {
-            const groupA = a[column].toUpperCase();
-            const groupB = b[column].toUpperCase();
+            var groupA = a[column].toUpperCase();
+            var groupB = b[column].toUpperCase();
 	    if (column == 'number_of_targets'){
 		    groupA = parseInt(a[column])
 		    groupB = parseInt(b[column])
@@ -202,8 +202,8 @@ class JobsTable extends React.Component {
 
       function compareDesc(a, b) {
         try {
-            const groupA = a[column].toUpperCase();
-            const groupB = b[column].toUpperCase();
+            var groupA = a[column].toUpperCase();
+            var groupB = b[column].toUpperCase();
             if (column == 'number_of_targets'){
                     groupA = parseInt(a[column])
                     groupB = parseInt(b[column])
