@@ -91,7 +91,14 @@ class JobsTable extends React.Component {
       var json_result_config = JSON.parse(data).config.crons;
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
+
       for (var i = 0; i < keys.length; i++) {
+	// set default number of target to 0
+        no_of_targets = json_result_config[keys[i]]["number_of_targets"]
+        if (!no_of_targets) {
+            no_of_targets = "0"
+        }
+
         cronJobs.push({
           id: i,
           name: keys[i],
@@ -102,7 +109,7 @@ class JobsTable extends React.Component {
           hard_timeout: json_result_config[keys[i]]["hard_timeout"],
           targets: json_result_config[keys[i]]["targets"],
           target_type: json_result_config[keys[i]]["target_type"],
-          number_of_targets: json_result_config[keys[i]]["number_of_targets"],
+          number_of_targets: no_of_targets,
           dom: json_result_config[keys[i]]["dom"],
           dow: json_result_config[keys[i]]["dow"],
           hour: json_result_config[keys[i]]["hour"],
