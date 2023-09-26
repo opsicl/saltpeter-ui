@@ -6,7 +6,12 @@ import { FaStop } from 'react-icons/fa';
 import { FaPlay } from 'react-icons/fa';
 import { MdWarning } from 'react-icons/md';
 import { FiInfo } from 'react-icons/fi';
-import { BsExclamationCircleFill } from 'react-icons/bs';
+import { FaExclamationCircle } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
+import { FaTimesCircle } from 'react-icons/fa';
+import { FaPlayCircle } from 'react-icons/fa';
+import { FaRegCircle } from 'react-icons/fa';
+
 import TextareaAutosize from 'react-autosize-textarea';
 
 let apis = require("../../version.json");
@@ -35,6 +40,7 @@ class CronJobDetails extends React.Component {
       mon: this.props.location.state !== undefined ? this.props.location.state.mon : "",
       sec: this.props.location.state !== undefined ? this.props.location.state.sec : "",
       year: this.props.location.state !== undefined ? this.props.location.state.year : "",
+      result: this.props.location.state !== undefined ? this.props.location.state.result : "NotRun",
       runningOn: [],
       next_run: "",
       last_run: "",
@@ -47,6 +53,7 @@ class CronJobDetails extends React.Component {
       ranForCounter: "",
       //softTimeoutCounter: "",
       startedJob:"",
+      result: "NotRun",
     }
     this.handleData.bind(this);
     this.calculateHardTimeout.bind(this);
@@ -192,20 +199,20 @@ class CronJobDetails extends React.Component {
           sec: json_result_config[this.state.name]["sec"],
           year: json_result_config[this.state.name]["year"],
           batch_size: json_result_config[this.state.name]["batch_size"],
+          result: "NotRun",
       });
     }
     // running
     else if(data.hasOwnProperty("running")){
-	//clear previous data
-        this.setState({ runningOn: []});
-
+        this.setState({ runningOn: []})
         var result_running = data["running"];
-        var keys_running = Object.keys(result_running);
+        var keys_running = Object.keys(result_running)
         for (var i = 0; i < keys_running.length; i++) {
-          var key_running = result_running[keys_running[i]]["name"];
+          var key_running = result_running[keys_running[i]]["name"]
             if (key_running === this.state.name) {
               this.setState((prevState,props) => ({ 
-		        runningOn: result_running[keys_running[i]]["machines"],
+                result: "Running",
+		            runningOn: result_running[keys_running[i]]["machines"],
                 startedJob: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
 	          }));
               break;
@@ -216,21 +223,35 @@ class CronJobDetails extends React.Component {
       var name = Object.keys(data)[0];
       if (name === this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
-          this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()});
+          this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()})
         }
         if (data[name].hasOwnProperty("last_run")){
-          this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()});
+          this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()})
         }
         if (data[name].hasOwnProperty("targets")){
-          this.setState({ targetsJob : data[name]["targets"].sort() });
+          this.setState({ targetsJob : data[name]["targets"].sort() })
         } 
         if (data[name].hasOwnProperty("results")){
-          this.setState({ results : data[name]["results"]});
+          this.setState({ results : data[name]["results"]})
         }
       if (data[name].hasOwnProperty("overlap")){
-          this.setState({ overlap : data[name]["overlap"]});
+          this.setState({ overlap : data[name]["overlap"]})
         }
-      } 
+      }
+    }
+    if ((data.hasOwnProperty("last_state")) && (Object.keys(this.state.runningOn).length === 0)) {
+      var json_result_last_state = data["last_state"]
+      var keys_last_state = Object.keys(json_result_last_state)
+      for (var i = 0; i < keys_last_state.length; i++) {
+        var key_name = keys_last_state[i]
+        if (key_name === this.state.name) {
+          if (json_result_last_state[key_name]["result_ok"] === true) {
+            this.setState({ result : "Success" })
+          } else if (json_result_last_state[key_name]["result_ok"] === false) {
+            this.setState({ result: "Fail" })
+          }
+        }
+      }
     }
   }
 
@@ -319,6 +340,7 @@ class CronJobDetails extends React.Component {
         ranForCounter: "",
         startedJob: "",
         hard_timeout: "",
+        result: "NotRun",
       });
     }
 
@@ -351,7 +373,21 @@ class CronJobDetails extends React.Component {
     return(
     <div>
         <div style={{marginLeft:"4%"}}>
-            <h1 className="cronTitle">{this.state.name} {this.state.overlap === true ? <BsExclamationCircleFill title="overlap" style={{color:"#FF1919", size:"3px", marginLeft:"10px" }}/> : ""}</h1>
+          <h1 className="cronTitle">
+            {this.state.name}
+            {this.state.overlap === true ?
+                (<FaExclamationCircle title="overlap" style={{ color: "#FF1919", size: "3px", marginLeft: "10px" }} />) :
+                  this.state.result === "Success" ?
+                    (<FaCheckCircle title="success" style={{ color: "#60CE80", size: "3px", marginLeft: "10px" }} />) :
+                  this.state.result === "Fail" ?
+                    (<FaTimesCircle title="failed" style={{ color: "#FF1919", size: "3px", marginLeft: "10px" }} />) :
+                  this.state.result === "Running" ?
+                    (<FaPlayCircle title="running" style={{ color: "#6AC3EC", size: "3px", marginLeft: "10px" }} />) :
+                  this.state.result === "NotRun" ?
+                    (<FaRegCircle title="not run" style={{ color: "#E0D9F6", size: "3px", marginLeft: "10px" }} />) :
+                  null
+            }
+          </h1>
         </div>
         <div>
         <div className="details1">
