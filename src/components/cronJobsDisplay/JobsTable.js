@@ -356,7 +356,7 @@ class JobsTable extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item} settings={this.state.settings}/>
+      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings}/>
     ));
 
     return (

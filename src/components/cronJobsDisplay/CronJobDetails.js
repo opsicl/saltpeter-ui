@@ -54,6 +54,7 @@ class CronJobDetails extends React.Component {
       //softTimeoutCounter: "",
       startedJob:"",
       result: "NotRun",
+      backend_version: this.props.location.state !== undefined ? this.props.location.state.backend_version : "",
     }
     this.handleData.bind(this);
     this.calculateHardTimeout.bind(this);
@@ -180,6 +181,10 @@ class CronJobDetails extends React.Component {
 
   handleData(json) {
     let data = JSON.parse(json);
+    if (data.hasOwnProperty("sp_version")){
+        var json_result_version = data.sp_version;
+        this.setState({ backend_version: json_result_version});
+    }
     if(data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
       this.setState({
@@ -341,6 +346,7 @@ class CronJobDetails extends React.Component {
         startedJob: "",
         hard_timeout: "",
         result: "NotRun",
+        backend_version: "",
       });
     }
 
@@ -552,7 +558,7 @@ class CronJobDetails extends React.Component {
     </div>
         <div className="versions">
             <p>UI: {UI_VERSION}</p>
-            <p>Backend: vx.y.z</p>
+            <p>Backend: {this.state.backend_version}</p>
         </div>
     </div>
     )
