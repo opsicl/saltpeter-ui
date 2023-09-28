@@ -1,8 +1,5 @@
 import React from "react";
 import "./Settings.css";
-import { withRouter } from 'react-router-dom';
-let apis = require("../../version.json");
-const UI_VERSION = apis.version;
 
 class Settings extends React.Component {
   constructor() {

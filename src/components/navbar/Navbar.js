@@ -33,7 +33,8 @@ class Navbar extends React.Component{
                     {NavbarData.map((item, index) => {
                         return (
                             <p key={index} className={item.cName}>
-                                <Link to={item.path}>
+                                <Link to={{pathname: item.path }}>
+
                                     <span style={{fontFamily:"Trebuchet MS, sans-serif", letterSpacing:"1px", textTransform:"uppercase"}}>{item.title}</span>
                                 </Link>
                             </p>
