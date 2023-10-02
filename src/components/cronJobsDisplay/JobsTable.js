@@ -45,6 +45,7 @@ class JobsTable extends React.Component {
       column_asc_sort:"",
       column_desc_sort:"",
       active_columns:[],
+      config_received: false,
     };
     socket.debug=true;
     socket.timeoutInterval = 5400;
@@ -62,7 +63,7 @@ class JobsTable extends React.Component {
 
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
-    console.log(event.target.value.substr(0, 20)) 
+    //console.log(event.target.value.substr(0, 20)) 
     if (event.target.value.substr(0, 20)) {
         const nextTitle = 'Saltpeter';
         const nextURL = "?search=" + event.target.value.substr(0, 20);
@@ -82,18 +83,22 @@ class JobsTable extends React.Component {
   handleData(data) {
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
+
+    // get backend version
     if (JSON.parse(data).hasOwnProperty("sp_version")){
         var json_result_version = JSON.parse(data).sp_version;
         this.setState({ backend_version: json_result_version});
     }
+
     //config
     if (JSON.parse(data).hasOwnProperty("config")) {
       var json_result_config = JSON.parse(data).config.crons;
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
+      this.setState({ config_received: true});
 
       for (var i = 0; i < keys.length; i++) {
-	// set default number of target to 0
+         // set default number of target to 0
         var no_of_targets = json_result_config[keys[i]]["number_of_targets"]
         if (!no_of_targets) {
             no_of_targets = "0"
@@ -126,7 +131,7 @@ class JobsTable extends React.Component {
       }
       this.setState({jobs: cronJobs})
     }
-    if (JSON.parse(data).hasOwnProperty("running")) {
+    if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
@@ -149,7 +154,7 @@ class JobsTable extends React.Component {
       this.setState({ jobs: cronJobs });
     }
 
-    if (JSON.parse(data).hasOwnProperty("last_state")) {
+    if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
@@ -161,7 +166,7 @@ class JobsTable extends React.Component {
       var keys_last_state = Object.keys(json_result_last_state);
       for (i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
-        for (var j = 0; j < cronJobs.length; j++) {
+        for (j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_name) {
             if (json_result_last_state[key_name]["result_ok"] === false) {
                 cronJobs[j]["result"] = "Fail"
@@ -174,22 +179,38 @@ class JobsTable extends React.Component {
         }
       }
     }
+    if (this.state.config_received === false) {
+      window.location.reload(false);
+    }
 
   }
 
   sortColumn(column){
       function compareAsc(a, b) {
         try {
-            var groupA = a[column].toUpperCase();
-            var groupB = b[column].toUpperCase();
-	    if (column == 'number_of_targets'){
-		    groupA = parseInt(a[column])
-		    groupB = parseInt(b[column])
-	    }
+          if (a[column] === undefined){
+            a[column] = ""
+          }
+          if (b[column] === undefined){
+            b[column] = ""
+          }
+          
+          var groupA = a[column]
+          var groupB = b[column]
 
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+
+          if (column == 'number_of_targets'){
+            groupA = parseInt(a[column])
+            groupB = parseInt(b[column])
+          }
             let comparison = 0;
-	    console.log(groupA, groupB)
-            console.log(groupA>groupB)
             if (groupA > groupB) {
                 comparison = 1;  
             } else if (groupA < groupB) {
@@ -197,6 +218,8 @@ class JobsTable extends React.Component {
             }
             return comparison;
         } catch (error) {
+            console.log("ASC")
+            console.log(error)
             let comparison = 0
             return comparison;
         }
@@ -204,11 +227,27 @@ class JobsTable extends React.Component {
 
       function compareDesc(a, b) {
         try {
-            var groupA = a[column].toUpperCase();
-            var groupB = b[column].toUpperCase();
+            if (a[column] === undefined){
+              a[column] = ""
+            }
+            if (b[column] === undefined){
+              b[column] = ""
+            }
+
+            var groupA = a[column]
+            var groupB = b[column]
+
+            if (typeof a[column] === 'string' || a[column] instanceof String) {
+              groupA = a[column].toUpperCase();
+            }
+
+            if (typeof b[column] === 'string' || b[column] instanceof String) {
+              groupB = b[column].toUpperCase();
+            }
+            
             if (column == 'number_of_targets'){
-                    groupA = parseInt(a[column])
-                    groupB = parseInt(b[column])
+              groupA = parseInt(a[column])
+              groupB = parseInt(b[column])
             }
 
             let comparison = 0;  
@@ -239,7 +278,7 @@ class JobsTable extends React.Component {
           }
         }
       const elem = document.getElementById(column);
-      var column_name = column
+      column_name = column
       if (column.includes("_")) {
           column_name = column.replace("_"," ")
       } 
@@ -356,7 +395,7 @@ class JobsTable extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item} settings={this.state.settings}/>
+      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings}/>
     ));
 
     return (
