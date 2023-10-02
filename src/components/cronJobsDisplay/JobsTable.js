@@ -188,16 +188,29 @@ class JobsTable extends React.Component {
   sortColumn(column){
       function compareAsc(a, b) {
         try {
-            var groupA = a[column].toUpperCase();
-            var groupB = b[column].toUpperCase();
-	    if (column == 'number_of_targets'){
-		    groupA = parseInt(a[column])
-		    groupB = parseInt(b[column])
-	    }
+          if (a[column] === undefined){
+            a[column] = ""
+          }
+          if (b[column] === undefined){
+            b[column] = ""
+          }
+          
+          var groupA = a[column]
+          var groupB = b[column]
 
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+
+          if (column == 'number_of_targets'){
+            groupA = parseInt(a[column])
+            groupB = parseInt(b[column])
+          }
             let comparison = 0;
-	    //console.log(groupA, groupB)
-       //     console.log(groupA>groupB)
             if (groupA > groupB) {
                 comparison = 1;  
             } else if (groupA < groupB) {
@@ -205,6 +218,8 @@ class JobsTable extends React.Component {
             }
             return comparison;
         } catch (error) {
+            console.log("ASC")
+            console.log(error)
             let comparison = 0
             return comparison;
         }
@@ -212,11 +227,27 @@ class JobsTable extends React.Component {
 
       function compareDesc(a, b) {
         try {
-            var groupA = a[column].toUpperCase();
-            var groupB = b[column].toUpperCase();
+            if (a[column] === undefined){
+              a[column] = ""
+            }
+            if (b[column] === undefined){
+              b[column] = ""
+            }
+
+            var groupA = a[column]
+            var groupB = b[column]
+
+            if (typeof a[column] === 'string' || a[column] instanceof String) {
+              groupA = a[column].toUpperCase();
+            }
+
+            if (typeof b[column] === 'string' || b[column] instanceof String) {
+              groupB = b[column].toUpperCase();
+            }
+            
             if (column == 'number_of_targets'){
-                    groupA = parseInt(a[column])
-                    groupB = parseInt(b[column])
+              groupA = parseInt(a[column])
+              groupB = parseInt(b[column])
             }
 
             let comparison = 0;  
