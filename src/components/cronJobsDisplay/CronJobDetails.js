@@ -185,7 +185,21 @@ class CronJobDetails extends React.Component {
         var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
     }
-    if(data.hasOwnProperty("config")){
+    if (data.hasOwnProperty("last_state") && (this.state.runningOn.length === 0)) {
+      var json_result_last_state = data["last_state"]
+      var keys_last_state = Object.keys(json_result_last_state)
+      for (i = 0; i < keys_last_state.length; i++) {
+        var key_name = keys_last_state[i]
+        if (key_name === this.state.name) {
+          if (json_result_last_state[key_name]["result_ok"] === true) {
+            this.setState({ result : "Success" })
+          } else if (json_result_last_state[key_name]["result_ok"] === false) {
+            this.setState({ result: "Fail" })
+          }
+        }
+      }
+    }
+    if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
       
       var keys = Object.keys(json_result_config);
@@ -241,7 +255,6 @@ class CronJobDetails extends React.Component {
           result: "NotRun",
           jobs: cronJobs,
       });
-      //console.log(this.state.jobs)
     }
     // running
     else if(data.hasOwnProperty("running")){
@@ -253,12 +266,12 @@ class CronJobDetails extends React.Component {
             if (key_running === this.state.name) {
               this.setState((prevState,props) => ({ 
                 result: "Running",
-		            runningOn: result_running[keys_running[i]]["machines"],
+                runningOn: result_running[keys_running[i]]["machines"],
                 startedJob: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
-	          }));
+              }));
+            }
               break;
             }
-        }
     } else {
       // details
       var name = Object.keys(data)[0];
@@ -277,20 +290,6 @@ class CronJobDetails extends React.Component {
         }
       if (data[name].hasOwnProperty("overlap")){
           this.setState({ overlap : data[name]["overlap"]})
-        }
-      }
-    }
-    if ((data.hasOwnProperty("last_state")) && (Object.keys(this.state.runningOn).length === 0)) {
-      var json_result_last_state = data["last_state"]
-      var keys_last_state = Object.keys(json_result_last_state)
-      for (i = 0; i < keys_last_state.length; i++) {
-        var key_name = keys_last_state[i]
-        if (key_name === this.state.name) {
-          if (json_result_last_state[key_name]["result_ok"] === true) {
-            this.setState({ result : "Success" })
-          } else if (json_result_last_state[key_name]["result_ok"] === false) {
-            this.setState({ result: "Fail" })
-          }
         }
       }
     }
@@ -527,7 +526,7 @@ class CronJobDetails extends React.Component {
                             this.circleColor = "#60CE80"
                             this.cursor = "pointer"
                             this.sign = "stopped"
-                            if (this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) {
+                            if ((this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) || (this.state.results[machine]["endtime"] === "" && this.state.results[machine]["retcode"] === "" && this.state.results[machine]["retcode"] === "")) {
                                 this.circleColor = "#FF0000"
                                 this.cursor = "pointer"
                                 this.sign = "warning"

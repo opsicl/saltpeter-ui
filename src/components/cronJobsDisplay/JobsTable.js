@@ -84,6 +84,12 @@ class JobsTable extends React.Component {
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
+    // get backend version
+    if (JSON.parse(data).hasOwnProperty("sp_version")){
+        var json_result_version = JSON.parse(data).sp_version;
+        this.setState({ backend_version: json_result_version});
+    }
+
     //config
     if (JSON.parse(data).hasOwnProperty("config")) {
       var json_result_config = JSON.parse(data).config.crons;

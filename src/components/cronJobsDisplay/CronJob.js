@@ -36,6 +36,7 @@ class CronJob extends React.Component {
         last_run: this.props.job.last_run,
         settings: this.props.settings,
         backend_version: this.props.backend_version,
+        result: this.props.result,
       }
     });
   };
