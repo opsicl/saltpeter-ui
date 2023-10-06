@@ -185,7 +185,6 @@ class CronJobDetails extends React.Component {
         this.setState({ backend_version: json_result_version});
     }
     if (data.hasOwnProperty("last_state") && (this.state.runningOn.length === 0)) {
-      console.log("has last state", data["last_state"])
       var json_result_last_state = data["last_state"]
       var keys_last_state = Object.keys(json_result_last_state)
       for (var i = 0; i < keys_last_state.length; i++) {
@@ -228,18 +227,15 @@ class CronJobDetails extends React.Component {
         var keys_running = Object.keys(result_running)
         for (i = 0; i < keys_running.length; i++) {
           var key_running = result_running[keys_running[i]]["name"]
-	    console.log(key_running)
             if (key_running === this.state.name) {
-	      console.log(result_running)
               this.setState((prevState,props) => ({ 
                 result: "Running",
                 runningOn: result_running[keys_running[i]]["machines"],
                 startedJob: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
               }));
-            }
               break;
             }
-	console.log("running", this.state)
+	}
     } else {
       // details
       var name = Object.keys(data)[0];
@@ -261,7 +257,6 @@ class CronJobDetails extends React.Component {
         }
       }
     }
-    console.log("final", this.state)
   }
 
   componentDidMount() {
