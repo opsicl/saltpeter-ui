@@ -54,7 +54,6 @@ class CronJobDetails extends React.Component {
       //softTimeoutCounter: "",
       startedJob:"",
       backend_version: this.props.location.state !== undefined ? this.props.location.state.backend_version : "",
-      jobs: [],
     }
     this.handleData.bind(this);
     this.calculateHardTimeout.bind(this);
@@ -201,40 +200,6 @@ class CronJobDetails extends React.Component {
     }
     if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
-      
-      var keys = Object.keys(json_result_config);
-      var cronJobs = [];
-      for (var i = 0; i < keys.length; i++) {
-        // set default number of target to 0
-        var no_of_targets = json_result_config[keys[i]]["number_of_targets"]
-        if (!no_of_targets) {
-            no_of_targets = "0"
-        }
-        cronJobs.push({
-          id: i,
-          name: keys[i],
-          command: json_result_config[keys[i]]["command"],
-          cwd: json_result_config[keys[i]]["cwd"],
-          user: json_result_config[keys[i]]["user"],
-          soft_timeout: json_result_config[keys[i]]["soft_timeout"],
-          hard_timeout: json_result_config[keys[i]]["hard_timeout"],
-          targets: json_result_config[keys[i]]["targets"],
-          target_type: json_result_config[keys[i]]["target_type"],
-          number_of_targets: no_of_targets,
-          dom: json_result_config[keys[i]]["dom"],
-          dow: json_result_config[keys[i]]["dow"],
-          hour: json_result_config[keys[i]]["hour"],
-          min: json_result_config[keys[i]]["min"],
-          mon: json_result_config[keys[i]]["mon"],
-          sec: json_result_config[keys[i]]["sec"],
-          year: json_result_config[keys[i]]["year"],
-          group: json_result_config[keys[i]]["group"],
-          batch_size: json_result_config[keys[i]]["batch_size"],
-          runningOn: [],
-          last_run: ""
-        });
-      }
-
       this.setState({
           command: json_result_config[this.state.name]["command"],
           cwd: json_result_config[this.state.name]["cwd"],
@@ -253,7 +218,6 @@ class CronJobDetails extends React.Component {
           year: json_result_config[this.state.name]["year"],
           batch_size: json_result_config[this.state.name]["batch_size"],
           result: "NotRun",
-          jobs: cronJobs,
       });
     }
     // running
@@ -293,6 +257,7 @@ class CronJobDetails extends React.Component {
         }
       }
     }
+    console.log(this.state)
   }
 
   componentDidMount() {
@@ -382,7 +347,6 @@ class CronJobDetails extends React.Component {
         hard_timeout: "",
         result: "NotRun",
         backend_version: "",
-        jobs: [],
       });
     }
 
@@ -526,7 +490,7 @@ class CronJobDetails extends React.Component {
                             this.circleColor = "#60CE80"
                             this.cursor = "pointer"
                             this.sign = "stopped"
-                            if ((this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0)) {
+                            if (this.state.results[machine]["retcode"] !== "" && this.state.results[machine]["retcode"] !== 0) {
                                 this.circleColor = "#FF0000"
                                 this.cursor = "pointer"
                                 this.sign = "warning"
