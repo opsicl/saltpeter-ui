@@ -184,7 +184,6 @@ class CronJobDetails extends React.Component {
         var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
     }
-    console.log("raw data", data)
     if (data.hasOwnProperty("last_state") && (this.state.runningOn.length === 0)) {
       console.log("has last state", data["last_state"])
       var json_result_last_state = data["last_state"]
@@ -199,9 +198,9 @@ class CronJobDetails extends React.Component {
           }
         }
       }
+      console.log("last state", this.state)
     }
     if (data.hasOwnProperty("config")){
-      console.log("has config", data.config)
       var json_result_config = data.config.crons;
       this.setState({
           command: json_result_config[this.state.name]["command"],
@@ -225,7 +224,6 @@ class CronJobDetails extends React.Component {
     }
     // running
     else if(data.hasOwnProperty("running")){
-	console.log("has running", data["running"])
         this.setState({ runningOn: []})
         var result_running = data["running"];
         var keys_running = Object.keys(result_running)
@@ -240,9 +238,9 @@ class CronJobDetails extends React.Component {
             }
               break;
             }
+	console.log("running", this.state)
     } else {
       // details
-      console.log("has something else", data)
       var name = Object.keys(data)[0];
       if (name === this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
@@ -262,6 +260,7 @@ class CronJobDetails extends React.Component {
         }
       }
     }
+    console.log("final", this.state)
   }
 
   componentDidMount() {
