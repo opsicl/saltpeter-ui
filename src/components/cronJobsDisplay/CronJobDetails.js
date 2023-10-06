@@ -187,7 +187,7 @@ class CronJobDetails extends React.Component {
     if (data.hasOwnProperty("last_state") && (this.state.runningOn.length === 0)) {
       var json_result_last_state = data["last_state"]
       var keys_last_state = Object.keys(json_result_last_state)
-      for (i = 0; i < keys_last_state.length; i++) {
+      for (var i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
         if (key_name === this.state.name) {
           if (json_result_last_state[key_name]["result_ok"] === true) {
