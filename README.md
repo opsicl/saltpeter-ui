@@ -1,11 +1,11 @@
 ### Description:
 
-
 User interface for [Saltpeter](https://github.com/syscollective/saltpeter):
 
 <img src="screenshots/Screenshot from 2023-02-13 09-46-12.png" width="800" >
 <img src="screenshots/Screenshot from 2023-02-13 09-49-47.png" width="800" >
 <img src="screenshots/Screenshot from 2023-02-13 09-48-01.png" width="800" >
+
 ### Installation:
 ```
 cd /opt
@@ -64,3 +64,5 @@ service nginx restart
 ```
 
 Now the UI will run on port 80, on localhost
+
+The commands should be executed as root
