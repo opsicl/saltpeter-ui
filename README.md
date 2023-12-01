@@ -64,5 +64,3 @@ service nginx restart
 ```
 
 Now the UI will run on port 80, on localhost
-
-Run as root
