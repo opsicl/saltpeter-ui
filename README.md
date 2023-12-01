@@ -1,1 +1,1 @@
-The commands should be executed as root
+End of README
