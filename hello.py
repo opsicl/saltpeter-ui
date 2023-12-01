@@ -1,1 +1,1 @@
-rint('Hello, World!')
+print('Hello, Fix!')
