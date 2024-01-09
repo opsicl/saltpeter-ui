@@ -1,8 +1,6 @@
 import React from "react";
-//import { withRouter } from 'react-router-dom';
-import CronJob from "./CronJob";
+import CronJobTimeline from "./CronJobTimeline";
 import "./JobsTable.css";
-//import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
 import { Link } from "react-router-dom";
 
@@ -13,11 +11,10 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      last: "5m", /////////////////////
+      timelineWindow: "30m", /////////////////////
       refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
-//    currentTime: new Date().toLocaleString(),
       backend_version:"",
       settings: {
         column_name_checked: true, 
@@ -86,7 +83,8 @@ class Timeline extends React.Component {
   getTimeline() {
     // send message to ws to get timeline info
     var obj = {}
-    obj.last = this.state.last
+    obj.last = this.state.timelineWindow
+    console.log(this.state.timelineWindow)
     var obj_send = {}
     obj_send.getTimeline = obj
     var jsonString = JSON.stringify(obj_send)
@@ -95,7 +93,6 @@ class Timeline extends React.Component {
   }
 
   handleData(data) {
-    //localStorage.setItem('savedState', JSON.stringify(this.state))
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
     // get backend version
@@ -192,7 +189,28 @@ class Timeline extends React.Component {
           }
         }
       }
+      this.setState({ jobs: cronJobs }); /////////////////////////
     }
+
+    // get timeline
+    if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
+      cronJobs = this.state.jobs  
+      var timeline = JSON.parse(data).timeline.content;       
+      for (i = 0; i < cronJobs.length; i++) {
+        var cronJobName = cronJobs[i]["name"]
+        var cronTimeline = []
+        for (j = 0; j < timeline.length; j++) {
+          if (cronJobName === timeline[j]["cron"]) {
+            cronTimeline.push(timeline[j])
+          }
+        }
+        console.log(cronJobName, cronTimeline)
+        cronJobs[i]["timeline"] = cronTimeline
+      }
+      this.setState({ jobs: cronJobs });
+      console.log(this.state.jobs)
+    }
+
     if (this.state.config_received === false) {
       window.location.reload(false);
     }
@@ -422,7 +440,7 @@ class Timeline extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings}/>
+      <CronJobTimeline key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} timeline={this.state.timeline}/>
     ));
 
     return (
