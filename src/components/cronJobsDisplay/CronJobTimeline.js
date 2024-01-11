@@ -59,34 +59,21 @@ class CronJobTimeline extends React.Component {
         }}
         onClick={this.handleHistory}>
           {this.props.settings['column_name_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.name}</div></td>:""}
-          {this.props.settings['column_command_checked']?<td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>:""}
-          {this.props.settings['column_cwd_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.cwd}</div></td>:""}
-          {this.props.settings['column_user_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.user}</div></td>:""}
-          {this.props.settings['column_soft_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.soft_timeout}</div></td>:""}
-          {this.props.settings['column_hard_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.hard_timeout}</div></td>:""}
-          {this.props.settings['column_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.targets}</div></td>:""}
-          {this.props.settings['column_target_type_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.target_type}</div></td>:""}
-          {this.props.settings['column_number_of_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.number_of_targets}</div></td>:""}
-          {this.props.settings['column_dom_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.dom}</div></td>:""}
-          {this.props.settings['column_dow_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.dow}</div></td>:""}
-          {this.props.settings['column_hour_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.hour}</div></td>:""}
-          {this.props.settings['column_min_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.min}</div></td>:""}
-          {this.props.settings['column_mon_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.mon}</div></td>:""}
-          {this.props.settings['column_sec_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.sec}</div></td>:""}
-          {this.props.settings['column_year_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.year}</div></td>:""}
-          {this.props.settings['column_group_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.group}</div></td>:""}
-          {this.props.settings['column_batch_size_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.batch_size}</div></td>:""}
-          {this.props.settings['column_running_on_checked']?
-            <td>
-              <div style={{ maxHeight:"100px", overflow:"auto", textAlign:"center"}} >
-                {this.props.job.runningOn.map((machine, i) => {
-                    return <p key={i} className="output">{machine}</p>;
-                })}
+          <td>
+              <div>
+                   {this.props.job.timeline !== [] ? this.props.job.timeline.map((run, i) => {
+                        lastTimeline = 
+                        return <p>{run.msg_type + " - " + run.timestamp}</p>
+                    }) : ""}
               </div>
-            </td> : ""
-          }
-         {this.props.settings['column_result_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.result}</div></td>:""}
-         {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!=""?new Date(this.props.job.last_run).toLocaleString():""}</div></td>:""}
+          </td>
+          <td>2/8</td>
+          <td>3/8</td>
+          <td>4/8</td>
+          <td>5/8</td>
+          <td>6/8</td>
+          <td>7/8</td>
+          <td>8/8</td>
       </tr>
     );
   }

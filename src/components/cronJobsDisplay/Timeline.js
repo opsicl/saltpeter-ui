@@ -1,6 +1,6 @@
 import React from "react";
 import CronJobTimeline from "./CronJobTimeline";
-import "./JobsTable.css";
+import "./Timeline.css";
 import { socket } from "./socket.js";
 import { Link } from "react-router-dom";
 
@@ -11,7 +11,7 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timelineWindow: "30m", /////////////////////
+      timelineLast: "30m", /////////////////////
       refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
@@ -63,7 +63,6 @@ class Timeline extends React.Component {
 
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
-    //console.log(event.target.value.substr(0, 20)) 
     if (event.target.value.substr(0, 20)) {
         const nextTitle = 'Saltpeter';
         const nextURL = "?search=" + event.target.value.substr(0, 20);
@@ -83,8 +82,7 @@ class Timeline extends React.Component {
   getTimeline() {
     // send message to ws to get timeline info
     var obj = {}
-    obj.last = this.state.timelineWindow
-    console.log(this.state.timelineWindow)
+    obj.last = this.state.timelineLast
     var obj_send = {}
     obj_send.getTimeline = obj
     var jsonString = JSON.stringify(obj_send)
@@ -137,7 +135,8 @@ class Timeline extends React.Component {
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
           result: 'NotRun',
-          last_run: ""
+          last_run: "",
+          timeline: []
         });
       }
       this.setState({jobs: cronJobs})
@@ -204,11 +203,9 @@ class Timeline extends React.Component {
             cronTimeline.push(timeline[j])
           }
         }
-        console.log(cronJobName, cronTimeline)
         cronJobs[i]["timeline"] = cronTimeline
       }
       this.setState({ jobs: cronJobs });
-      console.log(this.state.jobs)
     }
 
     if (this.state.config_received === false) {
@@ -250,7 +247,6 @@ class Timeline extends React.Component {
             }
             return comparison;
         } catch (error) {
-            console.log("ASC")
             console.log(error)
             let comparison = 0
             return comparison;
@@ -395,7 +391,8 @@ class Timeline extends React.Component {
         column_group_checked: true,
         column_result_checked: false,
         columns_width:"15%",
-        column_command_width:"40%"
+        column_command_width:"40%",
+        column_timeline_width: "45%"
       }
     }
     this.setState({ settings: settings})
@@ -440,7 +437,7 @@ class Timeline extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJobTimeline key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} timeline={this.state.timeline}/>
+      <CronJobTimeline key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} timelineLast={this.state.timelineLast}/>
     ));
 
     return (
@@ -477,26 +474,7 @@ class Timeline extends React.Component {
           <tbody>  
             <tr style={{cursor:"pointer"}}>
               {this.state.settings['column_name_checked']?<th id="name" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'name')}>Name</th>:""}
-              {this.state.settings['column_command_checked']?<th id="command" style={{ width: this.state.settings['column_command_width']}} onClick={this.sortColumn.bind(this,'command')}>Command</th>:""}
-              {this.state.settings['column_cwd_checked']?<th id="cwd" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'cwd')}>Cwd</th>:""}
-              {this.state.settings['column_user_checked']?<th id="user" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'user')}>User</th>:""}
-              {this.state.settings['column_soft_timeout_checked']?<th id="soft_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'soft_timeout')}>Soft Timeout</th>:""}
-              {this.state.settings['column_hard_timeout_checked']?<th id="hard_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'hard_timeout')}>Hard Timeout</th>:""}
-              {this.state.settings['column_targets_checked']?<th id="targets"style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'targets')}>Targets</th>:""}
-              {this.state.settings['column_target_type_checked']?<th id="target_type" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'target_type')}>Target Type</th>:""}
-              {this.state.settings['column_number_of_targets_checked']?<th id="number_of_targets" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'number_of_targets')}>No of targets</th>:""}
-              {this.state.settings['column_dom_checked']?<th id="dom" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dom')}>Dom</th>:""}
-              {this.state.settings['column_dow_checked']?<th id="dow" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'dow')}>Dow</th>:""}
-              {this.state.settings['column_hour_checked']?<th id="hour" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'hour')}>hour</th>:""}
-              {this.state.settings['column_min_checked']?<th id="min" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'min')}>min</th>:""}
-              {this.state.settings['column_mon_checked']?<th id="mon" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'mon')}>mon</th>:""}
-              {this.state.settings['column_sec_checked']?<th id="sec" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'sec')}>sec</th>:""}
-              {this.state.settings['column_year_checked']?<th id="year" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'year')}>year</th>:""}
-              {this.state.settings['column_group_checked']?<th id="group" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'group')}>group</th>:""}
-              {this.state.settings['column_batch_size_checked']?<th id="batch_size" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'batch_size')}>batch size</th>:""}
-              {this.state.settings['column_running_on_checked']?<th id="running_on" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'running_on')}>running on</th>:""}
-              {this.state.settings['column_result_checked']?<th id="result" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'result')}>result</th>:""}
-              {this.state.settings['column_last_run_checked']?<th id="last_run" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'last_run')}>last run</th>:""}
+              <th id="timeline" colSpan={8}>Timeline</th>
             </tr>
           </tbody>
           <tbody>
