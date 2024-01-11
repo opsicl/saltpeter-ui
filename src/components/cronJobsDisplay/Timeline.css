@@ -28,7 +28,7 @@ body {
   padding-left: 10px;
   font-size: 13px;
   border-collapse: collapse;
-  width: 80%;
+  width: 95%;
   color: #DFD9F5;
   margin-top: 0px;
   margin-left: auto;
@@ -119,7 +119,7 @@ body {
 
 .tableName2 {
   #background-color: #220524;
-  width: 80%;
+  width: 95%;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
@@ -160,7 +160,7 @@ body {
 
 .tableName {
   #background-color: #292929;
-  width: 80%;
+  width: 95%;
   text-align: center;
   margin-left: auto;
   margin-right: auto;

@@ -194,7 +194,7 @@ class Timeline extends React.Component {
     // get timeline
     if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
       cronJobs = this.state.jobs  
-      var timeline = JSON.parse(data).timeline.content;       
+      var timeline = JSON.parse(data).timeline.content;   
       for (i = 0; i < cronJobs.length; i++) {
         var cronJobName = cronJobs[i]["name"]
         var cronTimeline = []
@@ -474,7 +474,7 @@ class Timeline extends React.Component {
           <tbody>  
             <tr style={{cursor:"pointer"}}>
               {this.state.settings['column_name_checked']?<th id="name" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'name')}>Name</th>:""}
-              <th id="timeline" colSpan={8}>Timeline</th>
+              <th id="timeline" style={{ width: "85%" }}>Timeline</th>
             </tr>
           </tbody>
           <tbody>

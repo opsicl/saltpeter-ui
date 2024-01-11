@@ -2,6 +2,10 @@ import React  from "react";
 import { withRouter } from 'react-router-dom';
 import "./CronJob.css";
 
+import { FaSquareXmark } from "react-icons/fa6";
+import { FaSquareCaretRight } from "react-icons/fa6";
+import { FaSquareCheck } from "react-icons/fa6";
+
 class CronJobTimeline extends React.Component {
   constructor(props){
     super(props);
@@ -56,24 +60,71 @@ class CronJobTimeline extends React.Component {
         style={{
           color: color,
           cursor: "pointer"
-        }}
-        onClick={this.handleHistory}>
-          {this.props.settings['column_name_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.name}</div></td>:""}
+        }}>
+          {this.props.settings['column_name_checked']?<td onClick={this.handleHistory}><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.name}</div></td>:""}
           <td>
-              <div>
+              <div style={{ maxHeight:"50em", overflow:"auto"}}>
                    {this.props.job.timeline !== [] ? this.props.job.timeline.map((run, i) => {
-                        lastTimeline = 
-                        return <p>{run.msg_type + " - " + run.timestamp}</p>
+                        var lastNumber = parseInt(this.props.timelineLast.slice(0, -1))
+                        var lastMeasurement = this.props.timelineLast.slice(-1)
+                        if (lastMeasurement === "m") {
+                          lastMeasurement = 60
+                        }
+                        if (lastMeasurement === "h") {
+                          lastMeasurement = 3600
+                        }
+                        if (lastMeasurement === "d") {
+                          lastMeasurement = 86400
+                        }
+                        const lastAgo = Date.now() - (lastNumber * lastMeasurement * 1000);
+                        const dateLastAgo = new Date(lastAgo);
+                        if (run.timestamp) {
+                            var cron_timestamp = Date.parse(run.timestamp)
+                            var cron_timestamp_date = new Date(run.timestamp).toLocaleString()
+                            if (cron_timestamp > dateLastAgo) {
+                              //var h = cron_timestamp_date.getUTCHours().toString()
+                              //h = h.length === 1 ? "0" + h : h
+
+                              //var m = cron_timestamp_date.getUTCMinutes().toString()
+                              //m = m.length === 1 ? "0" + m : m
+
+                              //var s = cron_timestamp_date.getUTCSeconds().toString()
+                              //s = s.length === 1 ? "0" + s : s
+
+                              //var y = cron_timestamp_date.getFullYear().toString()
+                              
+                              //var mo = cron_timestamp_date.getMonth() + 1
+                              //mo = mo.toString()
+                              //mo = mo.length === 1 ? "0" + mo : mo
+
+                              //var d =  s = cron_timestamp_date.getDate().toString()
+                              //d = d.length === 1 ? "0" + d : d
+
+                              // check if it ended with success
+                              if ((run.msg_type === 'machine_result') && (run.ret_code == 0)) {
+                                return <FaSquareCheck title={cron_timestamp_date} style={{ color: "#76C2AE", size: "10px", marginLeft: "0.5em" }} />
+                                //return <p key={run.name + i} style={{ display: "inline-block", width: "1em", height: "1em", backgroundColor: "green", margin: "0 0.5em" }}></p>
+                                //<p>{run.msg_type + " - " + cron_timestamp_date.getHours() + ":" + cron_timestamp_date.getMinutes() + ":" + cron_timestamp_date.getSeconds()}</p>
+                              }
+
+                              // check if it ended with failure
+                              if ((run.msg_type === 'machine_result') && (run.ret_code > 0)) {
+                                return <FaSquareXmark title={cron_timestamp_date} style={{ color: "#D9544D", size: "3", marginLeft: "0.5em" }} />
+                                //return <p key={run.name + i} style={{ display: "inline-block", width: "2em", height: "1em", backgroundColor: "red", margin: "0 0.5em" }}></p>
+                              }
+
+                              // check if it just started
+                              if (run.msg_type === 'machine_start') {
+                                return <FaSquareCaretRight title={cron_timestamp_date} style={{ color: "#A9D1DF", size: "3", marginLeft: "0.5em" }} />
+                               // return <p key={run.name + i} onmouseover="ok" style={{ display: "inline-block", width: "1em", height: "1em", backgroundColor: "blue", margin: "0 0.5em" }}></p>
+                              }
+
+
+                            }
+                        }
                     }) : ""}
               </div>
           </td>
-          <td>2/8</td>
-          <td>3/8</td>
-          <td>4/8</td>
-          <td>5/8</td>
-          <td>6/8</td>
-          <td>7/8</td>
-          <td>8/8</td>
       </tr>
     );
   }
