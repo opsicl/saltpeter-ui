@@ -178,3 +178,13 @@ body {
   position:fixed; 
   bottom:0;
 }
+
+.apexcharts-tooltip {
+  background: #f3f3f3;
+  color: orange;
+}
+
+.apexcharts-grid-row{
+  fill: black;
+}
+

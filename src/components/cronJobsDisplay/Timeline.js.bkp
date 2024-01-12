@@ -14,8 +14,8 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timelineLast: "2h", /////////////////////
-      refresh: 100000, ////////////////////////
+      timelineLast: "2m", /////////////////////
+      refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
       backend_version:"",
@@ -51,8 +51,10 @@ class Timeline extends React.Component {
       series: [],
       options: {
           chart: {
-              height: 800,
+              height: 350,
               type: 'rangeBar',
+              background: 'black',
+              a:'b',
           },
           plotOptions: {
               bar: {
@@ -61,7 +63,11 @@ class Timeline extends React.Component {
                 rangeBarGroupRows: true
               }
           },
-          colors: ["#008000", "#FF0000"],
+          colors: [
+              "#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0",
+              "#3F51B5", "#546E7A", "#D4526E", "#8D5B4C", "#F86624",
+              "#D7263D", "#1B998B", "#2E294E", "#F46036", "#E2C044"
+          ],
           fill: {
               type: 'solid'
           },
@@ -70,6 +76,27 @@ class Timeline extends React.Component {
           },
           legend: {
               position: 'right'
+          },
+          dataLabels: {
+              enabled: true,
+              formatter: function(val, opts) {
+              var label = opts.w.globals.labels[opts.dataPointIndex]
+              var a = moment(val[0])
+              var b = moment(val[1])
+              var diff = b.diff(a, 'days')
+              return label + ': ' + diff + (diff > 1 ? ' days' : ' day')
+              },
+          },
+          tooltip: {
+              custom: function(opts) {
+              const fromYear = new Date(opts.y1).getFullYear()
+              const toYear = new Date(opts.y2).getFullYear()
+              const values = opts.ctx.rangeBar.getTooltipValues(opts)
+              
+              return (
+                ''
+              )
+              }
           },
           chart: {
              events: {
@@ -179,13 +206,13 @@ class Timeline extends React.Component {
     if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
-      for (var i = 0; i < cronJobs.length; i++) {
+      for (i = 0; i < cronJobs.length; i++) {
         cronJobs[i]["runningOn"] = [];
       }
 
       var json_result_running = JSON.parse(data).running;
       var keys_running = Object.keys(json_result_running);
-      for (var i = 0; i < keys_running.length; i++) {
+      for (i = 0; i < keys_running.length; i++) {
         var key_running = json_result_running[keys_running[i]]["name"];
         for (var j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_running) {
@@ -202,16 +229,16 @@ class Timeline extends React.Component {
     if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
-      for (var i = 0; i < cronJobs.length; i++) {
+      for (i = 0; i < cronJobs.length; i++) {
         cronJobs[i]["result"] = 0;
         cronJobs[i]["result"] = "Notrun";
       }
 
       var json_result_last_state = JSON.parse(data).last_state;
       var keys_last_state = Object.keys(json_result_last_state);
-      for (var i = 0; i < keys_last_state.length; i++) {
+      for (i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
-        for (var j = 0; j < cronJobs.length; j++) {
+        for (j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_name) {
             if (json_result_last_state[key_name]["result_ok"] === false) {
                 cronJobs[j]["result"] = "Fail"
@@ -228,89 +255,107 @@ class Timeline extends React.Component {
 
     // get timeline
     if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
-     console.log(new Date(), "start")
+      cronJobs = this.state.jobs  
+      var timeline = JSON.parse(data).timeline.content;   
+      for (i = 0; i < cronJobs.length; i++) {
+        var cronJobName = cronJobs[i]["name"]
+        var cronTimeline = []
+        for (j = 0; j < timeline.length; j++) {
+          if (cronJobName === timeline[j]["cron"]) {
+            cronTimeline.push(timeline[j])
+          }
+        }
+        cronJobs[i]["timeline"] = cronTimeline
+      }
+      this.setState({ jobs: cronJobs });
 
-      /// series first batch
+
+      /// series
       var seriesData = []
       var timeline = JSON.parse(data).timeline.content
-      var data = []
-      for (var i = 0; i < timeline.length; i++) {
+      for (i = 0; i < timeline.length; i++) {
           var jobName = timeline[i]["cron"]
           var jobInstance = timeline[i]["job_instance"]
           var msg_type = timeline[i]["msg_type"]
           var ret_code = timeline[i]['ret_code']
           var timestamp = timeline[i]['timestamp']
+          console.log(jobInstance, msg_type, new Date(timestamp).toLocaleString())
+
 
           var run_result
           if (timeline[i]['ret_code'] > 0) {
-               run_result = 'fail'
+            run_result = 'fail'
           } else {
-               run_result = 'pass'
+            run_result = 'pass'
           }
           
+          var x = timeline[i]["cron"]
           var y = []
+          var seriesItem = {}
           var xyItem = {}
-
+          var data = []
          //first element
-         var first = false
           if ((seriesData.length == 0) && (msg_type === 'machine_start')) {
             // add first element
               y.push(new Date(timestamp).getTime())
-              //y.push(new Date(timestamp).toLocaleString())
+
               xyItem['jobInstance'] = jobInstance
               xyItem['x'] = jobName
               xyItem['y'] = y
-              xyItem['result'] = run_result
-              seriesData.push(xyItem)
-              first = true
+
+              data.push(xyItem)
+
+              if (ret_code > 0) {
+                seriesItem['name'] = 'fail'
+              } else {
+                seriesItem['name'] = 'pass'
+              }
+
+              seriesItem['data'] = data
+              seriesData.push(seriesItem)
+              console.log('^first')
           } else {
             //search for job instance
              var resultSearchJobInstance = false
-             for (var j = 0; j < seriesData.length; j++) {
-                if (seriesData[j].jobInstance === jobInstance) {
-                   resultSearchJobInstance = true
-                   y = seriesData[j].y
-                   seriesData[j].result = run_result
-                   break
-                 }
+             for (j = 0; j < seriesData.length; j++) {
+               if (seriesData[j]['jobInstance'] === jobInstance) {
+                 resultSearchJobInstance = true
+                 y = seriesData[j]['y']
+                 console.log(seriesData[j]['data'])
+                 break
                }
-          }
-          // if not found and msg type = machine_start, add it
-          // if found and msg_type = machine_result, add it
-          // else, skip
-          //
-          if (!first && !resultSearchJobInstance && (msg_type === 'machine_start')) {
-            y.push(new Date(timestamp).getTime())
-            //y.push(new Date(timestamp).toLocaleString())
-            xyItem['jobInstance'] = jobInstance 
-            xyItem['x'] = jobName
-            xyItem['y'] = y
-            xyItem['result'] = run_result
-            seriesData.push(xyItem)
-          } else if (resultSearchJobInstance && (msg_type === 'machine_result')) {
-            y.push(new Date(timestamp).getTime()) 
-            //y.push(new Date(timestamp).toLocaleString())
-          } else {
-            // do nothing
-          }
-        }
+             }
 
-      // last list - series to process by react chart
-      var seriesDataFinal = [{'name':'pass', 'data':[]}, {'name':'fail', 'data':[]}]
-      for (var i = 0;  i < seriesData.length; i++){
-        var item = seriesData[i]
-        if (item.result === "pass") {
-          delete item.result
-          delete item.jobInstance
-          seriesDataFinal[0].data.push(item)
-        } else if (item.result === "fail") {
-          delete item.result
-          delete item.jobInstance
-          seriesDataFinal[1].data.push(item)
+            // if not found and msg type = machine_start, add it
+            // if found and msg_type = machine_result, add it
+            // else, skip
+            //
+            if (!resultSearchJobInstance && (msg_type === 'machine_start')) {
+              y.push(new Date(timestamp).getTime())
+          
+              xyItem['x'] = jobName
+              xyItem['y'] = y
+
+              data.push(xyItem)
+
+              seriesItem['data'] = data
+              seriesItem['jobInstance'] = jobInstance
+              seriesData.push(seriesItem)
+              console.log('^added start date')
+            } else if (resultSearchJobInstance && (msg_type === 'machine_result')) {
+              y.push(new Date(timestamp).getTime()) 
+              console.log('^added end date and status')
+              if (ret_code > 0) {
+                seriesItem['name'] = 'fail'
+              } else {
+                seriesItem['name'] = 'pass'
+              }
+            } else {
+              // do nothing
+            }
+           }
         }
-      }
-      this.setState({ series: seriesDataFinal });
-      console.log(new Date(), "end")
+      //this.setState({ series: seriesData });
 
     }
 
@@ -604,7 +649,7 @@ class Timeline extends React.Component {
             <p>Backend: {this.state.backend_version}</p>
         </div>
         <div id="chart">
-            <ReactApexChart options={this.state.options} series={this.state.series} type="rangeBar" height={800} />
+            <ReactApexChart options={this.state.options} series={this.state.series} type="rangeBar" height={350} />
         </div>
       </div>
     );
