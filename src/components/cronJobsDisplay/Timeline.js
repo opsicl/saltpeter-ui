@@ -14,8 +14,8 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timelineLast: "2h", /////////////////////
-      refresh: 100000, ////////////////////////
+      timelineLast: "5m", /////////////////////
+      refresh: 1000, ////////////////////////
       jobs: [],
       search: "",
       backend_version:"",
@@ -44,6 +44,7 @@ class Timeline extends React.Component {
         columns_width:"15%",
         column_command_width:"40%"
       },
+      dateNow: String(Date.now()),
       column_asc_sort:"",
       column_desc_sort:"",
       active_columns:[],
@@ -118,6 +119,9 @@ class Timeline extends React.Component {
     // send message to ws to get timeline info
     var obj = {}
     obj.last = this.state.timelineLast
+    var now = Date.now()
+    obj.id = String(now)
+    this.setState({dateNow: now})
     var obj_send = {}
     obj_send.getTimeline = obj
     var jsonString = JSON.stringify(obj_send)
