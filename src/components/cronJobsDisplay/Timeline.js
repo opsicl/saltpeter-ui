@@ -27,10 +27,14 @@ class Timeline extends React.Component {
               type: 'rangeBar',
               foreColor: '#E0D9F6',
               events: {
-                dataPointSelection: (event, chartContext, config) => {
-                   console.log(chartContext, config);
+                dataPointSelection: function(event, chartContext, config) {
+                  console.log(config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x);
+                },
+                xAxisLabelClick: function(event, chartContext, config) {
+                  console.log(config.globals.labels[config.labelIndex])
                 }
-            }
+              }
+                 
           },
           plotOptions: {
               bar: {
@@ -39,16 +43,30 @@ class Timeline extends React.Component {
                 rangeBarGroupRows: true
               }
           },
+          xaxis: {
+            type: 'datetime',
+          },
+          yaxis: {
+            labels: {
+              maxWidth: 250,
+              style: {
+                fontSize: '13px'
+              }
+            }
+          },
+
+          
           colors: ["#008000", "#FF0000"],
           fill: {
               type: 'solid'
           },
-          xaxis: {
-              type: 'datetime'
-          },
           legend: {
               position: 'right'
           },
+          tooltip: {
+            enabled: false,
+          },
+        
           tooltip: {
             custom: function(opts) {
               const fromTime = new Date(opts.y1).getTime();
@@ -59,13 +77,24 @@ class Timeline extends React.Component {
               const minutes = Math.floor((timeDiffInSeconds % 3600) / 60);
               const seconds = timeDiffInSeconds % 60;
 
-              const formattedTimeDiff = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+              const hoursStr = String(hours)
+              const minutesStr = String(minutes)
+              const secondsStr = String(seconds)
 
-              return (
-                `Ran for${formattedTimeDiff}`
-              );
+              var formattedTimeDiff = `${hoursStr}h:${minutesStr}m:${secondsStr}s`;
+          
+              if (hoursStr === '0') {
+                formattedTimeDiff = `${minutesStr}m:${secondsStr}s`
+                if (minutesStr === '0') {
+                  formattedTimeDiff = `${secondsStr}s`
+                }
+              }
+             return (
+               `   ran for ${formattedTimeDiff}   `
+             );
             }
           }
+          
       },
     }
 
@@ -237,7 +266,6 @@ class Timeline extends React.Component {
           if ((seriesData.length == 0) && (msg_type === 'machine_start')) {
             // add first element
               y.push(new Date(timestamp).getTime())
-              //y.push(new Date(timestamp).toLocaleString())
               xyItem['jobInstance'] = jobInstance
               xyItem['x'] = jobName
               xyItem['y'] = y
@@ -262,7 +290,6 @@ class Timeline extends React.Component {
           //
           if (!first && !resultSearchJobInstance && (msg_type === 'machine_start')) {
             y.push(new Date(timestamp).getTime())
-            //y.push(new Date(timestamp).toLocaleString())
             xyItem['jobInstance'] = jobInstance 
             xyItem['x'] = jobName
             xyItem['y'] = y
@@ -270,7 +297,6 @@ class Timeline extends React.Component {
             seriesData.push(xyItem)
           } else if (resultSearchJobInstance && (msg_type === 'machine_result')) {
             y.push(new Date(timestamp).getTime()) 
-            //y.push(new Date(timestamp).toLocaleString())
           } else {
             // do nothing
           }
