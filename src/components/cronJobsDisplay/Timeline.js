@@ -44,7 +44,7 @@ class Timeline extends React.Component {
         columns_width:"15%",
         column_command_width:"40%"
       },
-      dateNow: String(Date.now()),
+      dateNow: "",
       column_asc_sort:"",
       column_desc_sort:"",
       active_columns:[],
@@ -54,6 +54,12 @@ class Timeline extends React.Component {
           chart: {
               height: 800,
               type: 'rangeBar',
+              foreColor: '#E0D9F6',
+              events: {
+                dataPointSelection: (event, chartContext, config) => {
+                   console.log(chartContext, config);
+                }
+            }
           },
           plotOptions: {
               bar: {
@@ -72,20 +78,12 @@ class Timeline extends React.Component {
           legend: {
               position: 'right'
           },
-          chart: {
-             events: {
-                dataPointSelection: (event, chartContext, config) => {
-                   console.log(chartContext, config);
-                }
-            }
-          }
       },
     }
 
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this)
-    this.sortColumn.bind(this)
     this.sendToSettings.bind(this)
     this.getTimeline.bind(this)
   }
@@ -232,7 +230,7 @@ class Timeline extends React.Component {
 
     // get timeline
     if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
-     if (JSON.parse(data).timeline.id === this.state.dateNow) {  
+     if ((this.state.dateNow === "") || (JSON.parse(data).timeline.id === this.state.dateNow)) {  
       /// series first batch
       var seriesData = []
       var timeline = JSON.parse(data).timeline.content
@@ -326,120 +324,6 @@ class Timeline extends React.Component {
 
   }
 
-  sortColumn(column){
-      function compareAsc(a, b) {
-        try {
-          if (a[column] === undefined){
-            a[column] = ""
-          }
-          if (b[column] === undefined){
-            b[column] = ""
-          }
-          
-          var groupA = a[column]
-          var groupB = b[column]
-
-          if (typeof a[column] === 'string' || a[column] instanceof String) {
-            groupA = a[column].toUpperCase();
-          }
-
-          if (typeof b[column] === 'string' || b[column] instanceof String) {
-            groupB = b[column].toUpperCase();
-          }
-
-          if (column == 'number_of_targets'){
-            groupA = parseInt(a[column])
-            groupB = parseInt(b[column])
-          }
-            let comparison = 0;
-            if (groupA > groupB) {
-                comparison = 1;  
-            } else if (groupA < groupB) {
-                comparison = -1;
-            }
-            return comparison;
-        } catch (error) {
-            console.log(error)
-            let comparison = 0
-            return comparison;
-        }
-      }
-
-      function compareDesc(a, b) {
-        try {
-            if (a[column] === undefined){
-              a[column] = ""
-            }
-            if (b[column] === undefined){
-              b[column] = ""
-            }
-
-            var groupA = a[column]
-            var groupB = b[column]
-
-            if (typeof a[column] === 'string' || a[column] instanceof String) {
-              groupA = a[column].toUpperCase();
-            }
-
-            if (typeof b[column] === 'string' || b[column] instanceof String) {
-              groupB = b[column].toUpperCase();
-            }
-            
-            if (column == 'number_of_targets'){
-              groupA = parseInt(a[column])
-              groupB = parseInt(b[column])
-            }
-
-            let comparison = 0;  
-            if (groupA < groupB) {
-                comparison = 1;
-            } else if (groupA < groupB) {
-                comparison = -1;
-            }
-            return comparison;
-        } catch (error) {
-            let comparison = 0
-            return comparison;
-        }
-      }
-  
-      var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","soft_timeout","hard_timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","resultst","last_run"]
-      for (let i=0; i < keys.length; i++) {
-          var column_name = keys[i]
-          if (keys[i].includes("_")) {
-             column_name = keys[i].replace("_"," ")
-          }
-          try {
-            var elem_key = document.getElementById(keys[i])
-            elem_key.textContent = column_name
-          } catch (error) {
-              //continue
-          }
-        }
-      const elem = document.getElementById(column);
-      column_name = column
-      if (column.includes("_")) {
-          column_name = column.replace("_"," ")
-      } 
-
-      if (this.state.column_asc_sort == column) {
-          //desc sort
-          elem.textContent = column_name + " \u2191"
-          this.setState({ column_asc_sort: "", column_desc_sort: column, jobs: cronJobs.sort(compareDesc)});
-      /*} 
-      else if (this.state.column_desc_sort == column) {
-          elem.textContent = column
-          this.setState({ column_asc_sort: "", column_desc_sort: "", jobs: cronJobs});
-          */
-      } else {
-          // asc sort
-          elem.textContent = column_name + " \u2193"
-          this.setState({ column_asc_sort: column, column_desc_sort: "", jobs: cronJobs.sort(compareAsc)});
-      }
-  }
-
-
   componentDidMount() {
     //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
@@ -458,14 +342,6 @@ class Timeline extends React.Component {
      this.state.refresh);
 
 
-    //const fetchTimeline = () => {
-    //    self.getTimeline();
-    //    this.interval = setTimeout(fetchTimeline, this.state.refresh);
-   // };
-
-    //self.getTimeline();
-    //this.interval = setTimeout(fetchTimeline, this.state.refresh);
-    
     socket.onmessage =  function(event) {
       self.handleData(event.data);
     };
