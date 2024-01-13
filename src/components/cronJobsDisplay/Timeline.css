@@ -137,7 +137,7 @@ body {
 }
 
 
-.searchBar {
+.searchBarTimeline {
   border-radius: 5px;
   border-color: #BA4FD9;
   background-image: url("./icons/search_icon.png");
@@ -146,13 +146,13 @@ body {
   background-position: left center;
   background-position-x: 5px;
   background-size: 1.5rem 1.5rem;
-  width: 60%;
+  width: 44%;
   font-size: 13px;
   font-family: Montserrat-Medium;
   padding: 12px 20px 12px 40px;
   opacity: 0.5;
 }
-.searchBar:focus {
+.searchBarTimeline:focus {
   outline-color: #BA4FD9;
   outline-style: solid;
 }

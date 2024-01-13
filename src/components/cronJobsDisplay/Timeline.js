@@ -101,12 +101,12 @@ class Timeline extends React.Component {
     this.setState({ search: event.target.value.substr(0, 20) });
     if (event.target.value.substr(0, 20)) {
         const nextTitle = 'Saltpeter';
-        const nextURL = "?search=" + event.target.value.substr(0, 20);
+        const nextURL = "timeline?search=" + event.target.value.substr(0, 20);
         const nextState = { additionalInformation: 'Updated the URL with JS' };
         // This will create a new entry in the browser's history, without reloading
         window.history.replaceState(nextState,nextTitle,nextURL);
     } else {
-        const nextURL = "/"
+        const nextURL = "/timeline"
         const nextTitle = 'Saltpeter';
         const nextState = { additionalInformation: 'Updated the URL with JS' };
         // This will create a new entry in the browser's history, without reloading
@@ -232,7 +232,6 @@ class Timeline extends React.Component {
 
     // get timeline
     if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
-      console.log(typeof JSON.parse(data).timeline.id, typeof this.state.dateNow, JSON.parse(data).timeline.id === this.state.dateNow)
      if (JSON.parse(data).timeline.id === this.state.dateNow) {  
       /// series first batch
       var seriesData = []
@@ -313,6 +312,10 @@ class Timeline extends React.Component {
           seriesDataFinal[1].data.push(item)
         }
       }
+
+      seriesDataFinal.forEach(item => {
+        item.data.sort((a, b) => a.x.localeCompare(b.x));
+      });
       this.setState({ series: seriesDataFinal });
      }
     }
@@ -535,13 +538,17 @@ class Timeline extends React.Component {
         document.getElementById("searchBarInput").focus()
       }      
     })
+
+    const filteredSeries = this.state.series.map((item) => ({
+  name: item.name,
+  data: item.data.filter((dataItem) => dataItem.x.toLowerCase().includes(this.state.search.toLowerCase())),
+})).filter((item) => item.data.length > 0);
+
+
     let filteredJobs = this.state.jobs.filter((job) => {
       return (
         job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
-          -1 ||
-        job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
-        job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
-        job.result.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 
+          -1
       );
     });
 
@@ -550,25 +557,22 @@ class Timeline extends React.Component {
     ));
 
     return (
-      <div>
-        <table className="tableName">
+        <div>
+          <table className="tableName">
+            <tbody>
+              <tr>
+                <th>Timeline</th>
+              </tr>
+            </tbody>
+          </table>
+          <table className="tableName2">
           <tbody>
-            <tr>
-              <th>Crons</th>
-            </tr>
-          </tbody>
-        </table>
-        <table className="tableName2">
-          <tbody>
-            <tr style={{textAlign:"left"}}>
-              <th style={{cursor:"pointer",paddingLeft:"30px",textAlign:"left",verticalAlign:"bottom",width:"30%", fontSize:"9px", color:"#576AE2"}}>
-                <Link className="cols" to="/settings">set columns</Link>
-              </th>
-              <th style={{width:"70%", textAlign:"left"}}>
+            <tr style={{textAlign:"center"}}>
+              <th style={{width:"30%", textAlign:"center"}}>
                 <input
                   type="text"
-                  id="searchBarInput"
-                  className="searchBar"
+                  id="searchBarInputTimeline"
+                  className="searchBarTimeline"
                   placeholder="Search"
                   value={this.state.search}
                   onChange={this.updateSearch.bind(this)}
@@ -578,36 +582,12 @@ class Timeline extends React.Component {
             </tr>
           </tbody>
         </table>
-        <table id="cronsTable" className="data">
-        <div className="cronsdiv">
-          <tbody>  
-            <tr style={{cursor:"pointer"}}>
-              {this.state.settings['column_name_checked']?<th id="name" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'name')}>Name</th>:""}
-              <th id="timeline" style={{ width: "85%" }}>Timeline</th>
-            </tr>
-          </tbody>
-          <tbody>
-              {tableData}
-          </tbody>
+        <div id="chart" style = {{marginLeft:"2.5%", marginRight:"2.5%", marginBottom:"2%"}}>
+            <ReactApexChart options={this.state.options} series={filteredSeries} type="rangeBar" height={800} />
         </div>
-        </table>
-        <p
-          style={{
-            padding: "5px",
-            fontSize: "12px",
-            textAlign: "center",
-            columnSpan: "all",
-            color:"#d6d6d6"
-          }}
-        >
-          {filteredJobs == "" ? "No Data Available" : ""}
-        </p>
         <div className = "versions">
             <p>UI: {UI_VERSION}</p>
             <p>Backend: {this.state.backend_version}</p>
-        </div>
-        <div id="chart">
-            <ReactApexChart options={this.state.options} series={this.state.series} type="rangeBar" height={800} />
         </div>
       </div>
     );
