@@ -1,5 +1,4 @@
 import React from "react";
-import CronJobTimeline from "./CronJobTimeline";
 import "./Timeline.css";
 import { socket } from "./socket.js";
 import { Link } from "react-router-dom";
@@ -19,35 +18,7 @@ class Timeline extends React.Component {
       jobs: [],
       search: "",
       backend_version:"",
-      settings: {
-        column_name_checked: true, 
-        column_command_checked: true,
-        column_cwd_checked: false,
-        column_user_checked: false,
-        column_soft_timeout_checked: false,
-        column_hard_timeout_checked: false,
-        column_targets_checked: false,
-        column_target_type_checked: false,
-        column_number_of_targets_checked: false,
-        column_dom_checked: false,
-        column_dow_checked: false,
-        column_hour_checked: false,
-        column_min_checked: false,
-        column_mon_checked: false,
-        column_sec_checked: false,
-        column_year_checked: false,
-        column_batch_size_checked: false,
-        column_running_on_checked: true, 
-        column_last_run_checked: true, 
-        column_group_checked: true, 
-        column_result_checked: false,
-        columns_width:"15%",
-        column_command_width:"40%"
-      },
       dateNow: "",
-      column_asc_sort:"",
-      column_desc_sort:"",
-      active_columns:[],
       config_received: false,
       series: [],
       options: {
@@ -78,21 +49,30 @@ class Timeline extends React.Component {
           legend: {
               position: 'right'
           },
+          tooltip: {
+            custom: function(opts) {
+              const fromTime = new Date(opts.y1).getTime();
+              const toTime = new Date(opts.y2).getTime();
+              const timeDiffInSeconds = Math.floor((toTime - fromTime) / 1000);
+
+              const hours = Math.floor(timeDiffInSeconds / 3600);
+              const minutes = Math.floor((timeDiffInSeconds % 3600) / 60);
+              const seconds = timeDiffInSeconds % 60;
+
+              const formattedTimeDiff = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+              return (
+                `Ran for${formattedTimeDiff}`
+              );
+            }
+          }
       },
     }
 
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this)
-    this.sendToSettings.bind(this)
     this.getTimeline.bind(this)
-  }
-
-  sendToSettings(){
-      const nextTitle = 'Saltpeter';
-      const nextURL = "settings";
-      const nextState = { additionalInformation: 'Updated the URL with JS' };
-      window.history.pushState(nextState,nextTitle,nextURL);
   }
 
   updateSearch(event) {
@@ -349,56 +329,7 @@ class Timeline extends React.Component {
     socket.onclose = function(event) {
       self.setState({jobs: []});
     }
-    if (window.localStorage.getItem('settingsState')){
-      this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
-    }
-
     
-    var settings = JSON.parse(window.localStorage.getItem('settingsState'))
-    if (settings == null) {
-      settings = {
-        column_name_checked: true,
-        column_command_checked: true,
-        column_cwd_checked: false,
-        column_user_checked: false,
-        column_soft_timeout_checked: false,
-        column_hard_timeout_checked: false,
-        column_targets_checked: false,
-        column_target_type_checked: false,
-        column_number_of_targets_checked: false,
-        column_dom_checked: false,
-        column_dow_checked: false,
-        column_hour_checked: false,
-        column_min_checked: false,
-        column_mon_checked: false,
-        column_sec_checked: false,
-        column_year_checked: false,
-        column_batch_size_checked: false,
-        column_running_on_checked: true,
-        column_last_run_checked: true,
-        column_group_checked: true,
-        column_result_checked: false,
-        columns_width:"15%",
-        column_command_width:"40%",
-        column_timeline_width: "45%"
-      }
-    }
-    this.setState({ settings: settings})
-    var active_columns = []
-    if (settings) {
-        for (const col in settings) {
-            if (settings[col]){
-                if ((col != "column_command_width") && (col != "columns_width")) {
-                    //var col_name = col.replace("column_","").replace("_checked","").replace("_"," ")
-                    var col_name = col.replace("column_","").replace("_checked","")
-                    active_columns.push(col_name)
-                }
-            }
-        }
-    } else {
-        active_columns=["name"]
-    }
-    this.setState({ active_columns: active_columns})
   }
 
   componentWillUnmount() {
@@ -427,10 +358,6 @@ class Timeline extends React.Component {
           -1
       );
     });
-
-    var tableData = filteredJobs.map((item) => (
-      <CronJobTimeline key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} timelineLast={this.state.timelineLast}/>
-    ));
 
     return (
         <div>
