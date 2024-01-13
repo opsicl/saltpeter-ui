@@ -15,7 +15,7 @@ class Timeline extends React.Component {
     super(props);
     this.state = {
       timelineLast: "5m", /////////////////////
-      refresh: 1000, ////////////////////////
+      refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
       backend_version:"",
@@ -119,8 +119,8 @@ class Timeline extends React.Component {
     // send message to ws to get timeline info
     var obj = {}
     obj.last = this.state.timelineLast
-    var now = Date.now()
-    obj.id = String(now)
+    var now = String(Date.now())
+    obj.id = now
     this.setState({dateNow: now})
     var obj_send = {}
     obj_send.getTimeline = obj
@@ -232,8 +232,8 @@ class Timeline extends React.Component {
 
     // get timeline
     if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
-     console.log(new Date(), "start")
-
+      console.log(typeof JSON.parse(data).timeline.id, typeof this.state.dateNow, JSON.parse(data).timeline.id === this.state.dateNow)
+     if (JSON.parse(data).timeline.id === this.state.dateNow) {  
       /// series first batch
       var seriesData = []
       var timeline = JSON.parse(data).timeline.content
@@ -314,8 +314,7 @@ class Timeline extends React.Component {
         }
       }
       this.setState({ series: seriesDataFinal });
-      console.log(new Date(), "end")
-
+     }
     }
 
     if (this.state.config_received === false) {
