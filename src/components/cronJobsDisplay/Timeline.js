@@ -69,6 +69,7 @@ class Timeline extends React.Component {
         
           tooltip: {
             custom: function(opts) {
+              const cronName = opts.w['config']['series'][opts.seriesIndex]['data'][opts.dataPointIndex]['x']
               const fromTime = new Date(opts.y1).getTime();
               const toTime = new Date(opts.y2).getTime();
               const timeDiffInSeconds = Math.floor((toTime - fromTime) / 1000);
@@ -89,9 +90,10 @@ class Timeline extends React.Component {
                   formattedTimeDiff = `${secondsStr}s`
                 }
               }
-             return (
-               `   ran for ${formattedTimeDiff}   `
-             );
+             return '<ul style="margin: 0.2em">' +
+                      '<li>' + cronName + '</li>' +
+                       '<li>' + 'ran for: ' + formattedTimeDiff + '</li>' +
+                    '</ul>'
             }
           }
           
@@ -343,6 +345,7 @@ class Timeline extends React.Component {
     }
     
     var self = this;
+    self.getTimeline()
     this.interval = setInterval(
      () => self.getTimeline(),
      this.state.refresh);
