@@ -488,7 +488,7 @@ class Timeline extends React.Component {
             onChange={(e) => this.setState({ endDate: e.target.value })}
           />
            <div>
-              <label htmlFor="refreshInterval" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>Refresh: </label>
+              <label htmlFor="refreshInterval" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '6em', fontSize: '0.8em' }}>Refresh: </label>
                 <select id="refreshInterval" style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }} onChange={this.setRefreshInterval.bind(this)} value={this.state.refresh}>
                   <option value="off" style={{ backgroundColor: '#CCCCCC' }}>off</option>
                   <option value="10s" style={{ backgroundColor: '#CCCCCC' }}>10 sec</option>
@@ -497,7 +497,7 @@ class Timeline extends React.Component {
                   <option value="5m" style={{ backgroundColor: '#CCCCCC' }}>5 min</option>
                 </select>
     </div>
-          <button className="button" style={{color:"white", backgroundColor: "#808080", marginLeft: "15em", width: "10em"}} onClick={this.getTimeline.bind(this)}>
+          <button className="button" style={{color:"white", backgroundColor: "#808080", marginLeft: "12em", width: "10em"}} onClick={this.getTimeline.bind(this)}>
             <FontAwesomeIcon icon={faSync} style={{ marginRight: '0.5em' }} />
              Refresh
            </button>
