@@ -363,8 +363,8 @@ class Timeline extends React.Component {
 
   componentDidMount() {
     //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
-    const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
-    this.setState(rehydrate)
+    //const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
+    //this.setState(rehydrate)
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
     if (search_word){
@@ -406,7 +406,7 @@ class Timeline extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedState', JSON.stringify(this.state))
-    sessionStorage.setItem('savedState', JSON.stringify(this.state))
+    //sessionStorage.setItem('savedState', JSON.stringify(this.state))
     clearInterval(this.interval);
   }
 
