@@ -3,7 +3,8 @@ import "./Timeline.css";
 import { socket } from "./socket.js";
 import { Link } from "react-router-dom";
 import ReactApexChart from 'react-apexcharts';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSync } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 let apis = require("../../version.json");
@@ -13,7 +14,8 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timelineLast: "2m", /////////////////////
+      startDate: "now-5m",
+      endDate: "now",
       refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
@@ -127,7 +129,8 @@ class Timeline extends React.Component {
   getTimeline() {
     // send message to ws to get timeline info
     var obj = {}
-    obj.last = this.state.timelineLast
+    obj.start_date = this.state.startDate
+    obj.end_date = this.state.endDate
     var now = String(Date.now())
     obj.id = now
     this.setState({dateNow: now})
@@ -344,11 +347,25 @@ class Timeline extends React.Component {
         this.setState({ search:""})
     }
     
+    // get timeline
+    // send message to ws to get timeline info
+    var obj = {}
+    obj.start_date = this.state.startDate
+    obj.end_date = this.state.endDate
+    var now = String(Date.now())
+    obj.id = now
+    this.setState({dateNow: now})
+    var obj_send = {}
+    obj_send.getTimeline = obj
+    var jsonString = JSON.stringify(obj_send)
+    socket.send(jsonString);
+
+
     var self = this;
-    self.getTimeline()
-    this.interval = setInterval(
-     () => self.getTimeline(),
-     this.state.refresh);
+    //self.getTimeline()
+    //this.interval = setInterval(
+    // () => self.getTimeline(),
+    // this.state.refresh);
 
 
     socket.onmessage =  function(event) {
@@ -427,6 +444,28 @@ class Timeline extends React.Component {
             </tr>
           </tbody>
         </table>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: '93%' }}>
+          <label htmlFor="startDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>From:</label>
+          <input
+            style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            type="text"
+            id="startDate"
+            value={this.state.startDate}
+            onChange={(e) => this.setState({ startDate: e.target.value })}
+          />
+          <label htmlFor="endDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>To:</label>
+          <input
+      style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            type="text"
+            id="endDate"
+            value={this.state.endDate}
+            onChange={(e) => this.setState({ endDate: e.target.value })}
+          />
+          <button className="button" style={{color:"white", backgroundColor: "#808080", marginLeft: "15em", width: "10em"}} onClick={this.getTimeline.bind(this)}>
+            <FontAwesomeIcon icon={faSync} style={{ marginRight: '0.5em' }} />
+             Refresh
+           </button>
+        </div>
         <div id="chart" style = {{marginLeft:"2.5%", marginRight:"2.5%", marginBottom:"2%"}}>
             <ReactApexChart options={this.state.options} series={filteredSeries} type="rangeBar" height={800} />
         </div>
