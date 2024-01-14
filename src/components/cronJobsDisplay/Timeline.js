@@ -13,7 +13,7 @@ class Timeline extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timelineLast: "5m", /////////////////////
+      timelineLast: "2m", /////////////////////
       refresh: 10000, ////////////////////////
       jobs: [],
       search: "",
@@ -375,10 +375,23 @@ class Timeline extends React.Component {
       }      
     })
 
-    const filteredSeries = this.state.series.map((item) => ({
-  name: item.name,
-  data: item.data.filter((dataItem) => dataItem.x.toLowerCase().includes(this.state.search.toLowerCase())),
-})).filter((item) => item.data.length > 0);
+    var filteredSeries = this.state.series.map((item) => ({
+      name: item.name,
+      data: item.data.filter((dataItem) => dataItem.x.toLowerCase().includes(this.state.search.toLowerCase())),
+    })).filter((item) => item.data.length > 0);
+
+    if ((this.state.search.toLowerCase() === 'pass') || (this.state.search.toLowerCase() === 'fail')){ 
+      filteredSeries = this.state.series.filter(series => series.name === this.state.search.toLowerCase());
+    }
+
+   
+    // Add an entry for 'pass' if it doesn't exist in the filtered result
+    if (!filteredSeries.some(item => item.name === 'pass')) {
+     filteredSeries.unshift({ name: 'pass', data: [] });
+    } 
+    if (!filteredSeries.some(item => item.name === 'fail')) {
+     filteredSeries.push({ name: 'fail', data: [] });
+    }
 
 
     let filteredJobs = this.state.jobs.filter((job) => {
