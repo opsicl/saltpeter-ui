@@ -13,10 +13,16 @@ const UI_VERSION = apis.version;
 class Timeline extends React.Component {
   constructor(props) {
     super(props);
+    
+    this.handleData.bind(this)
+    this.getTimeline.bind(this)
+    this.setRefreshInterval.bind(this)
+
     this.state = {
+      interval: "",
       startDate: "now-5m",
       endDate: "now",
-      refresh: 10000, ////////////////////////
+      refresh: "off",
       jobs: [],
       search: "",
       backend_version:"",
@@ -30,10 +36,11 @@ class Timeline extends React.Component {
               foreColor: '#E0D9F6',
               events: {
                 dataPointSelection: function(event, chartContext, config) {
-                  console.log(config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x);
+                  //console.log(config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x);
                 },
                 xAxisLabelClick: function(event, chartContext, config) {
                   console.log(config.globals.labels[config.labelIndex])
+                   window.location.href = '/details/' + config.globals.labels[config.labelIndex]
                 }
               }
                  
@@ -104,8 +111,27 @@ class Timeline extends React.Component {
 
     socket.debug=true;
     socket.timeoutInterval = 5400;
-    this.handleData.bind(this)
-    this.getTimeline.bind(this)
+  }
+
+  setRefreshInterval(event) {
+    var val = event.target.value
+    this.setState({'refresh':val})
+
+    if (this.state.interval) {
+      clearInterval(this.state.interval);
+    }
+
+    if (val === "10s") {
+       this.setState({interval:setInterval(() => this.getTimeline(),10000)})
+    } else if (val === "30s") {
+      this.setState({interval:setInterval(() => this.getTimeline(),30000)})
+    } else if (val === "1m") {
+      this.setState({interval:setInterval(() => this.getTimeline(),60000)})
+    } else if (val === "5m") {
+      this.setState({interval:setInterval(() => this.getTimeline(),300000)})
+    } else {
+      // means it's set to off, so do nothing
+    }
   }
 
   updateSearch(event) {
@@ -461,6 +487,16 @@ class Timeline extends React.Component {
             value={this.state.endDate}
             onChange={(e) => this.setState({ endDate: e.target.value })}
           />
+           <div>
+              <label htmlFor="refreshInterval" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>Refresh: </label>
+                <select id="refreshInterval" style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }} onChange={this.setRefreshInterval.bind(this)} value={this.state.refresh}>
+                  <option value="off" style={{ backgroundColor: '#CCCCCC' }}>off</option>
+                  <option value="10s" style={{ backgroundColor: '#CCCCCC' }}>10 sec</option>
+                  <option value="30s" style={{ backgroundColor: '#CCCCCC' }}>30 sec</option>
+                  <option value="1m" style={{ backgroundColor: '#CCCCCC' }}>1 min</option>
+                  <option value="5m" style={{ backgroundColor: '#CCCCCC' }}>5 min</option>
+                </select>
+    </div>
           <button className="button" style={{color:"white", backgroundColor: "#808080", marginLeft: "15em", width: "10em"}} onClick={this.getTimeline.bind(this)}>
             <FontAwesomeIcon icon={faSync} style={{ marginRight: '0.5em' }} />
              Refresh

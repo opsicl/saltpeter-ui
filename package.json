@@ -4,6 +4,9 @@
   "private": true,
   "dependencies": {
     "@fontsource/space-mono": "^4.5.12",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@material-ui/icons": "^4.9.1",
     "@sweetalert2/theme-dark": "^4.0.0",
     "@sweetalert2/theme-material-ui": "^4.0.0",
