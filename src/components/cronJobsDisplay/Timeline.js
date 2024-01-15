@@ -17,7 +17,7 @@ class Timeline extends React.Component {
     this.handleData.bind(this)
     this.getTimeline.bind(this)
     this.setRefreshInterval.bind(this)
-
+    
     this.state = {
       interval: "",
       startDate: "now-5m",
@@ -41,9 +41,16 @@ class Timeline extends React.Component {
                 xAxisLabelClick: function(event, chartContext, config) {
                   console.log(config.globals.labels[config.labelIndex])
                    window.location.href = '/details/' + config.globals.labels[config.labelIndex]
+                },
+                zoomed : (chartContext, { xaxis }) => {
+                  const fromTime = new Date(xaxis.min).toLocaleString();
+                  const toTime =  new Date(xaxis.max).toLocaleString();
+                  this.setState({
+                     startDate: fromTime,
+                     endDate: toTime,
+                  });
                 }
-              }
-                 
+              },
           },
           plotOptions: {
               bar: {
@@ -70,7 +77,7 @@ class Timeline extends React.Component {
 
 
           
-          colors: ["#008000", "#FF0000"],
+          colors: ["#DEFE47", "#7700A6"],
           fill: {
               type: 'solid'
           },
@@ -464,7 +471,7 @@ class Timeline extends React.Component {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: '93%' }}>
           <label htmlFor="startDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>From:</label>
           <input
-            style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="startDate"
             value={this.state.startDate}
@@ -472,7 +479,7 @@ class Timeline extends React.Component {
           />
           <label htmlFor="endDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>To:</label>
           <input
-      style={{ width: '7em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+      style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="endDate"
             value={this.state.endDate}
