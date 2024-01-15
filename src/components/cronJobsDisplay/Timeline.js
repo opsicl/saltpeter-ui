@@ -85,10 +85,6 @@ class Timeline extends React.Component {
               position: 'right'
           },
           tooltip: {
-            enabled: false,
-          },
-        
-          tooltip: {
             custom: function(opts) {
               const cronName = opts.w['config']['series'][opts.seriesIndex]['data'][opts.dataPointIndex]['x']
               const fromTime = new Date(opts.y1).getTime();
