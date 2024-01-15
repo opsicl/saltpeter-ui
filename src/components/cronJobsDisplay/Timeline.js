@@ -26,7 +26,7 @@ class Timeline extends React.Component {
       jobs: [],
       search: "",
       backend_version:"",
-      dateNow: "",
+      dateNow: String(new Date().getTime()),
       config_received: false,
       series: [],
       options: {
@@ -110,7 +110,7 @@ class Timeline extends React.Component {
     }
 
     socket.debug=true;
-    socket.timeoutInterval = 5400;
+    //socket.timeoutInterval = 5400;
   }
 
   setRefreshInterval(event) {
@@ -157,7 +157,7 @@ class Timeline extends React.Component {
     var obj = {}
     obj.start_date = this.state.startDate
     obj.end_date = this.state.endDate
-    var now = String(Date.now())
+    var now = String(new Date().getTime())
     obj.id = now
     this.setState({dateNow: now})
     var obj_send = {}
@@ -168,7 +168,7 @@ class Timeline extends React.Component {
   }
 
   handleData(data) {
-    sessionStorage.setItem('savedState', JSON.stringify(this.state))
+    //sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
     // get backend version
     if (JSON.parse(data).hasOwnProperty("sp_version")){
@@ -269,8 +269,8 @@ class Timeline extends React.Component {
     }
 
     // get timeline
-    if ((JSON.parse(data).hasOwnProperty("timeline"))  && (this.state.config_received === true)) {
-     if ((this.state.dateNow === "") || (JSON.parse(data).timeline.id === this.state.dateNow)) {  
+    if (JSON.parse(data).hasOwnProperty("timeline")) {
+     if ((JSON.parse(data).timeline.id === this.state.dateNow)) {
       /// series first batch
       var seriesData = []
       var timeline = JSON.parse(data).timeline.content
@@ -354,17 +354,13 @@ class Timeline extends React.Component {
       this.setState({ series: seriesDataFinal });
      }
     }
-
-    if (this.state.config_received === false) {
-      window.location.reload(false);
-    }
-
   }
 
   componentDidMount() {
     //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     //const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
     //this.setState(rehydrate)
+    
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
     if (search_word){
@@ -373,35 +369,25 @@ class Timeline extends React.Component {
         this.setState({ search:""})
     }
     
+    var self = this
     // get timeline
+    // send message to ws to get timeline info
     // send message to ws to get timeline info
     var obj = {}
     obj.start_date = this.state.startDate
     obj.end_date = this.state.endDate
-    var now = String(Date.now())
+    var now = this.state.dateNow
     obj.id = now
-    this.setState({dateNow: now})
     var obj_send = {}
     obj_send.getTimeline = obj
     var jsonString = JSON.stringify(obj_send)
     socket.send(jsonString);
 
 
-    var self = this;
-    //self.getTimeline()
-    //this.interval = setInterval(
-    // () => self.getTimeline(),
-    // this.state.refresh);
-
-
     socket.onmessage =  function(event) {
       self.handleData(event.data);
     };
 
-    socket.onclose = function(event) {
-      self.setState({jobs: []});
-    }
-    
   }
 
   componentWillUnmount() {
