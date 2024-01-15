@@ -54,6 +54,7 @@ class Timeline extends React.Component {
           },
           xaxis: {
             type: 'datetime',
+            position: 'top',
           },
           yaxis: {
             labels: {
@@ -61,8 +62,12 @@ class Timeline extends React.Component {
               style: {
                 fontSize: '13px'
               }
-            }
+            },
           },
+        grid: {
+          show: false,
+            },
+
 
           
           colors: ["#008000", "#FF0000"],
