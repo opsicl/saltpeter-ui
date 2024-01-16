@@ -52,10 +52,23 @@ class Timeline extends React.Component {
                 }
               },
           },
+          noData: {
+            text: 'No data available',
+            align: 'center',
+            verticalAlign: 'middle',
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: '#e0d9f6',
+              fontSize: '14px',
+            }
+        },
+
           plotOptions: {
               bar: {
                 horizontal: true,
-                barHeight: '50%',
+                borderRadius: 3,
+                barHeight: '40%',
                 rangeBarGroupRows: true,
                 columnWidth: '100%'
               }
