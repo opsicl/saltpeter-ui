@@ -30,6 +30,9 @@ class Timeline extends React.Component {
       config_received: false,
       series: [],
       options: {
+          annotations: {
+            points: []
+          },
           chart: {
               height: 800,
               type: 'rangeBar',
@@ -186,98 +189,6 @@ class Timeline extends React.Component {
         this.setState({ backend_version: json_result_version});
     }
 
-    //config
-    if (JSON.parse(data).hasOwnProperty("config")) {
-      var json_result_config = JSON.parse(data).config.crons;
-      var keys = Object.keys(json_result_config);
-      var cronJobs = [];
-      this.setState({ config_received: true});
-
-      for (var i = 0; i < keys.length; i++) {
-         // set default number of target to 0
-        var no_of_targets = json_result_config[keys[i]]["number_of_targets"]
-        if (!no_of_targets) {
-            no_of_targets = "0"
-        }
-
-        cronJobs.push({
-          id: i,
-          name: keys[i],
-          command: json_result_config[keys[i]]["command"],
-          cwd: json_result_config[keys[i]]["cwd"],
-          user: json_result_config[keys[i]]["user"],
-          soft_timeout: json_result_config[keys[i]]["soft_timeout"],
-          hard_timeout: json_result_config[keys[i]]["hard_timeout"],
-          targets: json_result_config[keys[i]]["targets"],
-          target_type: json_result_config[keys[i]]["target_type"],
-          number_of_targets: no_of_targets,
-          dom: json_result_config[keys[i]]["dom"],
-          dow: json_result_config[keys[i]]["dow"],
-          hour: json_result_config[keys[i]]["hour"],
-          min: json_result_config[keys[i]]["min"],
-          mon: json_result_config[keys[i]]["mon"],
-          sec: json_result_config[keys[i]]["sec"],
-          year: json_result_config[keys[i]]["year"],
-          group: json_result_config[keys[i]]["group"],
-          batch_size: json_result_config[keys[i]]["batch_size"],
-          runningOn: [],
-          result: 'NotRun',
-          last_run: "",
-          timeline: []
-        });
-      }
-      this.setState({jobs: cronJobs})
-    }
-    if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
-      cronJobs = this.state.jobs;
-      //clear previous data
-      for (var i = 0; i < cronJobs.length; i++) {
-        cronJobs[i]["runningOn"] = [];
-      }
-
-      var json_result_running = JSON.parse(data).running;
-      var keys_running = Object.keys(json_result_running);
-      for (var i = 0; i < keys_running.length; i++) {
-        var key_running = json_result_running[keys_running[i]]["name"];
-        for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_running) {
-            cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
-            cronJobs[j]["result"] = "Running";
-            break;
-          }
-        }
-      }
-
-      this.setState({ jobs: cronJobs });
-    }
-
-    if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
-      cronJobs = this.state.jobs;
-      //clear previous data
-      for (var i = 0; i < cronJobs.length; i++) {
-        cronJobs[i]["result"] = 0;
-        cronJobs[i]["result"] = "Notrun";
-      }
-
-      var json_result_last_state = JSON.parse(data).last_state;
-      var keys_last_state = Object.keys(json_result_last_state);
-      for (var i = 0; i < keys_last_state.length; i++) {
-        var key_name = keys_last_state[i]
-        for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_name) {
-            if (json_result_last_state[key_name]["result_ok"] === false) {
-                cronJobs[j]["result"] = "Fail"
-            } else {
-                cronJobs[j]["result"] = "Success"
-            }
-            cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
-            break;
-          }
-        }
-      }
-      this.setState({ jobs: cronJobs }); /////////////////////////
-    }
-
     // get timeline
     if (JSON.parse(data).hasOwnProperty("timeline")) {
      if ((JSON.parse(data).timeline.id === this.state.dateNow)) {
@@ -361,6 +272,23 @@ class Timeline extends React.Component {
       seriesDataFinal.forEach(item => {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
+
+      var annPoints = []
+
+      for (var i = 0;  i < seriesData.length; i++){
+       var item = seriesData[i]
+       var point = {
+              x: new Date(item.y[0]+(item.y[1]-item.y[0])/2).getTime(),
+              y: item.x,
+              marker: {
+                size: 8,
+                shape: "circle",
+                radius: 2,
+               }
+            }
+       annPoints.push(point)
+     }
+     this.setState({ options: {annotations:{points: annPoints}}});
       this.setState({ series: seriesDataFinal });
      }
     }
