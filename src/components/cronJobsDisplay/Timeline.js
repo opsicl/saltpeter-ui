@@ -233,6 +233,7 @@ class Timeline extends React.Component {
                 radius: 2,
                 fillColor: color
                },
+         
               mouseEnter: (function (itemCopy) {
                 return function(event) {
                   var fromTime = new Date(itemCopy.y[0]).getTime()
@@ -253,6 +254,7 @@ class Timeline extends React.Component {
                   }
                   document.getElementById('marker').value = itemCopy.x + " - ran for " + formattedTimeDiff;
                  };
+                
               })(item)
           }
        annPoints.push(point)
@@ -277,7 +279,8 @@ class Timeline extends React.Component {
       seriesDataFinal.forEach(item => {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
-      this.setState({ series: seriesDataFinal, options: {annotations:{points: annPoints}} });
+     // this.setState({ series: seriesDataFinal})
+      this.setState({ series: seriesDataFinal , options: {annotations:{points: annPoints}} });
      }
     }
   }
