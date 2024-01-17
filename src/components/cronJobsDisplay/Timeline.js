@@ -57,7 +57,8 @@ class Timeline extends React.Component {
                 horizontal: true,
                 barHeight: '50%',
                 rangeBarGroupRows: true,
-                columnWidth: '100%'
+                columnWidth: '100%',
+                borderRadius: 3,
               }
           },
           xaxis: {
