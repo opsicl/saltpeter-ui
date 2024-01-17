@@ -225,7 +225,7 @@ class Timeline extends React.Component {
          color = "#7700A6"
        }
        var point = {
-              x: new Date(item.y[0]+(item.y[1]-item.y[0])/2).getTime(),
+              x: new Date(item.y[0]).getTime(),
               y: item.x,
               marker: {
                 size: 12,
