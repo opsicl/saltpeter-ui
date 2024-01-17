@@ -254,6 +254,28 @@ class Timeline extends React.Component {
           }
         }
 
+      var annPoints = []
+
+      for (var i = 0;  i < seriesData.length; i++){
+       var item = seriesData[i]
+       var color = "#DEFE47"
+       if (item.result === "fail"){
+         color = "#7700A6"
+       }
+       var point = {
+              x: new Date(item.y[0]+(item.y[1]-item.y[0])/2).getTime(),
+              y: item.x,
+              marker: {
+                size: 12,
+                shape: "square",
+                radius: 2,
+                fillColor: color
+               }
+          }
+       annPoints.push(point)
+     }
+
+
       // last list - series to process by react chart
       var seriesDataFinal = [{'name':'pass', 'data':[]}, {'name':'fail', 'data':[]}]
       for (var i = 0;  i < seriesData.length; i++){
@@ -273,24 +295,6 @@ class Timeline extends React.Component {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
 
-      var annPoints = []
-
-      for (var i = 0;  i < seriesData.length; i++){
-       var item = seriesData[i]
-       var point = {
-              x: new Date(item.y[0]+(item.y[1]-item.y[0])/2).getTime(),
-              y: item.x,
-              marker: {
-                size: 8,
-                shape: "circle",
-                radius: 2,
-               },
-               mouseEnter: function(item) { 
-                 console.log(item.y)
-                 }
-          }
-       annPoints.push(point)
-     }
      this.setState({ options: {annotations:{points: annPoints}}});
       this.setState({ series: seriesDataFinal });
      }
