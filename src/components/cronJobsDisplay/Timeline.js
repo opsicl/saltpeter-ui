@@ -30,14 +30,12 @@ class Timeline extends React.Component {
       config_received: false,
       series: [],
       options: {
+          annotations: {},
           chart: {
               height: 800,
               type: 'rangeBar',
               foreColor: '#E0D9F6',
               events: {
-                dataPointSelection: function(event, chartContext, config) {
-                  //console.log(config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x);
-                },
                 xAxisLabelClick: function(event, chartContext, config) {
                   console.log(config.globals.labels[config.labelIndex])
                    window.location.href = '/details/' + config.globals.labels[config.labelIndex]
@@ -55,7 +53,7 @@ class Timeline extends React.Component {
           plotOptions: {
               bar: {
                 horizontal: true,
-                barHeight: '50%',
+                barHeight: '0%',
                 rangeBarGroupRows: true
               }
           },
@@ -71,12 +69,9 @@ class Timeline extends React.Component {
               }
             },
           },
-        grid: {
-          show: false,
-            },
-
-
-          
+          grid: {
+            show: false,
+          },
           colors: ["#DEFE47", "#7700A6"],
           fill: {
               type: 'solid'
@@ -84,36 +79,6 @@ class Timeline extends React.Component {
           legend: {
               position: 'right'
           },
-          tooltip: {
-            custom: function(opts) {
-              const cronName = opts.w['config']['series'][opts.seriesIndex]['data'][opts.dataPointIndex]['x']
-              const fromTime = new Date(opts.y1).getTime();
-              const toTime = new Date(opts.y2).getTime();
-              const timeDiffInSeconds = Math.floor((toTime - fromTime) / 1000);
-
-              const hours = Math.floor(timeDiffInSeconds / 3600);
-              const minutes = Math.floor((timeDiffInSeconds % 3600) / 60);
-              const seconds = timeDiffInSeconds % 60;
-
-              const hoursStr = String(hours)
-              const minutesStr = String(minutes)
-              const secondsStr = String(seconds)
-
-              var formattedTimeDiff = `${hoursStr}h:${minutesStr}m:${secondsStr}s`;
-          
-              if (hoursStr === '0') {
-                formattedTimeDiff = `${minutesStr}m:${secondsStr}s`
-                if (minutesStr === '0') {
-                  formattedTimeDiff = `${secondsStr}s`
-                }
-              }
-             return '<ul style="margin: 0.2em">' +
-                      '<li>' + cronName + '</li>' +
-                       '<li>' + 'ran for: ' + formattedTimeDiff + '</li>' +
-                    '</ul>'
-            }
-          }
-          
       },
     }
 
@@ -341,6 +306,27 @@ class Timeline extends React.Component {
           }
         }
 
+      var annPoints = []
+      for (var i = 0;  i < seriesData.length; i++){
+       var item = seriesData[i]
+       var color = "#DEFE47"
+       if (item.result === "fail"){
+         color = "#7700A6"
+       }
+       var point = {
+              x: new Date(item.y[0]+(item.y[1]-item.y[0])/2).getTime(),
+              y: item.x,
+              marker: {
+                size: 12,
+                shape: "square",
+                radius: 2,
+                fillColor: color
+               }
+          }
+       annPoints.push(point)
+     }
+
+
       // last list - series to process by react chart
       var seriesDataFinal = [{'name':'pass', 'data':[]}, {'name':'fail', 'data':[]}]
       for (var i = 0;  i < seriesData.length; i++){
@@ -359,7 +345,7 @@ class Timeline extends React.Component {
       seriesDataFinal.forEach(item => {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
-      this.setState({ series: seriesDataFinal });
+      this.setState({ series: seriesDataFinal, options: {annotations:{points: annPoints}} });
      }
     }
   }
