@@ -58,7 +58,7 @@ class Timeline extends React.Component {
           plotOptions: {
               bar: {
                 horizontal: true,
-                barHeight: '50%',
+                barHeight: '0%',
                 rangeBarGroupRows: true,
                 columnWidth: '100%',
                 borderRadius: 3,
