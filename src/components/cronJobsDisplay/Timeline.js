@@ -29,8 +29,9 @@ class Timeline extends React.Component {
       dateNow: String(new Date().getTime()),
       config_received: false,
       series: [],
+      annotationsPoints:[],
       options: {
-          annotations: {},
+        annotations: {points:[]},
           chart: {
               height: 800,
               type: 'rangeBar',
@@ -233,7 +234,6 @@ class Timeline extends React.Component {
                 radius: 2,
                 fillColor: color
                },
-         
               mouseEnter: (function (itemCopy) {
                 return function(event) {
                   var fromTime = new Date(itemCopy.y[0]).getTime()
@@ -254,7 +254,6 @@ class Timeline extends React.Component {
                   }
                   document.getElementById('marker').value = itemCopy.x + " - ran for " + formattedTimeDiff;
                  };
-                
               })(item)
           }
        annPoints.push(point)
@@ -279,17 +278,12 @@ class Timeline extends React.Component {
       seriesDataFinal.forEach(item => {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
-     // this.setState({ series: seriesDataFinal})
-      this.setState({ series: seriesDataFinal , options: {annotations:{points: annPoints}} });
+      this.setState({ series: seriesDataFinal , annotationsPoints: annPoints });
      }
     }
   }
 
   componentDidMount() {
-    //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
-    //const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
-    //this.setState(rehydrate)
-    
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
     if (search_word){
@@ -300,7 +294,6 @@ class Timeline extends React.Component {
     
     var self = this
     // get timeline
-    // send message to ws to get timeline info
     // send message to ws to get timeline info
     var obj = {}
     obj.start_date = this.state.startDate
@@ -320,12 +313,11 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount() {
-    //localStorage.setItem('savedState', JSON.stringify(this.state))
-    //sessionStorage.setItem('savedState', JSON.stringify(this.state))
     clearInterval(this.interval);
   }
 
   render() {
+    console.log(this.state.options)
     window.addEventListener("keydown",function (e) {             
     if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {        
         e.preventDefault();         
@@ -351,13 +343,17 @@ class Timeline extends React.Component {
      filteredSeries.push({ name: 'fail', data: [] });
     }
 
+    var opts = JSON.parse(JSON.stringify(this.state.options))
 
-    let filteredJobs = this.state.jobs.filter((job) => {
-      return (
-        job.command.toLowerCase().indexOf(this.state.search.toLowerCase()) !==
-          -1
-      );
+    var filteredAnnotations = this.state.annotationsPoints.filter(annotation => {
+      return filteredSeries.some(series => {
+        return series.data.some(dataPoint => {
+          return annotation.y === dataPoint.x && annotation.x === dataPoint.y[0];
+        });
+      });
     });
+
+    opts.annotations.points = filteredAnnotations
 
     return (
         <div>
@@ -425,7 +421,7 @@ class Timeline extends React.Component {
            </button>
         </div>
         <div id="chart" style = {{marginLeft:"2.5%", marginRight:"2.5%", marginBottom:"2%"}}>
-            <ReactApexChart options={this.state.options} series={filteredSeries} type="rangeBar" height={800} />
+            <ReactApexChart options={opts} series={filteredSeries} type="rangeBar" height={800} />
         </div>
         <div className = "versions">
             <p>UI: {UI_VERSION}</p>
