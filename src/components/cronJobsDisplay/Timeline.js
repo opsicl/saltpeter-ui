@@ -284,8 +284,11 @@ class Timeline extends React.Component {
                 size: 8,
                 shape: "circle",
                 radius: 2,
-               }
-            }
+               },
+               mouseEnter: function(item) { 
+                 console.log(item.y)
+                 }
+          }
        annPoints.push(point)
      }
      this.setState({ options: {annotations:{points: annPoints}}});
