@@ -357,8 +357,8 @@ class Timeline extends React.Component {
                    window.location.href = '/details/' + config.globals.labels[config.labelIndex]
                 },
                 zoomed: function(chartContext, {xaxis}) {
-                  document.getElementById('startDate').value = new Date(xaxis.min).toString();
-                  document.getElementById('endDate').value =  new Date(xaxis.max).toString();
+                  document.getElementById('startDate').value = new Date(xaxis.min).toUTCString();
+                  document.getElementById('endDate').value =  new Date(xaxis.max).toUTCString();
                 }
               }
 
@@ -392,7 +392,7 @@ class Timeline extends React.Component {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: '93%' }}>
           <label htmlFor="marker" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>Selected Marker</label>
           <input
-            style={{width: '25em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            style={{width: '30em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="marker"
             readOnly={true}
@@ -400,7 +400,7 @@ class Timeline extends React.Component {
 
           <label htmlFor="startDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '6em', fontSize: '0.8em' }}>From:</label>
           <input
-            style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            style={{ width: '18em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="startDate"
             defaultValue="now-5m"
@@ -408,7 +408,7 @@ class Timeline extends React.Component {
           />
           <label htmlFor="endDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>To:</label>
           <input
-      style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+      style={{ width: '18em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="endDate"
             defaultValue="now"
