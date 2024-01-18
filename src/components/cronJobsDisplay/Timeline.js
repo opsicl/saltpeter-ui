@@ -41,7 +41,6 @@ class Timeline extends React.Component {
                   document.getElementById('marker').value = "" 
                 },
                 xAxisLabelClick: function(event, chartContext, config) {
-                  console.log(config.globals.labels[config.labelIndex])
                    window.location.href = '/details/' + config.globals.labels[config.labelIndex]
                 },
                 zoomed : (chartContext, { xaxis }) => {
@@ -81,7 +80,9 @@ class Timeline extends React.Component {
               type: 'solid'
           },
           legend: {
-              position: 'right'
+              position: 'right',
+              onItemClick: {toggleDataSeries: false},
+              onItemHover: {highlightDataSeries: false}
           },
       },
     }
@@ -354,6 +355,24 @@ class Timeline extends React.Component {
     });
 
     opts.annotations.points = filteredAnnotations
+    opts.chart.events = {
+                mouseLeave: function(event, chartContext, config) {
+                  document.getElementById('marker').value = ""
+                },
+                xAxisLabelClick: function(event, chartContext, config) {
+                   window.location.href = '/details/' + config.globals.labels[config.labelIndex]
+                },
+                zoomed : (chartContext, { xaxis }) => {
+                  const fromTime = new Date(xaxis.min).toLocaleString();
+                  const toTime =  new Date(xaxis.max).toLocaleString();
+                  this.setState({
+                     startDate: fromTime,
+                     endDate: toTime,
+                  });
+                }
+    }
+
+    console.log(opts)
 
     return (
         <div>
