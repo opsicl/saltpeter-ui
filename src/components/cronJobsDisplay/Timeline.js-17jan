@@ -6,7 +6,6 @@ import ReactApexChart from 'react-apexcharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
-import _ from 'lodash';
 
 let apis = require("../../version.json");
 const UI_VERSION = apis.version;
@@ -21,6 +20,8 @@ class Timeline extends React.Component {
     
     this.state = {
       interval: "",
+      startDate: "now-5m",
+      endDate: "now",
       refresh: "off",
       jobs: [],
       search: "",
@@ -28,13 +29,31 @@ class Timeline extends React.Component {
       dateNow: String(new Date().getTime()),
       config_received: false,
       series: [],
-      annotationsPoints:[],
+      annotations: [],
+      filteredSeries:[],
       options: {
-        annotations: {points:[]},
+          annotations: {},
           chart: {
               height: 800,
               type: 'rangeBar',
               foreColor: '#E0D9F6',
+              events: {
+                mouseLeave: function(event, chartContext, config) {
+                  document.getElementById('marker').value = "" 
+                },
+                xAxisLabelClick: function(event, chartContext, config) {
+                  console.log(config.globals.labels[config.labelIndex])
+                   window.location.href = '/details/' + config.globals.labels[config.labelIndex]
+                },
+                zoomed : (chartContext, { xaxis }) => {
+                  const fromTime = new Date(xaxis.min).toLocaleString();
+                  const toTime =  new Date(xaxis.max).toLocaleString();
+                  this.setState({
+                     startDate: fromTime,
+                     endDate: toTime,
+                  });
+                }
+              },
           },
           plotOptions: {
               bar: {
@@ -63,9 +82,7 @@ class Timeline extends React.Component {
               type: 'solid'
           },
           legend: {
-              position: 'right',
-              onItemClick: {toggleDataSeries: false},
-              onItemHover: {highlightDataSeries: false}
+              position: 'right'
           },
       },
     }
@@ -96,7 +113,9 @@ class Timeline extends React.Component {
   }
 
   updateSearch(event) {
+    var search = event.target.value.substr(0, 20)
     this.setState({ search: event.target.value.substr(0, 20) });
+    /*
     if (event.target.value.substr(0, 20)) {
         const nextTitle = 'Saltpeter';
         const nextURL = "timeline?search=" + event.target.value.substr(0, 20);
@@ -110,14 +129,46 @@ class Timeline extends React.Component {
         // This will create a new entry in the browser's history, without reloading
         window.history.replaceState(nextState,nextTitle,nextURL);
     }
+    */
+    console.log(this.state.series)
+    var filteredSeries = this.state.series.map((item) => ({
+      name: item.name,
+      data: item.data.filter((dataItem) => dataItem.x.toLowerCase().includes(search.toLowerCase())),
+    })).filter((item) => item.data.length > 0);
 
+    // Add an entry for 'pass' if it doesn't exist in the filtered result
+    if (!filteredSeries.some(item => item.name === 'pass')) {
+     filteredSeries.unshift({ name: 'pass', data: [] });
+    }
+    if (!filteredSeries.some(item => item.name === 'fail')) {
+     filteredSeries.push({ name: 'fail', data: [] });
+    }
+
+    if ((this.state.search.toLowerCase() === 'pass') || (this.state.search.toLowerCase() === 'fail')){
+      filteredSeries = this.state.series.filter(series => series.name === this.state.search.toLowerCase());
+    }
+
+    console.log(filteredSeries)
+
+    
+    let filteredAnnotations = [];
+    var annotations = this.state.annotations
+
+    filteredAnnotations = annotations.filter(annotation => {
+      return filteredSeries.some(series => {
+        return series.data.some(dataPoint => {
+         return annotation.y === dataPoint.x && annotation.x === dataPoint.y[0];
+        });
+      });
+    });
+    this.setState({ options: {annotations:{points: filteredAnnotations}} });
   }
 
   getTimeline() {
     // send message to ws to get timeline info
     var obj = {}
-    obj.start_date = document.getElementById('startDate').value
-    obj.end_date = document.getElementById('endDate').value
+    obj.start_date = this.state.startDate
+    obj.end_date = this.state.endDate
     var now = String(new Date().getTime())
     obj.id = now
     this.setState({dateNow: now})
@@ -218,6 +269,7 @@ class Timeline extends React.Component {
                 radius: 2,
                 fillColor: color
                },
+         
               mouseEnter: (function (itemCopy) {
                 return function(event) {
                   var fromTime = new Date(itemCopy.y[0]).getTime()
@@ -238,12 +290,12 @@ class Timeline extends React.Component {
                   }
                   document.getElementById('marker').value = itemCopy.x + " - ran for " + formattedTimeDiff;
                  };
+                
               })(item)
           }
        annPoints.push(point)
      }
-
-
+      
       // last list - series to process by react chart
       var seriesDataFinal = [{'name':'pass', 'data':[]}, {'name':'fail', 'data':[]}]
       for (var i = 0;  i < seriesData.length; i++){
@@ -262,12 +314,15 @@ class Timeline extends React.Component {
       seriesDataFinal.forEach(item => {
         item.data.sort((a, b) => a.x.localeCompare(b.x));
       });
-      this.setState({ series: seriesDataFinal , annotationsPoints: annPoints });
+      this.setState({ series: seriesDataFinal , annotations: annPoints, options: {annotations:{points: annPoints}} })
      }
     }
   }
 
   componentDidMount() {
+    //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
+    //const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
+    //this.setState(rehydrate)
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
     if (search_word){
@@ -279,9 +334,10 @@ class Timeline extends React.Component {
     var self = this
     // get timeline
     // send message to ws to get timeline info
+    // send message to ws to get timeline info
     var obj = {}
-    obj.start_date = document.getElementById('startDate').value
-    obj.end_date = document.getElementById('endDate').value
+    obj.start_date = this.state.startDate
+    obj.end_date = this.state.endDate
     var now = this.state.dateNow
     obj.id = now
     var obj_send = {}
@@ -297,6 +353,8 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount() {
+    //localStorage.setItem('savedState', JSON.stringify(this.state))
+    //sessionStorage.setItem('savedState', JSON.stringify(this.state))
     clearInterval(this.interval);
   }
 
@@ -307,44 +365,6 @@ class Timeline extends React.Component {
         document.getElementById("searchBarInput").focus()
       }      
     })
-
-    var filteredSeries = this.state.series.map((item) => ({
-      name: item.name,
-      data: item.data.filter((dataItem) => dataItem.x.toLowerCase().includes(this.state.search.toLowerCase())),
-    })).filter((item) => item.data.length > 0);
-
-    if ((this.state.search.toLowerCase() === 'pass') || (this.state.search.toLowerCase() === 'fail')){ 
-      filteredSeries = this.state.series.filter(series => series.name === this.state.search.toLowerCase());
-    }
-
-   
-    // Add an entry for 'pass' if it doesn't exist in the filtered result
-    if (!filteredSeries.some(item => item.name === 'pass')) {
-     filteredSeries.unshift({ name: 'pass', data: [] });
-    } 
-    if (!filteredSeries.some(item => item.name === 'fail')) {
-     filteredSeries.push({ name: 'fail', data: [] });
-    }
-
-    //var opts = JSON.parse(JSON.stringify(this.state.options))
-    var opts = _.cloneDeep(this.state.options)
-
-    var filteredAnnotations = this.state.annotationsPoints.filter(annotation => {
-      return filteredSeries.some(series => {
-        return series.data.some(dataPoint => {
-          return annotation.y === dataPoint.x && annotation.x === dataPoint.y[0];
-        });
-      });
-    });
-
-    opts.annotations.points = filteredAnnotations
-    opts.chart.events = {
-                zoomed: function(chartContext, {xaxis}) {
-                  document.getElementById('startDate').value = new Date(xaxis.min).toLocaleString();
-                  document.getElementById('endDate').value =  new Date(xaxis.max).toLocaleString();
-                }
-              }
-
 
     return (
         <div>
@@ -385,7 +405,7 @@ class Timeline extends React.Component {
             style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="startDate"
-            defaultValue="now-5m"
+            value={this.state.startDate}
             onChange={(e) => this.setState({ startDate: e.target.value })}
           />
           <label htmlFor="endDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>To:</label>
@@ -393,7 +413,8 @@ class Timeline extends React.Component {
       style={{ width: '16em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="endDate"
-            defaultValue="now"
+            value={this.state.endDate}
+            onChange={(e) => this.setState({ endDate: e.target.value })}
           />
            <div>
               <label htmlFor="refreshInterval" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '6em', fontSize: '0.8em' }}>Refresh: </label>
@@ -410,9 +431,11 @@ class Timeline extends React.Component {
              Refresh
            </button>
         </div>
-        <div id="chart" style = {{marginLeft:"2.5%", marginRight:"2.5%", marginBottom:"2%"}}>
-            <ReactApexChart options={opts} series={filteredSeries} type="rangeBar" height={800} />
-        </div>
+        <div id="chart" style={{ marginLeft: "2.5%", marginRight: "2.5%", marginBottom: "2%" }}>
+            <ReactApexChart options={this.state.options} series={this.state.series} type="rangeBar" height={800} />
+      </div>
+
+
         <div className = "versions">
             <p>UI: {UI_VERSION}</p>
             <p>Backend: {this.state.backend_version}</p>
