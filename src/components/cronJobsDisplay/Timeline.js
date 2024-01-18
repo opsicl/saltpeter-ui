@@ -81,8 +81,8 @@ class Timeline extends React.Component {
           },
           legend: {
               position: 'right',
-              onItemClick: {toggleDataSeries: false},
-              onItemHover: {highlightDataSeries: false}
+              //onItemClick: {toggleDataSeries: false},
+              //onItemHover: {highlightDataSeries: false}
           },
       },
     }
@@ -318,7 +318,6 @@ class Timeline extends React.Component {
   }
 
   render() {
-    console.log(this.state.options)
     window.addEventListener("keydown",function (e) {             
     if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {        
         e.preventDefault();         
@@ -371,8 +370,6 @@ class Timeline extends React.Component {
                   });
                 }
     }
-
-    console.log(opts)
 
     return (
         <div>
