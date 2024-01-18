@@ -32,7 +32,7 @@ class Timeline extends React.Component {
       options: {
         annotations: {points:[]},
           chart: {
-              height: 800,
+              height: '650',
               type: 'rangeBar',
               foreColor: '#E0D9F6',
           },
@@ -116,8 +116,19 @@ class Timeline extends React.Component {
   getTimeline() {
     // send message to ws to get timeline info
     var obj = {}
-    obj.start_date = document.getElementById('startDate').value
-    obj.end_date = document.getElementById('endDate').value
+    var startDateStr = document.getElementById('startDate').value
+    var endDateStr = document.getElementById('endDate').value
+
+    obj.start_date = new Date(startDateStr)
+    obj.end_date = new Date(endDateStr)
+
+    if (startDateStr.includes('now')) {
+      obj.start_date = startDateStr
+    }
+    if (endDateStr.includes('now')) {
+      obj.end_date = endDateStr
+    }
+
     var now = String(new Date().getTime())
     obj.id = now
     this.setState({dateNow: now})
@@ -343,12 +354,11 @@ class Timeline extends React.Component {
                   document.getElementById('marker').value = ""
                 },
                 xAxisLabelClick: function(event ,chartContext, config) {
-                   console.log(config)
                    window.location.href = '/details/' + config.globals.labels[config.labelIndex]
                 },
                 zoomed: function(chartContext, {xaxis}) {
-                  document.getElementById('startDate').value = new Date(xaxis.min).toLocaleString();
-                  document.getElementById('endDate').value =  new Date(xaxis.max).toLocaleString();
+                  document.getElementById('startDate').value = new Date(xaxis.min).toString();
+                  document.getElementById('endDate').value =  new Date(xaxis.max).toString();
                 }
               }
 
@@ -382,9 +392,10 @@ class Timeline extends React.Component {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right', width: '93%' }}>
           <label htmlFor="marker" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '3em', fontSize: '0.8em' }}>Selected Marker</label>
           <input
-            style={{ readOnly:"readonly" , width: '25em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
+            style={{width: '25em', backgroundColor: '#CCCCCC', border: '1px solid #000000', padding:'0.3em', textAlign: 'center', fontSize: '0.8em' }}
             type="text"
             id="marker"
+            readOnly={true}
           />
 
           <label htmlFor="startDate" style={{ color: '#e0d9f6', marginRight: '1em', marginLeft: '6em', fontSize: '0.8em' }}>From:</label>
@@ -418,7 +429,7 @@ class Timeline extends React.Component {
            </button>
         </div>
         <div id="chart" style = {{marginLeft:"2.5%", marginRight:"2.5%", marginBottom:"2%"}}>
-            <ReactApexChart options={opts} series={filteredSeries} type="rangeBar" height={800} />
+            <ReactApexChart options={opts} series={filteredSeries} type="rangeBar" height={'650'} />
         </div>
         <div className = "versions">
             <p>UI: {UI_VERSION}</p>
