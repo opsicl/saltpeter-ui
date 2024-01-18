@@ -339,6 +339,13 @@ class Timeline extends React.Component {
 
     opts.annotations.points = filteredAnnotations
     opts.chart.events = {
+                mouseLeave: function(chartContext, config) {
+                  document.getElementById('marker').value = ""
+                },
+                xAxisLabelClick: function(event ,chartContext, config) {
+                   console.log(config)
+                   window.location.href = '/details/' + config.globals.labels[config.labelIndex]
+                },
                 zoomed: function(chartContext, {xaxis}) {
                   document.getElementById('startDate').value = new Date(xaxis.min).toLocaleString();
                   document.getElementById('endDate').value =  new Date(xaxis.max).toLocaleString();
