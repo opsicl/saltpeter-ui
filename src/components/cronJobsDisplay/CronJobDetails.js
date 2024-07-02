@@ -412,7 +412,7 @@ class CronJobDetails extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedStateDetails', JSON.stringify(this.state))
-    
+    localStorage.setItem('tzState', this.state.tz) 
     this.stopInterval();
 
     var obj = {}
