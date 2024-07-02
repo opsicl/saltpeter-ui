@@ -352,13 +352,20 @@ class JobsTable extends React.Component {
     socket.onclose = function(event) {
       self.setState({jobs: []});
     }
+
+    // timezone
+    if (window.localStorage.getItem('tzState')){
+      this.setState({ tz: window.localStorage.getItem('tzState')})
+      this.changeTz(window.localStorage.getItem('tzState'))
+    } else {
+      this.setState({ tz: 'local'})
+      this.changeTz('local')
+    }
+
+
     if (window.localStorage.getItem('settingsState')){
       this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
     }
-
-    // timezone
-    this.setState({'tz':'local'})
-    this.changeTz('local')
 
     var settings = JSON.parse(window.localStorage.getItem('settingsState'))
     if (settings == null) {
@@ -407,6 +414,7 @@ class JobsTable extends React.Component {
   }
 
   componentWillUnmount() {
+    localStorage.setItem('tzState', this.state.tz)
     this.stopInterval();
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
