@@ -70,7 +70,6 @@ class JobsTable extends React.Component {
   };
 
   changeTz(tz){
-      console.log(tz)
       var local_text = document.getElementById("local_tz");
       var utc_text = document.getElementById("utc_tz");
       if (tz == 'local') {
