@@ -47,13 +47,14 @@ class CronJobDetails extends React.Component {
       targetsJob: [],
       results: {},
       overlap: "",
-      currentTime: Date.now(),
       untilNextRun: "",
       hardTimeoutCounter: "",
       ranForCounter: "",
       //softTimeoutCounter: "",
       startedJob:"",
       backend_version: this.props.location.state !== undefined ? this.props.location.state.backend_version : "",
+      tz: this.props.location.state !== undefined ? this.props.location.state.tz : "local",
+      currentTimeLocal: Date.now(),
     }
     this.handleData.bind(this);
     this.calculateHardTimeout.bind(this);
@@ -63,7 +64,39 @@ class CronJobDetails extends React.Component {
     //this.killJob.bind(this);
     this.killCron.bind(this);
     this.calculateRanFor.bind(this);
+    this.changeTz.bind(this);
   }
+
+  startInterval = () => {
+    this.interval = setInterval(
+      () => {
+        const currentTime = this.state.tz === "utc" ? new Date().toUTCString() : new Date().toLocaleString();
+        this.setState({ currentTime });
+      },
+      1000
+    );
+  };
+
+  stopInterval = () => {
+    clearInterval(this.interval);
+  };
+
+  changeTz(tz){
+      var local_text = document.getElementById("local_tz");
+      var utc_text = document.getElementById("utc_tz");
+      if (tz == 'local') {
+        utc_text.style.color = "#6ECBF5";
+  local_text.style.color = "#DEFE47";
+  this.setState({'tz':'local'})
+  this.startInterval();
+      } else if (tz == 'utc') {
+  local_text.style.color = "#6ECBF5";
+        utc_text.style.color = "#DEFE47";
+  this.setState({'tz':'utc'})
+  this.startInterval();
+      }
+  }
+
 
   runJob = () => {
     var obj = {}
@@ -241,10 +274,20 @@ class CronJobDetails extends React.Component {
       var name = Object.keys(data)[0];
       if (name === this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
-          this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()})
+          if (this.state.tz === "local") {
+              this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()})
+          }
+          if (this.state.tz === "utc") {
+              this.setState({ next_run: new Date(data[name]["next_run"]).toUTCString()})
+          }
         }
         if (data[name].hasOwnProperty("last_run")){
-          this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()})
+          if (this.state.tz === "local") {
+              this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()})
+          }
+          if (this.state.tz === "utc") {
+              this.setState({ last_run : new Date(data[name]["last_run"]).toUTCString()})
+          }
         }
         if (data[name].hasOwnProperty("targets")){
           this.setState({ targetsJob : data[name]["targets"].sort() })
@@ -262,6 +305,9 @@ class CronJobDetails extends React.Component {
   componentDidMount() {
     //const rehydrate = JSON.parse(localStorage.getItem('savedStateiDetails'))
     //this.setState(rehydrate)
+    // timezone
+    this.changeTz(this.state.tz)
+
 
     function secondsDiff(d1, d2) { 
       let secDiff = Math.floor( ((d2 - d1) % (1000*60))/1000 );
@@ -351,8 +397,8 @@ class CronJobDetails extends React.Component {
 
     this.interval = setInterval(
       () => this.setState((prevState,props) => ({
-	      currentTime: Date.now(),
-          untilNextRun:  String(daysDiff(prevState.currentTime, new Date(prevState.next_run))) + "d " + String(hoursDiff(prevState.currentTime, new Date(prevState.next_run)))+"h " + String(minutesDiff(prevState.currentTime, new Date(prevState.next_run))) + "m " + String(secondsDiff(prevState.currentTime, new Date(prevState.next_run)))+"s",
+          currentTimeLocal: Date.now(),
+          untilNextRun:  String(daysDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "d " + String(hoursDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"h " + String(minutesDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "m " + String(secondsDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"s",
           hardTimeoutCounter: self.calculateHardTimeout(),
           ranForCounter: self.calculateRanFor(),
           //softTimeoutCounter: self.calculateSoftTimeout(),
@@ -366,17 +412,33 @@ class CronJobDetails extends React.Component {
 
   componentWillUnmount() {
     //localStorage.setItem('savedStateDetails', JSON.stringify(this.state))
+    
+    this.stopInterval();
+
     var obj = {}
     obj.unsubscribe = this.state.name
     var jsonString = JSON.stringify(obj)
     socket.send(jsonString);
 
-    clearInterval(this.interval);
   }
 
   render(){
     return(
     <div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+      <div className="date">
+          <span style={{ display: 'inline-block', marginRight: '1em'}}>
+                        <p>{this.state.currentTime}</p>
+                </span>
+      <span style={{ display: 'inline-block', marginRight: '1em', cursor: 'pointer' }} onClick={this.changeTz.bind(this, 'local')} >
+          <p id="local_tz">Local</p>
+      </span>
+      <span style={{ display: 'inline-block', marginRight: '1em', cursor: 'pointer'}} onClick={this.changeTz.bind(this, 'utc')}>
+          <p id="utc_tz">UTC</p>
+      </span>
+      </div>
+  </div>
+
         <div style={{marginLeft:"4%"}}>
           <h1 className="cronTitle">
             {this.state.name}
@@ -522,10 +584,14 @@ class CronJobDetails extends React.Component {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
                         <p className="machineNameRight">{target}</p>
-                        {this.state.results[target]["starttime"] ?
-                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toLocaleString()}</span></p> : ""} 
-                        {this.state.results[target]["endtime"] ? 
+                        {this.state.results[target]["starttime"] && this.state.tz === "local" ?
+                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toLocaleString()}</span></p> : ""}
+                        {this.state.results[target]["starttime"] && this.state.tz === "utc" ?
+                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toUTCString()}</span></p> : ""}
+                        {this.state.results[target]["endtime"] && this.state.tz === "local" ? 
                             <p className="sectionDetails" >ended at: <span>{new Date(this.state.results[target]["endtime"]).toLocaleString()}</span></p>: ""}
+                        {this.state.results[target]["endtime"] && this.state.tz === "utc" ?
+                            <p className="sectionDetails" >ended at: <span>{new Date(this.state.results[target]["endtime"]).toUTCString()}</span></p>: ""}
                         {this.state.results[target]["starttime"] ?
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 

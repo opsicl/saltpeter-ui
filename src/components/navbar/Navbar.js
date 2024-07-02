@@ -6,19 +6,6 @@ import "./Navbar.css";
 class Navbar extends React.Component{
   constructor(props) {
     super(props);
-    this.state = {
-      currentTime: new Date().toLocaleString(),
-    };
-  }
-
-  componentDidMount() {
-    this.interval = setInterval(
-     () => this.setState({ currentTime: new Date().toLocaleString() }),
-     1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
   }
 
   render() {
@@ -41,9 +28,6 @@ class Navbar extends React.Component{
                         );
                     })}
                 </ul>
-            </div>
-            <div className="nav-right">
-                <p className="date">{this.state.currentTime}</p>
             </div>
         </div>
      </div>
