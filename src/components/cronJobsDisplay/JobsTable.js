@@ -15,7 +15,7 @@ class JobsTable extends React.Component {
     this.state = {
       jobs: [],
       search: "",
-      tz: "",
+//    currentTime: new Date().toLocaleString(),
       backend_version:"",
       settings: {
         column_name_checked: true, 
@@ -51,38 +51,7 @@ class JobsTable extends React.Component {
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
     this.sortColumn.bind(this);
-    this.sendToSettings.bind(this);
-    this.changeTz.bind(this)
-  }
-
-  startInterval = () => {
-    this.interval = setInterval(
-      () => {
-        const currentTime = this.state.tz === "utc" ? new Date().toUTCString() : new Date().toLocaleString();
-        this.setState({ currentTime });
-      },
-      1000
-    );
-  };
-
-  stopInterval = () => {
-    clearInterval(this.interval);
-  };
-
-  changeTz(tz){
-      var local_text = document.getElementById("local_tz");
-      var utc_text = document.getElementById("utc_tz");
-      if (tz == 'local') {
-        utc_text.style.color = "#6ECBF5";
-	local_text.style.color = "#DEFE47";
-	this.setState({'tz':'local'})
-	this.startInterval();
-      } else if (tz == 'utc') {
-	local_text.style.color = "#6ECBF5";
-        utc_text.style.color = "#DEFE47";
-	this.setState({'tz':'utc'})
-	this.startInterval();
-      }
+    this.sendToSettings.bind(this)
   }
 
   sendToSettings(){
@@ -204,7 +173,7 @@ class JobsTable extends React.Component {
             } else {
                 cronJobs[j]["result"] = "Success"
             }
-            cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
+            cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"];
             break;
           }
         }
@@ -332,7 +301,6 @@ class JobsTable extends React.Component {
 
 
   componentDidMount() {
-
     //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
     const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
     this.setState(rehydrate)
@@ -352,21 +320,11 @@ class JobsTable extends React.Component {
     socket.onclose = function(event) {
       self.setState({jobs: []});
     }
-
-    // timezone
-    if (window.localStorage.getItem('tzState')){
-      this.setState({ tz: window.localStorage.getItem('tzState')})
-      this.changeTz(window.localStorage.getItem('tzState'))
-    } else {
-      this.setState({ tz: 'local'})
-      this.changeTz('local')
-    }
-
-
     if (window.localStorage.getItem('settingsState')){
       this.setState({ settings: JSON.parse(window.localStorage.getItem('settingsState'))})
     }
 
+    
     var settings = JSON.parse(window.localStorage.getItem('settingsState'))
     if (settings == null) {
       settings = {
@@ -414,8 +372,6 @@ class JobsTable extends React.Component {
   }
 
   componentWillUnmount() {
-    localStorage.setItem('tzState', this.state.tz)
-    this.stopInterval();
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
     //clearInterval(this.interval);
@@ -439,24 +395,11 @@ class JobsTable extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} tz={this.state.tz}/>
+      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings}/>
     ));
 
     return (
       <div>
-	<div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-	    <div className="date">
-	        <span style={{ display: 'inline-block', marginRight: '1em'}}>
-                        <p>{this.state.currentTime}</p>
-                </span>
-  		<span style={{ display: 'inline-block', marginRight: '1em', cursor: 'pointer' }} onClick={this.changeTz.bind(this, 'local')} >
-    			<p id="local_tz">Local</p>
-  		</span>
-  		<span style={{ display: 'inline-block', marginRight: '1em', cursor: 'pointer'}} onClick={this.changeTz.bind(this, 'utc')}>
-    			<p id="utc_tz">UTC</p>
-  		</span>
-	    </div>
-	</div>
         <table className="tableName">
           <tbody>
             <tr>

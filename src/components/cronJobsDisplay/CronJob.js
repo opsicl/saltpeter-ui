@@ -37,7 +37,6 @@ class CronJob extends React.Component {
         settings: this.props.settings,
         backend_version: this.props.backend_version,
         result: this.props.result,
-        tz: this.props.tz,
       }
     });
   };
@@ -87,7 +86,7 @@ class CronJob extends React.Component {
             </td> : ""
           }
          {this.props.settings['column_result_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.result}</div></td>:""}
-         {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!="" && this.props.tz === "local"?new Date(this.props.job.last_run).toLocaleString():this.props.job.last_run!="" && this.props.tz === "utc"?new Date(this.props.job.last_run).toUTCString():""}</div></td>:""}
+         {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!=""?new Date(this.props.job.last_run).toLocaleString():""}</div></td>:""}
       </tr>
     );
   }

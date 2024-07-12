@@ -178,15 +178,3 @@ body {
   position:fixed; 
   bottom:0;
 }
-
-.date {
-  color: #6ECBF5;
-  text-align: "right";
-  font-family:Trebuchet MS, sans-serif;
-  font-size: 14px;
-  line-height: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 4px #000000;
-}
-
