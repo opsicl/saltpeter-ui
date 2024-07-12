@@ -1,0 +1,228 @@
+@font-face {
+  font-family: Montserrat-Regular;
+  src: url('../fonts/montserrat/Montserrat-Regular.ttf'); 
+}
+
+@font-face {
+  font-family: Montserrat-Medium;
+  src: url('../fonts/montserrat/Montserrat-Medium.ttf');
+}
+
+body {
+  background-color: #000000;
+}
+
+
+.cronsdiv {
+  max-height: 65vh;
+  box-sizing: border-box;
+  overflow: auto;
+  #background-color: #220524;
+  scrollbar-color: #6ECBF5 #000000;
+}
+
+.data {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  text-align: left;
+  padding-left: 10px;
+  font-size: 13px;
+  border-collapse: collapse;
+  width: 95%;
+  color: #DFD9F5;
+  margin-top: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5%;
+  margin-top: 1px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
+}
+
+.data td,
+.data th {
+  padding-top: 7px;
+  padding-right: 30px;
+  padding-left: 30px;
+  padding-bottom: 15px;
+  font-family: Montserrat-Regular;
+}
+
+
+.data tr:hover {
+  background-color: #7700A6;
+  #background-color: #383838;
+}
+
+.data th {
+  top: 0;
+  position: sticky;
+  padding: 20px;
+  text-align: center;
+  font-family: Montserrat-Medium; 
+  font-size: 13px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  #background-color: #220524;
+  background-color: #000;
+  color: #6ECBF5;
+  text-shadow: 2px 2px 4px #000000;
+}
+.data th:hover {
+  color: #BA4FD9;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tableName th {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  font-family: Montserrat-Regular;
+  font-size: 20px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  #background-color: #220524;
+  color: #BA4FD9;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName2 {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tableName2 th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  font-family: Montserrat-Regular;
+  font-size: 20px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  #background-color: #220524;
+  color: #BA4FD9;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.tableName2 {
+  #background-color: #220524;
+  width: 95%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+}
+
+.cols {
+  text-decoration: none;
+}
+
+.cols:hover {
+  #color: #BA4FD9;
+  color: #6ECBF5;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+
+.searchBarTimeline {
+  border-radius: 5px;
+  border-color: #BA4FD9;
+  background-image: url("./icons/search_icon.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-position-x: 5px;
+  background-size: 1.5rem 1.5rem;
+  width: 44%;
+  font-size: 13px;
+  font-family: Montserrat-Medium;
+  padding: 12px 20px 12px 40px;
+  opacity: 0.5;
+}
+.searchBarTimeline:focus {
+  outline-color: #BA4FD9;
+  outline-style: solid;
+}
+
+
+.tableName {
+  #background-color: #292929;
+  width: 95%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+}
+
+.versions {
+  margin:10px;
+  width: 98%;
+  color: #5a5a5a;
+  text-align:right;
+  font-style:italic;
+  font-family: Montserrat-Regular;
+  font-size: 12px;
+  position:fixed; 
+  bottom:0;
+}
+
+.apexcharts-tooltip {
+  background: #f3f3f3;
+  color: black;
+}
+
+.apexcharts-grid-row{
+  fill: black;
+}
+
+.button {
+  position: relative;
+  background-color: #f44336;
+  border: none;
+  font-size: 12px;
+  color: #FFFFFF;
+  padding: 8px;
+  width: 80px;
+  text-align: center;
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: Montserrat-Medium;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.button:after {
+  content: "";
+  background: #f1f1f1;
+  display: block;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s;
+}
+
+.button:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s
+}
+
