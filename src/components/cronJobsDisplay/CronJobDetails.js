@@ -11,6 +11,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { FaTimesCircle } from 'react-icons/fa';
 import { FaPlayCircle } from 'react-icons/fa';
 import { FaRegCircle } from 'react-icons/fa';
+import { FaClock } from "react-icons/fa";
 
 import TextareaAutosize from 'react-autosize-textarea';
 
@@ -47,6 +48,7 @@ class CronJobDetails extends React.Component {
       targetsJob: [],
       results: {},
       overlap: "",
+      timeout_reached: "",
       untilNextRun: "",
       hardTimeoutCounter: "",
       ranForCounter: "",
@@ -298,6 +300,10 @@ class CronJobDetails extends React.Component {
       if (data[name].hasOwnProperty("overlap")){
           this.setState({ overlap : data[name]["overlap"]})
         }
+        if (data[name].hasOwnProperty("timeout_reached")){
+          this.setState({ timeout_reached : data[name]["timeout_reached"]})
+        }
+
       }
     }
   }
@@ -385,6 +391,7 @@ class CronJobDetails extends React.Component {
         sec: "",
         year: "",
         overlap: "",
+        timeout_reached: "",
         untilNextRun: "",
         hardTimeoutCounter: "",
         ranForCounter: "",
@@ -452,6 +459,12 @@ class CronJobDetails extends React.Component {
                     (<FaPlayCircle title="running" style={{ color: "#6AC3EC", size: "3px", marginLeft: "10px" }} />) :
                   this.state.result === "NotRun" ?
                     (<FaRegCircle title="not run" style={{ color: "#E0D9F6", size: "3px", marginLeft: "10px" }} />) :
+                  null
+            }
+            {this.state.timeout_reached === 'soft' ?
+                (<FaClock title="soft timeout" style={{ color: "FFBF00", size: "3px", marginLeft: "10px" }} />) :
+                  this.state.timeout_reached === 'hard' ?
+                    (<FaClock title="hard timeout" style={{ color: "#FF1919", size: "3px", marginLeft: "10px" }} />) :
                   null
             }
           </h1>
