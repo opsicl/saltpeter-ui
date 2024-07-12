@@ -36,6 +36,18 @@ class Timeline extends React.Component {
               type: 'rangeBar',
               foreColor: '#E0D9F6',
           },
+          noData: {
+            text: 'No data available',
+            align: 'center',
+            verticalAlign: 'middle',
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: '#e0d9f6',
+              fontSize: '14px',
+            }
+        },
+
           plotOptions: {
               bar: {
                 horizontal: true,
