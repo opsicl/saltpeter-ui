@@ -491,7 +491,7 @@ class CronJobDetails extends React.Component {
                             <th style={{width:"25%"}}>target type</th>
                             <td>{this.state.target_type}</td>
                         </tr>
-                        {Number.isInteger(this.state.number_of_targets) ? 
+                        {(Number.isInteger(this.state.number_of_targets) || (this.state.number_of_targets === 0)) ? 
                             <tr>
                                 <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
                                 <td>{this.state.number_of_targets}</td>
@@ -501,7 +501,7 @@ class CronJobDetails extends React.Component {
                                 <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
                                 <td>{this.state.batch_size}</td>
                             </tr> : ""}
-                        {this.state.timeout ?
+                        {(Number.isInteger(this.state.timeout) || (this.state.timeout === 0)) ?
                             <tr>
                                 <th style={{width:"25%"}}>timeout</th>
                                <td>{this.state.timeout}</td>
