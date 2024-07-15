@@ -31,7 +31,7 @@ class CronJobDetails extends React.Component {
       user: this.props.location.state !== undefined ? this.props.location.state.user: "",
       targets: this.props.location.state !== undefined ? this.props.location.state.targets : "",
       target_type: this.props.location.state !== undefined ? this.props.location.state.target_type : "",
-      number_of_targets: this.props.location.state !== undefined ? this.props.location.state.number_of_targets : "",
+      number_of_targets: this.props.location.state !== undefined ? this.props.location.state.number_of_targets: "",
       batch_size: this.props.location.state !== undefined ? this.props.location.state.batch_size : "",
       dom: this.props.location.state !== undefined ? this.props.location.state.dom : "", 
       dow: this.props.location.state !== undefined ? this.props.location.state.dow : "",
@@ -491,7 +491,7 @@ class CronJobDetails extends React.Component {
                             <th style={{width:"25%"}}>target type</th>
                             <td>{this.state.target_type}</td>
                         </tr>
-                        {this.state.number_of_targets ? 
+                        {Number.isInteger(this.state.number_of_targets) ? 
                             <tr>
                                 <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
                                 <td>{this.state.number_of_targets}</td>
