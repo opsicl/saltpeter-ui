@@ -16,8 +16,7 @@ class CronJob extends React.Component {
       state: { 
         name: this.props.job.name,
         command: this.props.job.command,
-        soft_timeout: this.props.job.soft_timeout,
-        hard_timeout: this.props.job.hard_timeout,
+        timeout: this.props.job.timeout,
         cwd: this.props.job.cwd,
         user: this.props.job.user,
         targets: this.props.job.targets,
@@ -63,8 +62,7 @@ class CronJob extends React.Component {
           {this.props.settings['column_command_checked']?<td>{this.props.job.command.split('\n').map(str => <p>{str}</p>)}</td>:""}
           {this.props.settings['column_cwd_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.cwd}</div></td>:""}
           {this.props.settings['column_user_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.user}</div></td>:""}
-          {this.props.settings['column_soft_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.soft_timeout}</div></td>:""}
-          {this.props.settings['column_hard_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.hard_timeout}</div></td>:""}
+          {this.props.settings['column_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.timeout}</div></td>:""}
           {this.props.settings['column_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.targets}</div></td>:""}
           {this.props.settings['column_target_type_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.target_type}</div></td>:""}
           {this.props.settings['column_number_of_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.number_of_targets}</div></td>:""}

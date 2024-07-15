@@ -22,8 +22,7 @@ class JobsTable extends React.Component {
         column_command_checked: true,
         column_cwd_checked: false,
         column_user_checked: false,
-        column_soft_timeout_checked: false,
-        column_hard_timeout_checked: false,
+        column_timeout_checked: false,
         column_targets_checked: false,
         column_target_type_checked: false,
         column_number_of_targets_checked: false,
@@ -141,8 +140,7 @@ class JobsTable extends React.Component {
           command: json_result_config[keys[i]]["command"],
           cwd: json_result_config[keys[i]]["cwd"],
           user: json_result_config[keys[i]]["user"],
-          soft_timeout: json_result_config[keys[i]]["soft_timeout"],
-          hard_timeout: json_result_config[keys[i]]["hard_timeout"],
+          timeout: json_result_config[keys[i]]["timeout"],
           targets: json_result_config[keys[i]]["targets"],
           target_type: json_result_config[keys[i]]["target_type"],
           number_of_targets: no_of_targets,
@@ -295,7 +293,7 @@ class JobsTable extends React.Component {
       }
   
       var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","soft_timeout","hard_timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","resultst","last_run"]
+      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","resultst","last_run"]
       for (let i=0; i < keys.length; i++) {
           var column_name = keys[i]
           if (keys[i].includes("_")) {
@@ -374,8 +372,7 @@ class JobsTable extends React.Component {
         column_command_checked: true,
         column_cwd_checked: false,
         column_user_checked: false,
-        column_soft_timeout_checked: false,
-        column_hard_timeout_checked: false,
+        column_timeout_checked: false,
         column_targets_checked: false,
         column_target_type_checked: false,
         column_number_of_targets_checked: false,
@@ -492,8 +489,7 @@ class JobsTable extends React.Component {
               {this.state.settings['column_command_checked']?<th id="command" style={{ width: this.state.settings['column_command_width']}} onClick={this.sortColumn.bind(this,'command')}>Command</th>:""}
               {this.state.settings['column_cwd_checked']?<th id="cwd" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'cwd')}>Cwd</th>:""}
               {this.state.settings['column_user_checked']?<th id="user" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'user')}>User</th>:""}
-              {this.state.settings['column_soft_timeout_checked']?<th id="soft_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'soft_timeout')}>Soft Timeout</th>:""}
-              {this.state.settings['column_hard_timeout_checked']?<th id="hard_timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'hard_timeout')}>Hard Timeout</th>:""}
+              {this.state.settings['column_timeout_checked']?<th id="timeout" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'timeout')}>Timeout</th>:""}
               {this.state.settings['column_targets_checked']?<th id="targets"style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'targets')}>Targets</th>:""}
               {this.state.settings['column_target_type_checked']?<th id="target_type" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'target_type')}>Target Type</th>:""}
               {this.state.settings['column_number_of_targets_checked']?<th id="number_of_targets" style={{ width: this.state.settings['columns_width']}} onClick={this.sortColumn.bind(this,'number_of_targets')}>No of targets</th>:""}
