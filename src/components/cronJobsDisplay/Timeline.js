@@ -167,6 +167,7 @@ class Timeline extends React.Component {
       var seriesData = []
       var timeline = JSON.parse(data).timeline.content
       var data = []
+      var jobsFailed = []
       for (var i = 0; i < timeline.length; i++) {
           var jobName = timeline[i]["cron"]
           var jobInstance = timeline[i]["job_instance"]
@@ -177,8 +178,11 @@ class Timeline extends React.Component {
           var run_result
           if (timeline[i]['ret_code'] > 0) {
                run_result = 'fail'
+               jobsFailed.push(jobName)
           } else {
-               run_result = 'pass'
+               if (!jobsFailed.includes(jobName)){
+                   run_result = 'pass'
+               }
           }
           
           var y = []
@@ -288,6 +292,7 @@ class Timeline extends React.Component {
       this.setState({ series: seriesDataFinal , annotationsPoints: annPoints });
      }
     }
+
   }
 
   componentDidMount() {

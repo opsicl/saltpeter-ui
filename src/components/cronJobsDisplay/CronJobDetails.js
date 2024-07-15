@@ -26,8 +26,7 @@ class CronJobDetails extends React.Component {
     this.state = {
       name: id,
       command: this.props.location.state !== undefined ? this.props.location.state.command : "",
-      hard_timeout: this.props.location.state !== undefined ? this.props.location.state.hard_timeout : "",
-      //soft_timeout: this.props.location.state.soft_timeout,
+      timeout: this.props.location.state !== undefined ? this.props.location.state.timeout : "",
       cwd: this.props.location.state !== undefined ? this.props.location.state.cwd : "",
       user: this.props.location.state !== undefined ? this.props.location.state.user: "",
       targets: this.props.location.state !== undefined ? this.props.location.state.targets : "",
@@ -48,19 +47,16 @@ class CronJobDetails extends React.Component {
       targetsJob: [],
       results: {},
       overlap: "",
-      timeout_reached: "",
       untilNextRun: "",
-      hardTimeoutCounter: "",
+      timeoutCounter: "",
       ranForCounter: "",
-      //softTimeoutCounter: "",
       startedJob:"",
       backend_version: this.props.location.state !== undefined ? this.props.location.state.backend_version : "",
       tz: this.props.location.state !== undefined ? this.props.location.state.tz : "local",
       currentTimeLocal: Date.now(),
     }
     this.handleData.bind(this);
-    this.calculateHardTimeout.bind(this);
-    //this.calculateSoftTimeout.bind(this);
+    this.calculateTimeout.bind(this);
     this.showLastRun.bind(this);
     this.runJob.bind(this);
     //this.killJob.bind(this);
@@ -146,33 +142,21 @@ class CronJobDetails extends React.Component {
       // go on
     }
   }
-/*
-  calculateSoftTimeout() {
-    var currentTime = Date.now();
-    let secDiff = Math.floor( ((new Date(this.state.startedJob) - currentTime) % (1000*60))/1000 );
-    if (Number.isFinite(secDiff) && this.state.soft_timeout){
-      return secDiff +  this.state.soft_timeout;
-    }
-    else { 
-      return ""
-    }
-  }
-*/
-  calculateHardTimeout() {
+  calculateTimeout() {
     var start_time;
     var machinesTimeouts = {};
     var currentTime = Date.now();
-    if (this.state.hard_timeout) { 
+    if (this.state.timeout) { 
       for (let machine in this.state.results) {
         if (this.state.runningOn.includes(machine)) {
           start_time = this.state.results[machine]["starttime"];
-          let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60))/1000 );
-          let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000*60*60)) / (1000*60) );
-          let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.hard_timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60))/1000 );
+          let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60*60)) / (1000*60) );
+          let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           if (secondsDiff < 0) { secondsDiff = 0; }
           if (minutesDiff < 0) { minutesDiff = 0 }
           if (hoursDiff < 0) {hoursDiff = 0 }
-          machinesTimeouts[machine] = "hard timeout: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
+          machinesTimeouts[machine] = "timeout: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
         }
       }
       return machinesTimeouts;
@@ -239,8 +223,7 @@ class CronJobDetails extends React.Component {
           command: json_result_config[this.state.name]["command"],
           cwd: json_result_config[this.state.name]["cwd"],
           user: json_result_config[this.state.name]["user"],
-          //soft_timeout: json_result_config[this.state.name]["soft_timeout"],
-          hard_timeout: json_result_config[this.state.name]["hard_timeout"],
+          timeout: json_result_config[this.state.name]["timeout"],
           targets: json_result_config[this.state.name]["targets"],
           target_type: json_result_config[this.state.name]["target_type"],
           number_of_targets: json_result_config[this.state.name]["number_of_targets"],
@@ -299,9 +282,6 @@ class CronJobDetails extends React.Component {
         }
       if (data[name].hasOwnProperty("overlap")){
           this.setState({ overlap : data[name]["overlap"]})
-        }
-        if (data[name].hasOwnProperty("timeout_reached")){
-          this.setState({ timeout_reached : data[name]["timeout_reached"]})
         }
 
       }
@@ -391,12 +371,11 @@ class CronJobDetails extends React.Component {
         sec: "",
         year: "",
         overlap: "",
-        timeout_reached: "",
         untilNextRun: "",
-        hardTimeoutCounter: "",
+        timeoutCounter: "",
         ranForCounter: "",
         startedJob: "",
-        hard_timeout: "",
+        timeout: "",
         result: "NotRun",
         backend_version: "",
       });
@@ -406,9 +385,8 @@ class CronJobDetails extends React.Component {
       () => this.setState((prevState,props) => ({
           currentTimeLocal: Date.now(),
           untilNextRun:  String(daysDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "d " + String(hoursDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"h " + String(minutesDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "m " + String(secondsDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"s",
-          hardTimeoutCounter: self.calculateHardTimeout(),
+          timeoutCounter: self.calculateTimeout(),
           ranForCounter: self.calculateRanFor(),
-          //softTimeoutCounter: self.calculateSoftTimeout(),
       })),
       1000
     );
@@ -459,12 +437,6 @@ class CronJobDetails extends React.Component {
                     (<FaPlayCircle title="running" style={{ color: "#6AC3EC", size: "3px", marginLeft: "10px" }} />) :
                   this.state.result === "NotRun" ?
                     (<FaRegCircle title="not run" style={{ color: "#E0D9F6", size: "3px", marginLeft: "10px" }} />) :
-                  null
-            }
-            {this.state.timeout_reached === 'soft' ?
-                (<FaClock title="soft timeout" style={{ color: "FFBF00", size: "3px", marginLeft: "10px" }} />) :
-                  this.state.timeout_reached === 'hard' ?
-                    (<FaClock title="hard timeout" style={{ color: "#FF1919", size: "3px", marginLeft: "10px" }} />) :
                   null
             }
           </h1>
@@ -528,6 +500,11 @@ class CronJobDetails extends React.Component {
                             <tr>
                                 <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
                                 <td>{this.state.batch_size}</td>
+                            </tr> : ""}
+                        {this.state.timeout ?
+                            <tr>
+                                <th style={{width:"25%"}}>timeout</th>
+                               <td>{this.state.timeout}</td>
                             </tr> : ""}
                 </table>
 
@@ -609,8 +586,8 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 
                             <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""} 
-                        {this.state.hardTimeoutCounter.hasOwnProperty(target) ?
-                            <p className="sectionDetails" >{this.state.hardTimeoutCounter[target]}</p> : ""}
+                        {this.state.timeoutCounter.hasOwnProperty(target) ?
+                            <p className="sectionDetails" >{this.state.timeoutCounter[target]}</p> : ""}
                         {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
                         {this.state.results[target]["ret"] ? <p>
                             <div className="sectionDetailsOutput">

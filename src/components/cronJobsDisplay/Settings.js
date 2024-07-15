@@ -9,8 +9,7 @@ class Settings extends React.Component {
       column_command_checked: true,
       column_cwd_checked: false,
       column_user_checked: false,
-      column_soft_timeout_checked: false,
-      column_hard_timeout_checked: false,
+      column_timeout_checked: false,
       column_targets_checked: false,
       column_target_type_checked: false,
       column_number_of_targets_checked: false,
@@ -52,8 +51,7 @@ class Settings extends React.Component {
      var column_command = document.getElementById("command")
      var column_cwd = document.getElementById("cwd")
      var column_user = document.getElementById("user")
-     var column_soft_timeout = document.getElementById("soft_timeout")
-     var column_hard_timeout = document.getElementById("hard_timeout")
+     var column_timeout = document.getElementById("timeout")
      var column_targets = document.getElementById("targets")
      var column_target_type = document.getElementById("target_type")
      var column_number_of_targets = document.getElementById("number_of_targets")
@@ -89,15 +87,9 @@ class Settings extends React.Component {
         active_columns_count = active_columns_count + 1
      }
 
-     var column_soft_timeout_checked = false
-     if (column_soft_timeout.checked) {
-        column_soft_timeout_checked = true
-        active_columns_count = active_columns_count + 1
-     }
-
-     var column_hard_timeout_checked = false
-     if (column_hard_timeout.checked) {
-        column_hard_timeout_checked = true
+     var column_timeout_checked = false
+     if (column_timeout.checked) {
+        column_timeout_checked = true
         active_columns_count = active_columns_count + 1
      }
 
@@ -211,8 +203,7 @@ class Settings extends React.Component {
 	     column_command_checked: column_command_checked, 
 	     column_cwd_checked: column_cwd_checked, 
 	     column_user_checked: column_user_checked,
-	     column_soft_timeout_checked: column_soft_timeout_checked,
-	     column_hard_timeout_checked: column_hard_timeout_checked,
+	     column_timeout_checked: column_timeout_checked,
 	     column_targets_checked: column_targets_checked,
 	     column_target_type_checked: column_target_type_checked,
 	     column_number_of_targets_checked: column_number_of_targets_checked,
@@ -249,8 +240,7 @@ class Settings extends React.Component {
     var column_command = document.getElementById("command")
     var column_cwd = document.getElementById("cwd")
     var column_user = document.getElementById("user")
-    var column_soft_timeout = document.getElementById("soft_timeout")
-    var column_hard_timeout = document.getElementById("hard_timeout")
+    var column_timeout = document.getElementById("timeout")
     var column_targets = document.getElementById("targets")
     var column_target_type = document.getElementById("target_type")
     var column_number_of_targets = document.getElementById("number_of_targets")
@@ -271,8 +261,7 @@ class Settings extends React.Component {
     column_command.checked = this.state.column_command_checked
     column_cwd.checked = this.state.column_cwd_checked
     column_user.checked = this.state.column_user_checked
-    column_soft_timeout.checked = this.state.column_soft_timeout_checked
-    column_hard_timeout.checked = this.state.column_hard_timeout_checked
+    column_timeout.checked = this.state.column_timeout_checked
     column_targets.checked = this.state.column_targets_checked
     column_target_type.checked = this.state.column_target_type_checked
     column_number_of_targets.checked = this.state.column_number_of_targets_checked
@@ -319,12 +308,8 @@ class Settings extends React.Component {
                 <input type="checkbox" id="group" name="group" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
-            <label class="container">soft timeout
-                <input type="checkbox" id="soft_timeout" name="soft_timeout" onClick={this.submitSettings.bind(this)}/>
-                <span class="checkmark"></span>
-            </label>
-            <label class="container">hard timeout
-                <input type="checkbox" id="hard_timeout" name="hard_timeout" onClick={this.submitSettings.bind(this)}/>
+            <label class="container">timeout
+                <input type="checkbox" id="timeout" name="timeout" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
         </div>
