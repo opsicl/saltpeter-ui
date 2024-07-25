@@ -5,7 +5,7 @@ export const NavbarData = [
     cName: "nav-text",
   },
   {
-    title: "Timeline",
+    title: "Timeline (beta)",
     path: "/timeline",
     cName: "nav-text",
   },

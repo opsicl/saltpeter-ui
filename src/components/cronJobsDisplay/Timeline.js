@@ -385,7 +385,7 @@ class Timeline extends React.Component {
           <table className="tableName">
             <tbody>
               <tr>
-                <th>Timeline</th>
+                <th>Timeline (beta)</th>
               </tr>
             </tbody>
           </table>
