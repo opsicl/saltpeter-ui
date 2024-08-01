@@ -486,9 +486,7 @@ class CronJobDetails extends React.Component {
                         <tr>
                             <th style={{width:"25%"}}>targets</th>
                             <td>
-                              {this.state.targets.map((target, index) => (
-                                  <div key={index}>{target}</div>
-                              ))}
+                               {Array.isArray(this.state.targets) ? this.state.targets.map((target, index) => (<div key={index}>{target}</div>)) : <div>{this.state.targets}</div>}
                             </td>
                         </tr>
                         <tr>

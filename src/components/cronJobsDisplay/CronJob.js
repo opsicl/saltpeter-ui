@@ -64,10 +64,17 @@ class CronJob extends React.Component {
           {this.props.settings['column_user_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.user}</div></td>:""}
           {this.props.settings['column_timeout_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.timeout}</div></td>:""}
           {this.props.settings['column_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>
-                  {this.props.job.targets.map((target, index) => (
-                    <div key={index}>{target}</div>
-                  ))}
-              </div></td>:""}
+              {Array.isArray(this.props.job.targets) ? (
+                this.props.job.targets.map((target, index) => (
+                  <div key={index}>{target}</div>
+                ))
+              ) : (
+                <div>{this.props.job.targets}</div>
+              )}
+            </div>
+          </td>
+        : ""}
+
           {this.props.settings['column_target_type_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.target_type}</div></td>:""}
           {this.props.settings['column_number_of_targets_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.number_of_targets}</div></td>:""}
           {this.props.settings['column_dom_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.dom}</div></td>:""}
