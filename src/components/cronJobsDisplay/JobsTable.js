@@ -112,7 +112,8 @@ class JobsTable extends React.Component {
 
   handleData(data) {
     //localStorage.setItem('savedState', JSON.stringify(this.state))
-    sessionStorage.setItem('savedState', JSON.stringify(this.state))
+    
+    ///////sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
     // get backend version
     if (JSON.parse(data).hasOwnProperty("sp_version")){
@@ -327,8 +328,10 @@ class JobsTable extends React.Component {
   componentDidMount() {
 
     //const rehydrate = JSON.parse(localStorage.getItem('savedState'))
-    const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
-    this.setState(rehydrate)
+    
+    /////const rehydrate = JSON.parse(sessionStorage.getItem('savedState'))
+    /////this.setState(rehydrate)
+    
     const queryParams = new URLSearchParams(window.location.search);
     const search_word = queryParams.get('search');
     if (search_word){
@@ -409,7 +412,9 @@ class JobsTable extends React.Component {
     localStorage.setItem('tzState', this.state.tz)
     this.stopInterval();
     //localStorage.setItem('savedState', JSON.stringify(this.state))
-    sessionStorage.setItem('savedState', JSON.stringify(this.state))
+    
+    //////sessionStorage.setItem('savedState', JSON.stringify(this.state))
+    
     //clearInterval(this.interval);
   }
 

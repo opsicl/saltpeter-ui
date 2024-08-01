@@ -485,7 +485,11 @@ class CronJobDetails extends React.Component {
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>targets</th>
-                            <td>{this.state.targets}</td>
+                            <td>
+                              {this.state.targets.map((target, index) => (
+                                  <div key={index}>{target}</div>
+                              ))}
+                            </td>
                         </tr>
                         <tr>
                             <th style={{width:"25%"}}>target type</th>
