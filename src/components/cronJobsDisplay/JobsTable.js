@@ -46,7 +46,6 @@ class JobsTable extends React.Component {
       active_columns:[],
       config_received: false,
     };
-    currently_running: [],
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
