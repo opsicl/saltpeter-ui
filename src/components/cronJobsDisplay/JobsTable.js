@@ -46,6 +46,7 @@ class JobsTable extends React.Component {
       active_columns:[],
       config_received: false,
     };
+    currently_running: [],
     socket.debug=true;
     socket.timeoutInterval = 5400;
     this.handleData.bind(this);
@@ -192,7 +193,7 @@ class JobsTable extends React.Component {
       for (i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
         for (j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_name) {
+          if ((cronJobs[j]["name"] === key_name) && (cronJobs[j]["runningOn"].length == 0)) {
             if (json_result_last_state[key_name]["result_ok"] === false) {
                 cronJobs[j]["result"] = "Fail"
             } else {
