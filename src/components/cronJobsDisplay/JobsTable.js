@@ -182,17 +182,17 @@ class JobsTable extends React.Component {
     if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
-      for (i = 0; i < cronJobs.length; i++) {
-        cronJobs[i]["result"] = 0;
-        cronJobs[i]["result"] = "Notrun";
-      }
+      //for (i = 0; i < cronJobs.length; i++) {
+      //  cronJobs[i]["result"] = 0;
+      //  cronJobs[i]["result"] = "Notrun";
+      //}
 
       var json_result_last_state = JSON.parse(data).last_state;
       var keys_last_state = Object.keys(json_result_last_state);
       for (i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
         for (j = 0; j < cronJobs.length; j++) {
-          if ((cronJobs[j]["name"] === key_name) && (cronJobs[j]["runningOn"].length == 0)) {
+          if ((cronJobs[j]["name"] === key_name) && (cronJobs[j]["runningOn"].length === 0)) {
             if (json_result_last_state[key_name]["result_ok"] === false) {
                 cronJobs[j]["result"] = "Fail"
             } else {
