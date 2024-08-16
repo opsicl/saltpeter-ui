@@ -5,6 +5,7 @@ import "./CronJob.css";
 class CronJob extends React.Component {
   constructor(props){
     super(props);
+    this.calculateRanFor = this.calculateRanFor.bind(this)
     this.handleHistory.bind(this);
   }
 
@@ -31,19 +32,31 @@ class CronJob extends React.Component {
         year: this.props.job.year,
         group: this.props.job.group,
         batch_size: this.props.job.batch_size,
-        result: this.props.job.result,
+        status: this.props.job.status,
         last_run: this.props.job.last_run,
         settings: this.props.settings,
         backend_version: this.props.backend_version,
-        result: this.props.result,
         tz: this.props.tz,
+        running_started: this.props.job.running_started,
       }
     });
   };
 
+  calculateRanFor(){
+    var ran_string = ""
+    if (this.props.job.status == "Running") {
+      var hours = Math.floor( ((Date.now() - new Date(this.props.job.running_started)) / (1000 * 60 * 60)))
+      var min = Math.floor( ((Date.now() - new Date(this.props.job.running_started)) % (1000*60*60)) / (1000*60) )
+      var sec = Math.floor( ((Date.now() - new Date(this.props.job.running_started)) % (1000*60))/1000)
+      ran_string = "for: " + hours + "h " + min + "m "+ sec + "s"
+    }
+    return ran_string
+  }
+
+
   render() {
     var color = "#E0D9F6";
-    switch(this.props.job.result) {
+    switch(this.props.job.status) {
       case "Fail": color = "#FE00FE"; break;
       case "Success": color = "#DEFE47"; break;
       case "Running": color = "#6AC3EC"; break;
@@ -95,7 +108,16 @@ class CronJob extends React.Component {
               </div>
             </td> : ""
           }
-         {this.props.settings['column_result_checked']?<td><div style={{ maxHeight:"100px", overflow:"auto"}}>{this.props.job.result}</div></td>:""}
+         {this.props.settings['column_status_checked']?
+             <td>
+                <div style={{ maxHeight:"100px", overflow:"auto"}}>
+                   {this.props.job.status}
+                </div>
+                <div style={{ maxHeight:"100px", overflow:"auto"}} >
+                   {this.calculateRanFor()}
+                </div>
+             </td>:""
+         }
          {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!="" && this.props.tz === "local"?new Date(this.props.job.last_run).toLocaleString():this.props.job.last_run!="" && this.props.tz === "utc"?new Date(this.props.job.last_run).toUTCString():""}</div></td>:""}
       </tr>
     );

@@ -37,7 +37,7 @@ class JobsTable extends React.Component {
         column_running_on_checked: true, 
         column_last_run_checked: true, 
         column_group_checked: true, 
-        column_result_checked: false,
+        column_status_checked: false,
         columns_width:"15%",
         column_command_width:"40%"
       },
@@ -46,11 +46,11 @@ class JobsTable extends React.Component {
       active_columns:[],
       config_received: false,
     };
-    socket.debug=true;
-    socket.timeoutInterval = 5400;
-    this.handleData.bind(this);
-    this.sortColumn.bind(this);
-    this.sendToSettings.bind(this);
+    socket.debug=true
+    socket.timeoutInterval = 5400
+    this.handleData.bind(this)
+    this.sortColumn.bind(this)
+    this.sendToSettings.bind(this)
     this.changeTz.bind(this)
   }
 
@@ -150,8 +150,10 @@ class JobsTable extends React.Component {
           group: json_result_config[keys[i]]["group"],
           batch_size: json_result_config[keys[i]]["batch_size"],
           runningOn: [],
-          result: 'NotRun',
-          last_run: ""
+          status: 'NotRun',
+          last_run: "",
+          running_started:"",
+          ran_for: "",
         });
       }
       this.setState({jobs: cronJobs})
@@ -170,7 +172,8 @@ class JobsTable extends React.Component {
         for (var j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_running) {
             cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
-            cronJobs[j]["result"] = "Running";
+            cronJobs[j]["status"] = "Running";
+            cronJobs[j]["running_started"] = json_result_running[keys_running[i]]["started"]
             break;
           }
         }
@@ -195,10 +198,11 @@ class JobsTable extends React.Component {
           if (cronJobs[j]["name"] === key_name) {
             if (cronJobs[j]["runningOn"].length === 0) {
                 if (json_result_last_state[key_name]["result_ok"] === false) {
-                    cronJobs[j]["result"] = "Fail"
+                    cronJobs[j]["status"] = "Fail"
                 } else {
-                    cronJobs[j]["result"] = "Success"
+                    cronJobs[j]["status"] = "Success"
                 }
+                cronJobs[j]["ran_for"] = Date.now() - new Date(json_result_last_state[key_name]["last_run"])
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
             }
             else {
@@ -294,7 +298,7 @@ class JobsTable extends React.Component {
       }
   
       var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","resultst","last_run"]
+      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","status","last_run"]
       for (let i=0; i < keys.length; i++) {
           var column_name = keys[i]
           if (keys[i].includes("_")) {
@@ -390,7 +394,7 @@ class JobsTable extends React.Component {
         column_running_on_checked: true,
         column_last_run_checked: true,
         column_group_checked: true,
-        column_result_checked: false,
+        column_status_checked: false,
         columns_width:"15%",
         column_command_width:"40%"
       }
@@ -436,7 +440,7 @@ class JobsTable extends React.Component {
           -1 ||
         job.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 ||
         job.group.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 || 
-        job.result.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 
+        job.status.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 
       );
     });
 
@@ -508,7 +512,7 @@ class JobsTable extends React.Component {
               {this.state.settings['column_group_checked']?<th id="group" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'group')}>group</th>:""}
               {this.state.settings['column_batch_size_checked']?<th id="batch_size" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'batch_size')}>batch size</th>:""}
               {this.state.settings['column_running_on_checked']?<th id="running_on" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'running_on')}>running on</th>:""}
-              {this.state.settings['column_result_checked']?<th id="result" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'result')}>result</th>:""}
+              {this.state.settings['column_status_checked']?<th id="status" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'status')}>status</th>:""}
               {this.state.settings['column_last_run_checked']?<th id="last_run" style={{ width: this.state.settings['columns_width'] }} onClick={this.sortColumn.bind(this,'last_run')}>last run</th>:""}
             </tr>
           </tbody>

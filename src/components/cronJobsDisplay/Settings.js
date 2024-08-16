@@ -23,7 +23,7 @@ class Settings extends React.Component {
       column_group_checked: true,
       column_batch_size_checked: false,
       column_running_on_checked: true,
-      column_result_checked: false,
+      column_status_checked: false,
       column_last_run_checked: true,
       columns_width: "0%",
       column_command_width: "0%",
@@ -65,7 +65,7 @@ class Settings extends React.Component {
      var column_group = document.getElementById("group")
      var column_batch_size = document.getElementById("batch_size")
      var column_running_on = document.getElementById("running_on")
-     var column_result = document.getElementById("result")
+     var column_status = document.getElementById("status")
      var column_last_run = document.getElementById("last_run")
 
      var active_columns_count = 0
@@ -171,9 +171,9 @@ class Settings extends React.Component {
         active_columns_count = active_columns_count + 1
      }
 
-     var column_result_checked = false
-     if (column_result.checked) {
-        column_result_checked = true
+     var column_status_checked = false
+     if (column_status.checked) {
+        column_status_checked = true
         active_columns_count = active_columns_count + 1
      }
 
@@ -217,7 +217,7 @@ class Settings extends React.Component {
 	     column_group_checked: column_group_checked,
 	     column_batch_size_checked: column_batch_size_checked,
 	     column_running_on_checked: column_running_on_checked,
-	     column_result_checked: column_result_checked,
+	     column_status_checked: column_status_checked,
 	     column_last_run_checked: column_last_run_checked,
 	     columns_width: columns_width, 
 	     column_command_width: column_command_width
@@ -254,7 +254,7 @@ class Settings extends React.Component {
     var column_group = document.getElementById("group")
     var column_batch_size = document.getElementById("batch_size")
     var column_running_on = document.getElementById("running_on")
-    var column_result = document.getElementById("result")
+    var column_status = document.getElementById("status")
     var column_last_run = document.getElementById("last_run")
 
     column_name.checked = this.state.column_name_checked
@@ -275,7 +275,7 @@ class Settings extends React.Component {
     column_group.checked = this.state.column_group_checked
     column_batch_size.checked = this.state.column_batch_size_checked
     column_running_on.checked = this.state.column_running_on_checked
-    column_result.checked = this.state.column_result_checked
+    column_status.checked = this.state.column_status_checked
     column_last_run.checked = this.state.column_last_run_checked
   }
 
@@ -334,8 +334,8 @@ class Settings extends React.Component {
                 <input type="checkbox" id="running_on" name="running_on" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
-            <label class="container">result
-                <input type="checkbox" id="result" name="result" onClick={this.submitSettings.bind(this)}/>
+            <label class="container">status
+                <input type="checkbox" id="status" name="status" onClick={this.submitSettings.bind(this)}/>
                 <span class="checkmark"></span>
             </label>
             <label class="container">last run
