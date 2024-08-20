@@ -63,12 +63,33 @@ class CronJobDetails extends React.Component {
     this.killCron.bind(this);
     this.calculateRanFor.bind(this);
     this.changeTz.bind(this);
+    this.formatDateToUTC.bind(this);
+    this.formatDateToLocal.bind(this);
   }
+
+   formatDateToUTC(date) {
+    return date.getUTCFullYear() + '-' +
+           ('0' + (date.getUTCMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getUTCDate()).slice(-2) + ' ' +
+           ('0' + date.getUTCHours()).slice(-2) + ':' +
+           ('0' + date.getUTCMinutes()).slice(-2) + ':' +
+           ('0' + date.getUTCSeconds()).slice(-2);
+  }
+
+  formatDateToLocal(date) {
+    return date.getFullYear() + '-' +
+           ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getDate()).slice(-2) + ' ' +
+           ('0' + date.getHours()).slice(-2) + ':' +
+           ('0' + date.getMinutes()).slice(-2) + ':' +
+           ('0' + date.getSeconds()).slice(-2);
+  }
+
 
   startInterval = () => {
     this.interval = setInterval(
       () => {
-        const currentTime = this.state.tz === "utc" ? new Date().toUTCString() : new Date().toLocaleString();
+        const currentTime = this.state.tz === "utc" ? this.formatDateToUTC(new Date()) : this.formatDateToLocal(new Date());
         this.setState({ currentTime });
       },
       1000
@@ -260,18 +281,18 @@ class CronJobDetails extends React.Component {
       if (name === this.state.name) {
         if (data[name].hasOwnProperty("next_run")){
           if (this.state.tz === "local") {
-              this.setState({ next_run: new Date(data[name]["next_run"]).toLocaleString()})
+              this.setState({ next_run: this.formatDateToLocal(new Date(data[name]["next_run"]))})
           }
           if (this.state.tz === "utc") {
-              this.setState({ next_run: new Date(data[name]["next_run"]).toUTCString()})
+              this.setState({ next_run: this.formatDateToUTC(new Date(data[name]["next_run"]))})
           }
         }
         if (data[name].hasOwnProperty("last_run")){
           if (this.state.tz === "local") {
-              this.setState({ last_run : new Date(data[name]["last_run"]).toLocaleString()})
+              this.setState({ last_run : this.formatDateToLocal(new Date(data[name]["last_run"]))})
           }
           if (this.state.tz === "utc") {
-              this.setState({ last_run : new Date(data[name]["last_run"]).toUTCString()})
+              this.setState({ last_run : this.formatDateToUTC(new Date(data[name]["last_run"]))})
           }
         }
         if (data[name].hasOwnProperty("targets")){
@@ -577,13 +598,13 @@ class CronJobDetails extends React.Component {
                     return <div id={target} style={{display:"none"}}>
                         <p className="machineNameRight">{target}</p>
                         {this.state.results[target]["starttime"] && this.state.tz === "local" ?
-                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toLocaleString()}</span></p> : ""}
+                            <p className="sectionDetails" >started at: <span>{this.formatDateToLocal(new Date(this.state.results[target]["starttime"]))}</span></p> : ""}
                         {this.state.results[target]["starttime"] && this.state.tz === "utc" ?
-                            <p className="sectionDetails" >started at: <span>{new Date(this.state.results[target]["starttime"]).toUTCString()}</span></p> : ""}
+                            <p className="sectionDetails" >started at: <span>{this.formatDateToUTC(new Date(this.state.results[target]["starttime"]))}</span></p> : ""}
                         {this.state.results[target]["endtime"] && this.state.tz === "local" ? 
-                            <p className="sectionDetails" >ended at: <span>{new Date(this.state.results[target]["endtime"]).toLocaleString()}</span></p>: ""}
+                            <p className="sectionDetails" >ended at: <span>{this.formatDateToLocal(new Date(this.state.results[target]["endtime"]))}</span></p>: ""}
                         {this.state.results[target]["endtime"] && this.state.tz === "utc" ?
-                            <p className="sectionDetails" >ended at: <span>{new Date(this.state.results[target]["endtime"]).toUTCString()}</span></p>: ""}
+                            <p className="sectionDetails" >ended at: <span>{this.formatDateToUTC(new Date(this.state.results[target]["endtime"]))}</span></p>: ""}
                         {this.state.results[target]["starttime"] ?
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 

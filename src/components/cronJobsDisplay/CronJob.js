@@ -7,6 +7,8 @@ class CronJob extends React.Component {
     super(props);
     this.calculateRanFor = this.calculateRanFor.bind(this)
     this.handleHistory.bind(this);
+    this.formatDateToUTC.bind(this);
+    this.formatDateToLocal.bind(this);
   }
 
   handleHistory = () => {
@@ -41,6 +43,24 @@ class CronJob extends React.Component {
       }
     });
   };
+
+   formatDateToUTC(date) {
+    return date.getUTCFullYear() + '-' +
+           ('0' + (date.getUTCMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getUTCDate()).slice(-2) + ' ' +
+           ('0' + date.getUTCHours()).slice(-2) + ':' +
+           ('0' + date.getUTCMinutes()).slice(-2) + ':' +
+           ('0' + date.getUTCSeconds()).slice(-2);
+  }
+
+  formatDateToLocal(date) {
+    return date.getFullYear() + '-' +
+           ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getDate()).slice(-2) + ' ' +
+           ('0' + date.getHours()).slice(-2) + ':' +
+           ('0' + date.getMinutes()).slice(-2) + ':' +
+           ('0' + date.getSeconds()).slice(-2);
+  }
 
   calculateRanFor(){
     var ran_string = ""
@@ -118,7 +138,7 @@ class CronJob extends React.Component {
                 </div>
              </td>:""
          }
-         {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!="" && this.props.tz === "local"?new Date(this.props.job.last_run).toLocaleString():this.props.job.last_run!="" && this.props.tz === "utc"?new Date(this.props.job.last_run).toUTCString():""}</div></td>:""}
+         {this.props.settings['column_last_run_checked']?<td><div style={{ textAlign:"center", maxHeight:"100px", overflow:"auto"}}>{this.props.job.last_run!="" && this.props.tz === "local"?this.formatDateToLocal(new Date(this.props.job.last_run)):this.props.job.last_run!="" && this.props.tz === "utc"?this.formatDateToUTC(new Date(this.props.job.last_run)):""}</div></td>:""}
       </tr>
     );
   }

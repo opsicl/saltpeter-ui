@@ -52,12 +52,14 @@ class JobsTable extends React.Component {
     this.sortColumn.bind(this)
     this.sendToSettings.bind(this)
     this.changeTz.bind(this)
+    this.formatDateToUTC.bind(this)
+    this.formatDateToLocal.bind(this)
   }
 
   startInterval = () => {
     this.interval = setInterval(
       () => {
-        const currentTime = this.state.tz === "utc" ? new Date().toUTCString() : new Date().toLocaleString();
+        const currentTime = this.state.tz === "utc" ? this.formatDateToUTC(new Date()) : this.formatDateToLocal(new Date());
         this.setState({ currentTime });
       },
       1000
@@ -67,6 +69,24 @@ class JobsTable extends React.Component {
   stopInterval = () => {
     clearInterval(this.interval);
   };
+
+  formatDateToUTC(date) {
+    return date.getUTCFullYear() + '-' +
+           ('0' + (date.getUTCMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getUTCDate()).slice(-2) + ' ' +
+           ('0' + date.getUTCHours()).slice(-2) + ':' +
+           ('0' + date.getUTCMinutes()).slice(-2) + ':' +
+           ('0' + date.getUTCSeconds()).slice(-2);
+  }
+
+  formatDateToLocal(date) {
+    return date.getFullYear() + '-' +
+           ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+           ('0' + date.getDate()).slice(-2) + ' ' +
+           ('0' + date.getHours()).slice(-2) + ':' +
+           ('0' + date.getMinutes()).slice(-2) + ':' +
+           ('0' + date.getSeconds()).slice(-2);
+  }
 
   changeTz(tz){
       var local_text = document.getElementById("local_tz");
@@ -298,7 +318,7 @@ class JobsTable extends React.Component {
       }
   
       var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","status","last_run"]
+      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","last_run"]
       for (let i=0; i < keys.length; i++) {
           var column_name = keys[i]
           if (keys[i].includes("_")) {
