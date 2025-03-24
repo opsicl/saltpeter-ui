@@ -5,6 +5,7 @@ import "./JobsTable.css";
 //import ReconnectingWebSocket from 'reconnecting-websocket';
 import { socket } from "./socket.js";
 import { Link } from "react-router-dom";
+import { GiAutoRepair } from "react-icons/gi";
 
 let apis = require("../../version.json");
 const UI_VERSION = apis.version;
@@ -14,6 +15,7 @@ class JobsTable extends React.Component {
     super(props);
     this.state = {
       jobs: [],
+      maintenance: {},
       search: "",
       tz: "",
       backend_version:"",
@@ -113,7 +115,6 @@ class JobsTable extends React.Component {
 
   updateSearch(event) {
     this.setState({ search: event.target.value.substr(0, 20) });
-    //console.log(event.target.value.substr(0, 20)) 
     if (event.target.value.substr(0, 20)) {
         const nextTitle = 'Saltpeter';
         const nextURL = "?search=" + event.target.value.substr(0, 20);
@@ -169,14 +170,18 @@ class JobsTable extends React.Component {
           year: json_result_config[keys[i]]["year"],
           group: json_result_config[keys[i]]["group"],
           batch_size: json_result_config[keys[i]]["batch_size"],
+          last_run: "",
           runningOn: [],
           status: 'NotRun',
-          last_run: "",
           running_started:"",
           ran_for: "",
         });
       }
+
       this.setState({jobs: cronJobs})
+
+      var maintenance_conf = JSON.parse(data).config.maintenance
+      this.setState({maintenance: maintenance_conf})
     }
     if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
@@ -318,7 +323,7 @@ class JobsTable extends React.Component {
       }
   
       var cronJobs = this.state.jobs
-      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","last_run"]
+      var keys = ["name","command","cwd","user","timeout","targets","target_type","number_of_targets","dom","dow","hour","min","mon","sec","year","group","batch_size","running_on","last_run","maintenance"]
       for (let i=0; i < keys.length; i++) {
           var column_name = keys[i]
           if (keys[i].includes("_")) {
@@ -465,7 +470,7 @@ class JobsTable extends React.Component {
     });
 
     var tableData = filteredJobs.map((item) => (
-      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} tz={this.state.tz}/>
+      <CronJob key={item.id} job={item} backend_version={this.state.backend_version} settings={this.state.settings} maintenance={this.state.maintenance} tz={this.state.tz}/>
     ));
 
     return (
@@ -486,7 +491,14 @@ class JobsTable extends React.Component {
         <table className="tableName">
           <tbody>
             <tr>
-              <th>Crons</th>
+	      <th>Crons</th>
+            </tr>
+          </tbody>
+        </table>
+	<table  className="maintenance">
+          <tbody>
+            <tr>
+               {this.state.maintenance.global ? <th>maintenance</th>  :""}
             </tr>
           </tbody>
         </table>

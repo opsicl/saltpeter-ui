@@ -12,6 +12,7 @@ class CronJob extends React.Component {
   }
 
   handleHistory = () => {
+    console.log(this.props)
     const { history } = this.props;
     //console.log(this.props.job.name);
     history.push({
@@ -40,6 +41,7 @@ class CronJob extends React.Component {
         backend_version: this.props.backend_version,
         tz: this.props.tz,
         running_started: this.props.job.running_started,
+        maintenance: this.props.maintenance
       }
     });
   };
@@ -123,7 +125,7 @@ class CronJob extends React.Component {
             <td>
               <div style={{ maxHeight:"100px", overflow:"auto", textAlign:"center"}} >
                 {this.props.job.runningOn.map((machine, i) => {
-                    return <p key={i} className="output">{machine}</p>;
+                     return <p key={i} className="output">{machine}</p>;
                 })}
               </div>
             </td> : ""

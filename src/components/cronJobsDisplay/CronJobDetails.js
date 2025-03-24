@@ -53,6 +53,7 @@ class CronJobDetails extends React.Component {
       startedJob:"",
       backend_version: this.props.location.state !== undefined ? this.props.location.state.backend_version : "",
       tz: this.props.location.state !== undefined ? this.props.location.state.tz : "local",
+      maintenance: this.props.location.state !== undefined ? this.props.location.state.maintenance : {},
       currentTimeLocal: Date.now(),
     }
     this.handleData.bind(this);
@@ -240,6 +241,7 @@ class CronJobDetails extends React.Component {
     }
     if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
+      var json_result_config_maintenance = data.config.maintenance
       this.setState({
           command: json_result_config[this.state.name]["command"],
           cwd: json_result_config[this.state.name]["cwd"],
@@ -256,6 +258,7 @@ class CronJobDetails extends React.Component {
           sec: json_result_config[this.state.name]["sec"],
           year: json_result_config[this.state.name]["year"],
           batch_size: json_result_config[this.state.name]["batch_size"],
+          maintenance: json_result_config_maintenance,
           result: "NotRun",
       });
     }
@@ -552,7 +555,7 @@ class CronJobDetails extends React.Component {
                     {Object.keys(this.state.runningOn).length > 0 ? <button className="button" style={{ color:"white",backgroundColor: "#F44336", marginLeft: "30px"}} onClick={this.killCron.bind(this)}>Kill cron</button> : ""}
                 </div>
 
-                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
+                <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;yellow - under maintenance&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
                 <div ClassName="targetsList">
                     {this.state.targetsJob !== [] ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
@@ -569,6 +572,12 @@ class CronJobDetails extends React.Component {
                                 this.cursor = "pointer"
                                 this.sign = "warning"
                             }
+			} else if (this.state.maintenance.hasOwnProperty('machines')){
+				if (this.state.maintenance.machines.includes(machine)) {
+			    	    this.circleColor = "#FFDE21"
+				    this.cursor = "pointer"
+				    this.sign = "warning"
+				}
                         } else {
                             this.circleColor = "white"
                             this.cursor = "auto"

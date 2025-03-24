@@ -21,6 +21,22 @@ body {
   scrollbar-color: #6ECBF5 #000000;
 }
 
+.maintenance {
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  text-align: center;
+  padding-left: 10px;
+  font-size: 13px;
+  border-collapse: collapse;
+  width: 80%;
+  color: #FFDE21;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0px;
+  margin-top: 1px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 0px 0 rgba(0, 0, 0, 0.19);
+}
+
 .data {
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
