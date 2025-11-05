@@ -621,8 +621,8 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
                         {this.state.results[target]["ret"] ? <p>
                             <div className="sectionDetailsOutput">
-                              <TextareaAutosize wrap="off" maxRows={15}>
-                                {this.state.results[target]["ret"]}
+                              <TextareaAutosize wrap="off" maxRows={15}
+                                value={this.state.results[target]["ret"] || ""}>
                               </TextareaAutosize>
                             </div>
                           </p> : "" }
