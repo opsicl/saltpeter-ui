@@ -60,7 +60,7 @@ class CronJobDetails extends React.Component {
     this.calculateTimeout.bind(this);
     this.showLastRun.bind(this);
     this.runJob.bind(this);
-    //this.killJob.bind(this);
+    this.killJob.bind(this);
     this.killCron.bind(this);
     this.calculateRanFor.bind(this);
     this.changeTz.bind(this);
@@ -126,7 +126,7 @@ class CronJobDetails extends React.Component {
   }
 
 
-/*
+
   killJob = (machine) => {
     var obj = {}
     obj.cron = this.state.name
@@ -136,7 +136,7 @@ class CronJobDetails extends React.Component {
     var jsonString = JSON.stringify(obj_main)
     socket.send(jsonString)  
   }
-  */
+  
 
   killCron = () => {
     var obj = {}
@@ -581,7 +581,7 @@ class CronJobDetails extends React.Component {
                             this.cursor = "auto"
                         }
                         if (this.circleColor !== "white") {
-                            if (this.sign === "start") {
+			    if (this.sign === "start") {
                                 return  <p id={id1} className="machineNameLeft" onClick={this.showLastRun.bind(this,machine,id1)} style={{ cursor: this.cursor, color: "#DFD9F5" }} > <FaPlay style={{color:this.circleColor, marginRight:"7px"}} />{machine}</p>
                             }
                             if (this.sign === "stopped") {
@@ -603,7 +603,29 @@ class CronJobDetails extends React.Component {
                 <div> {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
-                        <p className="machineNameRight">{target}</p>
+                        <div style={{ display: "flex", alignItems: "center"}}>
+  <p className="machineNameRight" style={{ marginRight: "10px" }}>{target}</p>
+  {this.state.runningOn.includes(target) && (
+    <button
+      className="button"
+      style={{
+        backgroundColor: "#F44336",
+        color: "white",
+        fontSize: "12px",
+        padding: "2px 6px",
+        borderRadius: "4px",
+        cursor: "pointer",
+        marginLeft: "10em"
+      }}
+      onClick={() => {
+        this.killJob(target);
+      }}
+    >
+      Kill
+    </button>
+  )}
+</div>
+
                         {this.state.results[target]["starttime"] && this.state.tz === "local" ?
                             <p className="sectionDetails" >started at: <span>{this.formatDateToLocal(new Date(this.state.results[target]["starttime"]))}</span></p> : ""}
                         {this.state.results[target]["starttime"] && this.state.tz === "utc" ?
