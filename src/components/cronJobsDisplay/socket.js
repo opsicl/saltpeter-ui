@@ -211,6 +211,18 @@ class SaltpeterWebSocket {
     getOutput(cron, machine) {
         return this.outputBuffers[cron]?.[machine] || '';
     }
+    
+    clearOutput(cron, machine) {
+        if (!this.outputBuffers[cron]) {
+            this.outputBuffers[cron] = {};
+        }
+        this.outputBuffers[cron][machine] = '';
+        
+        if (!this.outputPositions[cron]) {
+            this.outputPositions[cron] = {};
+        }
+        this.outputPositions[cron][machine] = 0;
+    }
 }
 
 export const socket = new SaltpeterWebSocket(SALTPETER_WS);

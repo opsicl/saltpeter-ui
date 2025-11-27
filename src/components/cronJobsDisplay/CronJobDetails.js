@@ -222,51 +222,56 @@ class CronJobDetails extends React.Component {
   handleData(data) {
     // Handle typed protocol messages
     if (data.type === 'status') {
-      // Convert status message to results format
-      const results = this.state.results;
-      if (!results[data.machine]) {
-        results[data.machine] = {};
-      }
-      results[data.machine].starttime = data.starttime;
-      results[data.machine].endtime = data.endtime || '';
-      results[data.machine].retcode = data.retcode;
-      results[data.machine].status = data.status;
+      // Handle running/last_state status updates
+      const { running, last_state } = data;
       
-      this.setState({ results });
-      
-      // Update running status
-      if (data.status === 'running') {
-        const runningOn = this.state.runningOn;
-        if (!runningOn.includes(data.machine)) {
-          runningOn.push(data.machine);
-          this.setState({ 
+      if (running) {
+        // Check if this cron is running
+        const runningEntry = Object.values(running).find(r => r.name === this.state.name);
+        if (runningEntry) {
+          const wasRunning = this.state.runningOn.length > 0;
+          const machines = runningEntry.machines || [];
+          
+          // Clear output buffers for machines that just started
+          if (!wasRunning || JSON.stringify(this.state.runningOn) !== JSON.stringify(machines)) {
+            machines.forEach(machine => {
+              socket.clearOutput(this.state.name, machine);
+            });
+          }
+          
+          this.setState({
             result: "Running",
-            runningOn,
-            startedJob: new Date(data.starttime).toLocaleString()
+            runningOn: machines,
+            startedJob: runningEntry.started ? new Date(runningEntry.started).toLocaleString() : ''
           });
-        }
-      } else {
-        // Remove from running
-        const runningOn = this.state.runningOn.filter(m => m !== data.machine);
-        this.setState({ runningOn });
-        
-        if (runningOn.length === 0) {
-          this.setState({ 
-            result: data.status === 'success' ? 'Success' : 'Fail'
-          });
+        } else if (this.state.runningOn.length > 0) {
+          // Was running, now stopped
+          this.setState({ runningOn: [] });
         }
       }
+      
+      // Update last_state only if not running
+      if (last_state && last_state[this.state.name] && this.state.runningOn.length === 0) {
+        const lastState = last_state[this.state.name];
+        if (lastState.result_ok === true) {
+          this.setState({ result: "Success" });
+        } else if (lastState.result_ok === false) {
+          this.setState({ result: "Fail" });
+        }
+      }
+      
       return;
     }
     
     if (data.type === 'output_chunk') {
-      // Output chunks are handled by socket.js buffer
-      // Just update results with the full output
-      const results = this.state.results;
+      // Output is managed by socket.js buffer
+      // Update results with current output from buffer
+      const results = {...this.state.results};
       if (!results[data.machine]) {
         results[data.machine] = {};
       }
-      results[data.machine].output = data.full_output;
+      // Get full output from socket buffer
+      results[data.machine].ret = socket.getOutput(data.cron, data.machine);
       this.setState({ results });
       return;
     }
@@ -317,21 +322,7 @@ class CronJobDetails extends React.Component {
         var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
     }
-    if (data.hasOwnProperty("last_state") && (this.state.runningOn.length === 0)) {
-      var json_result_last_state = data["last_state"]
-      var keys_last_state = Object.keys(json_result_last_state)
-      for (var i = 0; i < keys_last_state.length; i++) {
-        var key_name = keys_last_state[i]
-        if (key_name === this.state.name) {
-          // Only update if we actually have last_state data
-          if (json_result_last_state[key_name]["result_ok"] === true) {
-            this.setState({ result : "Success" })
-          } else if (json_result_last_state[key_name]["result_ok"] === false) {
-            this.setState({ result: "Fail" })
-          }
-        }
-      }
-    }
+    
     if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
       var json_result_config_maintenance = data.config.maintenance
@@ -355,23 +346,8 @@ class CronJobDetails extends React.Component {
           result: "NotRun",
       });
     }
-    // running
-    else if(data.hasOwnProperty("running")){
-        this.setState({ runningOn: []})
-        var result_running = data["running"];
-        var keys_running = Object.keys(result_running)
-        for (i = 0; i < keys_running.length; i++) {
-          var key_running = result_running[keys_running[i]]["name"]
-            if (key_running === this.state.name) {
-              this.setState((prevState,props) => ({ 
-                result: "Running",
-                runningOn: result_running[keys_running[i]]["machines"],
-                startedJob: new Date(result_running[keys_running[i]]["started"]).toLocaleString(),
-              }));
-              break;
-            }
-	}
-    } else {
+    // details - legacy format {cronname: {data}}
+    else {
       // details
       var name = Object.keys(data)[0];
       if (name === this.state.name) {
@@ -474,9 +450,17 @@ class CronJobDetails extends React.Component {
     // Handle detail updates for this cron
     const handleDetails = (data) => {
       if (data.cron === self.state.name) {
-        // Transform to legacy format
+        const newData = data.data;
+        
+        // Get output from socket buffer for all machines
+        if (newData.results) {
+          Object.keys(newData.results).forEach(machine => {
+            newData.results[machine].ret = socket.getOutput(data.cron, machine) || '';
+          });
+        }
+        
         const legacyData = {};
-        legacyData[data.cron] = data.data;
+        legacyData[data.cron] = newData;
         self.handleData(legacyData);
       }
     };
