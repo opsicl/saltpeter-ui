@@ -232,11 +232,14 @@ class CronJobDetails extends React.Component {
           const wasRunning = this.state.runningOn.length > 0;
           const machines = runningEntry.machines || [];
           
-          // Clear output buffers for machines that just started
-          if (!wasRunning || JSON.stringify(this.state.runningOn) !== JSON.stringify(machines)) {
-            // Clear both socket buffers and UI state for fresh run
+          // Clear output buffers ONLY for newly started machines
+          const previousMachines = this.state.runningOn;
+          const newMachines = machines.filter(m => !previousMachines.includes(m));
+          
+          if (newMachines.length > 0) {
+            // Clear both socket buffers and UI state for fresh run on new machines only
             const clearedResults = {...this.state.results};
-            machines.forEach(machine => {
+            newMachines.forEach(machine => {
               socket.clearOutput(this.state.name, machine);
               // Clear or reset result data for this machine
               if (clearedResults[machine]) {
