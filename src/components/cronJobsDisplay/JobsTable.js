@@ -136,15 +136,73 @@ class JobsTable extends React.Component {
     
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
+    // Handle new protocol message types
+    if (data.type === 'config') {
+      data = { config: data.config, sp_version: data.sp_version };
+    } else if (data.type === 'timeline') {
+      // Convert timeline format
+      const timeline = data.timeline;
+      const running = {};
+      const last_state = {};
+      
+      // Extract running and last_state from timeline
+      if (timeline.jobs) {
+        Object.keys(timeline.jobs).forEach(cronName => {
+          const cronJobs = timeline.jobs[cronName];
+          const runningMachines = [];
+          let hasRunning = false;
+          let started = null;
+          let lastRun = null;
+          let resultOk = true;
+          
+          Object.keys(cronJobs).forEach(machine => {
+            const job = cronJobs[machine];
+            if (job.status === 'running') {
+              runningMachines.push(machine);
+              hasRunning = true;
+              if (!started || new Date(job.starttime) < new Date(started)) {
+                started = job.starttime;
+              }
+            }
+            if (job.endtime) {
+              if (!lastRun || new Date(job.endtime) > new Date(lastRun)) {
+                lastRun = job.endtime;
+              }
+              if (job.status === 'failed') {
+                resultOk = false;
+              }
+            }
+          });
+          
+          if (hasRunning) {
+            running[cronName] = {
+              name: cronName,
+              machines: runningMachines,
+              started: started
+            };
+          }
+          
+          if (lastRun) {
+            last_state[cronName] = {
+              last_run: lastRun,
+              result_ok: resultOk
+            };
+          }
+        });
+      }
+      
+      data = { running, last_state };
+    }
+
     // get backend version
-    if (JSON.parse(data).hasOwnProperty("sp_version")){
-        var json_result_version = JSON.parse(data).sp_version;
+    if (data.hasOwnProperty("sp_version")){
+        var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
     }
 
     //config
-    if (JSON.parse(data).hasOwnProperty("config")) {
-      var json_result_config = JSON.parse(data).config.crons;
+    if (data.hasOwnProperty("config")) {
+      var json_result_config = data.config.crons;
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
       this.setState({ config_received: true});
@@ -180,17 +238,17 @@ class JobsTable extends React.Component {
 
       this.setState({jobs: cronJobs})
 
-      var maintenance_conf = JSON.parse(data).config.maintenance
+      var maintenance_conf = data.config.maintenance
       this.setState({maintenance: maintenance_conf})
     }
-    if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
+    if ((data.hasOwnProperty("running")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
       for (i = 0; i < cronJobs.length; i++) {
         cronJobs[i]["runningOn"] = [];
       }
 
-      var json_result_running = JSON.parse(data).running;
+      var json_result_running = data.running;
       var keys_running = Object.keys(json_result_running);
       for (i = 0; i < keys_running.length; i++) {
         var key_running = json_result_running[keys_running[i]]["name"];
@@ -207,7 +265,7 @@ class JobsTable extends React.Component {
       this.setState({ jobs: cronJobs });
     }
 
-    if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
+    if ((data.hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
       //clear previous data
       //for (i = 0; i < cronJobs.length; i++) {
@@ -215,7 +273,7 @@ class JobsTable extends React.Component {
       //  cronJobs[i]["result"] = "Notrun";
       //}
 
-      var json_result_last_state = JSON.parse(data).last_state;
+      var json_result_last_state = data.last_state;
       var keys_last_state = Object.keys(json_result_last_state);
       for (i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
@@ -376,7 +434,8 @@ class JobsTable extends React.Component {
 
     var self = this;
     socket.onmessage =  function(event) {
-      self.handleData(event.data);
+      const data = JSON.parse(event.data);
+      self.handleData(data);
     };
 
     socket.onclose = function(event) {

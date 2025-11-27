@@ -220,7 +220,105 @@ class CronJobDetails extends React.Component {
 
 
   handleData(json) {
-    let data = JSON.parse(json);
+    let data = typeof json === 'string' ? JSON.parse(json) : json;
+    
+    // Handle new protocol message types
+    if (data.type === 'status') {
+      // Convert status message to results format
+      const results = this.state.results;
+      if (!results[data.machine]) {
+        results[data.machine] = {};
+      }
+      results[data.machine].starttime = data.starttime;
+      results[data.machine].endtime = data.endtime || '';
+      results[data.machine].retcode = data.retcode;
+      results[data.machine].status = data.status;
+      
+      this.setState({ results });
+      
+      // Update running status
+      if (data.status === 'running') {
+        const runningOn = this.state.runningOn;
+        if (!runningOn.includes(data.machine)) {
+          runningOn.push(data.machine);
+          this.setState({ 
+            result: "Running",
+            runningOn,
+            startedJob: new Date(data.starttime).toLocaleString()
+          });
+        }
+      } else {
+        // Remove from running
+        const runningOn = this.state.runningOn.filter(m => m !== data.machine);
+        this.setState({ runningOn });
+        
+        if (runningOn.length === 0) {
+          this.setState({ 
+            result: data.status === 'success' ? 'Success' : 'Fail'
+          });
+        }
+      }
+      return;
+    }
+    
+    if (data.type === 'output_chunk') {
+      // Output chunks are handled by socket.js buffer
+      // Just update results with the full output
+      const results = this.state.results;
+      if (!results[data.machine]) {
+        results[data.machine] = {};
+      }
+      results[data.machine].output = data.full_output;
+      this.setState({ results });
+      return;
+    }
+    
+    if (data.type === 'config') {
+      data = { config: data.config, sp_version: data.sp_version };
+    }
+    
+    if (data.type === 'timeline') {
+      // Convert timeline to legacy format for this job
+      const timeline = data.timeline;
+      const cronData = timeline.jobs?.[this.state.name];
+      if (cronData) {
+        const results = {};
+        const runningMachines = [];
+        let started = null;
+        
+        Object.keys(cronData).forEach(machine => {
+          const job = cronData[machine];
+          results[machine] = {
+            starttime: job.starttime,
+            endtime: job.endtime || '',
+            retcode: job.retcode,
+            status: job.status,
+            output: socket.getOutput(this.state.name, machine)
+          };
+          
+          if (job.status === 'running') {
+            runningMachines.push(machine);
+            if (!started || new Date(job.starttime) < new Date(started)) {
+              started = job.starttime;
+            }
+          }
+        });
+        
+        const updateState = { results };
+        
+        if (runningMachines.length > 0) {
+          updateState.runningOn = runningMachines;
+          updateState.result = "Running";
+          updateState.startedJob = new Date(started).toLocaleString();
+        } else {
+          updateState.runningOn = [];
+        }
+        
+        this.setState(updateState);
+      }
+      return;
+    }
+    
     if (data.hasOwnProperty("sp_version")){
         var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
@@ -361,16 +459,15 @@ class CronJobDetails extends React.Component {
 
     var self = this;
     socket.onmessage =  function(event) {
-      self.handleData(event.data);
+      const data = JSON.parse(event.data);
+      self.handleData(data);
     };
 
-    var obj = {}
-    obj.subscribe = this.state.name
-    var jsonString = JSON.stringify(obj)
-    socket.send(jsonString);
+    // Subscribe to this job
+    socket.subscribe(this.state.name);
 
     socket.onopen = function(event) {
-      socket.send(jsonString);
+      socket.subscribe(self.state.name);
     }
 
     socket.onclose = function(event) {
@@ -424,11 +521,8 @@ class CronJobDetails extends React.Component {
     localStorage.setItem('tzState', this.state.tz) 
     this.stopInterval();
 
-    var obj = {}
-    obj.unsubscribe = this.state.name
-    var jsonString = JSON.stringify(obj)
-    socket.send(jsonString);
-
+    // Unsubscribe from this job
+    socket.unsubscribe(this.state.name);
   }
 
   render(){
