@@ -219,10 +219,8 @@ class CronJobDetails extends React.Component {
     }
 
 
-  handleData(json) {
-    let data = typeof json === 'string' ? JSON.parse(json) : json;
-    
-    // Handle new protocol message types
+  handleData(data) {
+    // Handle typed protocol messages
     if (data.type === 'status') {
       // Convert status message to results format
       const results = this.state.results;
@@ -271,10 +269,6 @@ class CronJobDetails extends React.Component {
       results[data.machine].output = data.full_output;
       this.setState({ results });
       return;
-    }
-    
-    if (data.type === 'config') {
-      data = { config: data.config, sp_version: data.sp_version };
     }
     
     if (data.type === 'timeline') {
@@ -458,10 +452,27 @@ class CronJobDetails extends React.Component {
     }
 
     var self = this;
-    socket.onmessage =  function(event) {
-      const data = JSON.parse(event.data);
+    
+    // Handle status updates
+    const handleStatus = (data) => {
       self.handleData(data);
     };
+    
+    // Handle config updates
+    const handleConfig = (data) => {
+      self.handleData(data);
+    };
+    
+    // Handle output chunks
+    const handleOutputChunk = (data) => {
+      if (data.cron === self.state.name) {
+        self.handleData(data);
+      }
+    };
+    
+    socket.on('status', handleStatus);
+    socket.on('config', handleConfig);
+    socket.on('output_chunk', handleOutputChunk);
 
     // Subscribe to this job
     socket.subscribe(this.state.name);

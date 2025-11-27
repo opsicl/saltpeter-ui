@@ -136,10 +136,8 @@ class JobsTable extends React.Component {
     
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
-    // Handle new protocol message types
-    if (data.type === 'config') {
-      data = { config: data.config, sp_version: data.sp_version };
-    } else if (data.type === 'timeline') {
+    // Handle typed protocol messages
+    if (data.type === 'timeline') {
       // Convert timeline format
       const timeline = data.timeline;
       const running = {};
@@ -433,10 +431,19 @@ class JobsTable extends React.Component {
     }
 
     var self = this;
-    socket.onmessage =  function(event) {
-      const data = JSON.parse(event.data);
+    
+    // Handle status updates
+    const handleStatus = (data) => {
       self.handleData(data);
     };
+    
+    // Handle config updates
+    const handleConfig = (data) => {
+      self.handleData(data);
+    };
+    
+    socket.on('status', handleStatus);
+    socket.on('config', handleConfig);
 
     socket.onclose = function(event) {
       self.setState({jobs: []});

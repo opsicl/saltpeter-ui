@@ -18,8 +18,7 @@ class SaltpeterWebSocket {
             status: [],
             output_chunk: [],
             config: [],
-            timeline: [],
-            message: []  // Legacy handler for backward compatibility
+            timeline: []
         };
         
         this.ws.onmessage = (event) => {
@@ -80,8 +79,10 @@ class SaltpeterWebSocket {
     }
     
     handleMessage(data) {
-        // Call legacy message handler for backward compatibility
-        this.handlers.message.forEach(handler => handler(data));
+        if (!data.type) {
+            console.warn('Message missing type field:', data);
+            return;
+        }
         
         switch(data.type) {
             case 'status':
@@ -96,6 +97,8 @@ class SaltpeterWebSocket {
             case 'timeline':
                 this.handleTimeline(data);
                 break;
+            default:
+                console.warn('Unknown message type:', data.type);
         }
     }
     
@@ -178,13 +181,6 @@ class SaltpeterWebSocket {
             }));
         } catch (e) {
             // Don't fail if ACK can't be sent
-        }
-    }
-    
-    // For backward compatibility with existing code
-    set onmessage(handler) {
-        if (handler) {
-            this.handlers.message = [handler];
         }
     }
     
