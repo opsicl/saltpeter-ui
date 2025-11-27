@@ -234,9 +234,18 @@ class CronJobDetails extends React.Component {
           
           // Clear output buffers for machines that just started
           if (!wasRunning || JSON.stringify(this.state.runningOn) !== JSON.stringify(machines)) {
+            // Clear both socket buffers and UI state for fresh run
+            const clearedResults = {...this.state.results};
             machines.forEach(machine => {
               socket.clearOutput(this.state.name, machine);
+              // Clear or reset result data for this machine
+              if (clearedResults[machine]) {
+                clearedResults[machine].ret = '';
+                clearedResults[machine].endtime = '';
+                clearedResults[machine].retcode = '';
+              }
             });
+            this.setState({ results: clearedResults });
           }
           
           this.setState({
@@ -270,9 +279,14 @@ class CronJobDetails extends React.Component {
       if (!results[data.machine]) {
         results[data.machine] = {};
       }
-      // Get full output from socket buffer
-      results[data.machine].ret = socket.getOutput(data.cron, data.machine);
-      this.setState({ results });
+      // Get full output from socket buffer and force update
+      const fullOutput = socket.getOutput(data.cron, data.machine);
+      results[data.machine].ret = fullOutput;
+      // Force state update even if object looks the same
+      this.setState({ results }, () => {
+        // Update textarea if visible
+        this.forceUpdate();
+      });
       return;
     }
     

@@ -149,9 +149,17 @@ class SaltpeterWebSocket {
         const expected = this.outputPositions[cron][machine];
         if (position !== expected) {
             console.warn(`Position mismatch for ${cron}/${machine}: expected ${expected}, got ${position}`);
-            // Reset buffer and position
-            this.outputBuffers[cron][machine] = '';
-            this.outputPositions[cron][machine] = 0;
+            // Don't reset buffer - this loses output
+            // If position < expected, it's a duplicate chunk we already have
+            if (position < expected) {
+                console.log(`Ignoring duplicate chunk at position ${position}`);
+                // Still send ACK for current position
+                this.sendAck(cron, machine, expected);
+                return;
+            }
+            // If position > expected, we're missing chunks
+            // Continue anyway and hope backend resends missing parts
+            console.warn(`Gap detected: missing bytes ${expected} to ${position}`);
         }
         
         // Append chunk to buffer
