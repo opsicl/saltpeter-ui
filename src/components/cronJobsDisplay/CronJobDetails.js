@@ -323,6 +323,7 @@ class CronJobDetails extends React.Component {
       for (var i = 0; i < keys_last_state.length; i++) {
         var key_name = keys_last_state[i]
         if (key_name === this.state.name) {
+          // Only update if we actually have last_state data
           if (json_result_last_state[key_name]["result_ok"] === true) {
             this.setState({ result : "Success" })
           } else if (json_result_last_state[key_name]["result_ok"] === false) {
@@ -470,9 +471,20 @@ class CronJobDetails extends React.Component {
       }
     };
     
+    // Handle detail updates for this cron
+    const handleDetails = (data) => {
+      if (data.cron === self.state.name) {
+        // Transform to legacy format
+        const legacyData = {};
+        legacyData[data.cron] = data.data;
+        self.handleData(legacyData);
+      }
+    };
+    
     socket.on('status', handleStatus);
     socket.on('config', handleConfig);
     socket.on('output_chunk', handleOutputChunk);
+    socket.on('details', handleDetails);
 
     // Subscribe to this job
     socket.subscribe(this.state.name);

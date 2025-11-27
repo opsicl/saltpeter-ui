@@ -18,7 +18,8 @@ class SaltpeterWebSocket {
             status: [],
             output_chunk: [],
             config: [],
-            timeline: []
+            timeline: [],
+            details: []
         };
         
         this.ws.onmessage = (event) => {
@@ -64,8 +65,12 @@ class SaltpeterWebSocket {
     
     subscribe(jobs) {
         const jobArray = Array.isArray(jobs) ? jobs : [jobs];
-        jobArray.forEach(job => this.subscriptions.add(job));
-        this.send(JSON.stringify({ subscribe: jobArray }));
+        const newJobs = jobArray.filter(job => !this.subscriptions.has(job));
+        if (newJobs.length === 0) {
+            return; // Already subscribed
+        }
+        newJobs.forEach(job => this.subscriptions.add(job));
+        this.send(JSON.stringify({ subscribe: newJobs }));
     }
     
     unsubscribe(jobs) {
@@ -96,6 +101,9 @@ class SaltpeterWebSocket {
                 break;
             case 'timeline':
                 this.handleTimeline(data);
+                break;
+            case 'details':
+                this.handleDetails(data);
                 break;
             default:
                 console.warn('Unknown message type:', data.type);
@@ -168,6 +176,10 @@ class SaltpeterWebSocket {
     
     handleTimeline(data) {
         this.handlers.timeline.forEach(handler => handler(data));
+    }
+    
+    handleDetails(data) {
+        this.handlers.details.forEach(handler => handler(data));
     }
     
     sendAck(cron, machine, position) {
