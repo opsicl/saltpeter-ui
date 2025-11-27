@@ -151,7 +151,8 @@
 }
 
 .targetsList {
-  max-height: 20px;
+  margin-bottom: 20px;
+  overflow: visible;
 }
 
 .button {

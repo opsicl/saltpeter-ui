@@ -674,7 +674,7 @@ class CronJobDetails extends React.Component {
                 </div>
 
                 <h1 className="sectionTitle"><span> TARGETS <FiInfo  title="gray - matched by expression&#10;green - ran successfully&#10;yellow - under maintenance&#10;blue - running now&#10;red - ran with errors" style ={{marginLeft: "2px"}}/> </span></h1>
-                <div ClassName="targetsList">
+                <div className="targetsList">
                     {this.state.targetsJob.length > 0 ? this.state.targetsJob.map((machine, i) => {
                         var id1 = i;
                         if (Object.values(this.state.runningOn).indexOf(machine) > -1) {
