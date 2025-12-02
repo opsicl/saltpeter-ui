@@ -50,7 +50,9 @@ class SaltpeterWebSocket {
             // Reload page after backend restart to get fresh state
             // Only reload if this is a reconnect (not initial connection)
             if (this.hasConnected) {
-                console.log('Backend reconnected - reloading page to clear stale state');
+                console.log('Backend reconnected - clearing stale state and reloading');
+                // Clear sessionStorage to remove stale job state
+                sessionStorage.removeItem('savedState');
                 window.location.reload();
                 return;
             }
