@@ -248,6 +248,7 @@ class JobsTable extends React.Component {
       
       // Process running data first
       if (data.hasOwnProperty("running")) {
+        console.log('[DEBUG] Processing running data:', JSON.stringify(data.running));
         // Build set of running job names for quick lookup
         var json_result_running = data.running;
         var keys_running = Object.keys(json_result_running);
@@ -282,6 +283,7 @@ class JobsTable extends React.Component {
 
       // Process last_state data second (on same cronJobs array)
       if (data.hasOwnProperty("last_state")) {
+        console.log('[DEBUG] Processing last_state data:', JSON.stringify(data.last_state));
         var json_result_last_state = data.last_state;
         var keys_last_state = Object.keys(json_result_last_state);
         for (i = 0; i < keys_last_state.length; i++) {
@@ -308,6 +310,7 @@ class JobsTable extends React.Component {
       }
       
       // Update state once with all changes
+      console.log('[DEBUG] Final cronJobs state before setState:', cronJobs.map(j => ({name: j.name, status: j.status, runningOn: j.runningOn})));
       this.setState({ jobs: cronJobs });
     }
     if (this.state.config_received === false) {
