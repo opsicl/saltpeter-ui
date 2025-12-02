@@ -218,6 +218,35 @@ class CronJobDetails extends React.Component {
         return machinesRanFor;
     }
 
+  calculateLastHeartbeat() {
+    var machinesHeartbeat = {};
+    var currentTime = Date.now();
+    for (let machine in this.state.results) {
+      if (this.state.runningOn.includes(machine) && this.state.results[machine]["last_heartbeat"]) {
+        const lastHeartbeat = new Date(this.state.results[machine]["last_heartbeat"]);
+        const diffMs = currentTime - lastHeartbeat.getTime();
+        const secondsAgo = Math.floor(diffMs / 1000);
+        const minutesAgo = Math.floor(secondsAgo / 60);
+        const hoursAgo = Math.floor(minutesAgo / 60);
+        
+        let relativeTime;
+        if (secondsAgo < 60) {
+          relativeTime = `${secondsAgo}s ago`;
+        } else if (minutesAgo < 60) {
+          relativeTime = `${minutesAgo}m ${secondsAgo % 60}s ago`;
+        } else {
+          relativeTime = `${hoursAgo}h ${minutesAgo % 60}m ago`;
+        }
+        
+        machinesHeartbeat[machine] = {
+          relative: relativeTime,
+          exact: this.state.tz === "utc" ? this.formatDateToUTC(lastHeartbeat) : this.formatDateToLocal(lastHeartbeat)
+        };
+      }
+    }
+    return machinesHeartbeat;
+  }
+
 
   handleData(data) {
     // Handle typed protocol messages
@@ -532,6 +561,7 @@ class CronJobDetails extends React.Component {
           untilNextRun:  String(daysDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "d " + String(hoursDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"h " + String(minutesDiff(prevState.currentTimeLocal, new Date(prevState.next_run))) + "m " + String(secondsDiff(prevState.currentTimeLocal, new Date(prevState.next_run)))+"s",
           timeoutCounter: self.calculateTimeout(),
           ranForCounter: self.calculateRanFor(),
+          lastHeartbeatCounter: self.calculateLastHeartbeat(),
       })),
       1000
     );
@@ -755,7 +785,11 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["starttime"] ?
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 
-                            <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""} 
+                            <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""}
+                        {this.state.results[target]["wrapper_version"] ?
+                            <p className="sectionDetails" >wrapper version: <span>{this.state.results[target]["wrapper_version"]}</span></p> : ""}
+                        {this.state.lastHeartbeatCounter && this.state.lastHeartbeatCounter[target] ?
+                            <p className="sectionDetails" title={this.state.lastHeartbeatCounter[target].exact}>last heartbeat: <span>{this.state.lastHeartbeatCounter[target].relative}</span></p> : ""}
                         {this.state.timeoutCounter.hasOwnProperty(target) ?
                             <p className="sectionDetails" >{this.state.timeoutCounter[target]}</p> : ""}
                         {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
