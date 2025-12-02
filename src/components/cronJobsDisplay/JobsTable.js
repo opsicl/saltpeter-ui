@@ -277,7 +277,8 @@ class JobsTable extends React.Component {
         var key_name = keys_last_state[i]
         for (j = 0; j < cronJobs.length; j++) {
           if (cronJobs[j]["name"] === key_name) {
-            if (cronJobs[j]["runningOn"].length === 0) {
+            // Only apply last_state if job is NOT currently running
+            if (cronJobs[j]["status"] !== "Running") {
                 if (json_result_last_state[key_name]["result_ok"] === false) {
                     cronJobs[j]["status"] = "Fail"
                 } else {
