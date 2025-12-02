@@ -41,6 +41,8 @@ class SaltpeterWebSocket {
             // Clear state on disconnect
             this.outputPositions = {};
             this.outputBuffers = {};
+            // Clear sessionStorage to prevent stale data after backend restart
+            sessionStorage.removeItem('savedState');
             if (this.onclose) this.onclose(...args);
         };
         
