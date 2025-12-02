@@ -239,74 +239,76 @@ class JobsTable extends React.Component {
       var maintenance_conf = data.config.maintenance
       this.setState({maintenance: maintenance_conf})
     }
-    if ((data.hasOwnProperty("running")) && (this.state.config_received === true)) {
+    
+    // Process running and last_state together to avoid async setState issues
+    var needsUpdate = false;
+    if ((data.hasOwnProperty("running") || data.hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
+      needsUpdate = true;
       
-      // Build set of running job names for quick lookup
-      var json_result_running = data.running;
-      var keys_running = Object.keys(json_result_running);
-      var runningJobNames = new Set();
-      for (i = 0; i < keys_running.length; i++) {
-        runningJobNames.add(json_result_running[keys_running[i]]["name"]);
-      }
-      
-      // Clear running data only for jobs that are NOT in the running list
-      for (i = 0; i < cronJobs.length; i++) {
-        if (!runningJobNames.has(cronJobs[i]["name"])) {
-          cronJobs[i]["runningOn"] = [];
-          if (cronJobs[i]["status"] === "Running") {
-            cronJobs[i]["status"] = "NotRun";
+      // Process running data first
+      if (data.hasOwnProperty("running")) {
+        // Build set of running job names for quick lookup
+        var json_result_running = data.running;
+        var keys_running = Object.keys(json_result_running);
+        var runningJobNames = new Set();
+        for (i = 0; i < keys_running.length; i++) {
+          runningJobNames.add(json_result_running[keys_running[i]]["name"]);
+        }
+        
+        // Clear running data only for jobs that are NOT in the running list
+        for (i = 0; i < cronJobs.length; i++) {
+          if (!runningJobNames.has(cronJobs[i]["name"])) {
+            cronJobs[i]["runningOn"] = [];
+            if (cronJobs[i]["status"] === "Running") {
+              cronJobs[i]["status"] = "NotRun";
+            }
+          }
+        }
+
+        // Set running data for jobs that ARE running
+        for (i = 0; i < keys_running.length; i++) {
+          var key_running = json_result_running[keys_running[i]]["name"];
+          for (var j = 0; j < cronJobs.length; j++) {
+            if (cronJobs[j]["name"] === key_running) {
+              cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
+              cronJobs[j]["status"] = "Running";
+              cronJobs[j]["running_started"] = json_result_running[keys_running[i]]["started"]
+              break;
+            }
           }
         }
       }
 
-      // Set running data for jobs that ARE running
-      for (i = 0; i < keys_running.length; i++) {
-        var key_running = json_result_running[keys_running[i]]["name"];
-        for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_running) {
-            cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
-            cronJobs[j]["status"] = "Running";
-            cronJobs[j]["running_started"] = json_result_running[keys_running[i]]["started"]
-            break;
-          }
-        }
-      }
-
-      this.setState({ jobs: cronJobs });
-    }
-
-    if ((data.hasOwnProperty("last_state")) && (this.state.config_received === true)) {
-      cronJobs = this.state.jobs;
-      //clear previous data
-      //for (i = 0; i < cronJobs.length; i++) {
-      //  cronJobs[i]["result"] = 0;
-      //  cronJobs[i]["result"] = "Notrun";
-      //}
-
-      var json_result_last_state = data.last_state;
-      var keys_last_state = Object.keys(json_result_last_state);
-      for (i = 0; i < keys_last_state.length; i++) {
-        var key_name = keys_last_state[i]
-        for (j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_name) {
-            // Only apply last_state if job is NOT currently running
-            if (cronJobs[j]["status"] !== "Running") {
-                if (json_result_last_state[key_name]["result_ok"] === false) {
-                    cronJobs[j]["status"] = "Fail"
-                } else {
-                    cronJobs[j]["status"] = "Success"
-                }
-                cronJobs[j]["ran_for"] = Date.now() - new Date(json_result_last_state[key_name]["last_run"])
+      // Process last_state data second (on same cronJobs array)
+      if (data.hasOwnProperty("last_state")) {
+        var json_result_last_state = data.last_state;
+        var keys_last_state = Object.keys(json_result_last_state);
+        for (i = 0; i < keys_last_state.length; i++) {
+          var key_name = keys_last_state[i]
+          for (j = 0; j < cronJobs.length; j++) {
+            if (cronJobs[j]["name"] === key_name) {
+              // Only apply last_state if job is NOT currently running
+              if (cronJobs[j]["status"] !== "Running") {
+                  if (json_result_last_state[key_name]["result_ok"] === false) {
+                      cronJobs[j]["status"] = "Fail"
+                  } else {
+                      cronJobs[j]["status"] = "Success"
+                  }
+                  cronJobs[j]["ran_for"] = Date.now() - new Date(json_result_last_state[key_name]["last_run"])
+                  cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
+              }
+              else {
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
+              }
+              break
             }
-            else {
-              cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
-            }
-            break
           }
         }
       }
+      
+      // Update state once with all changes
+      this.setState({ jobs: cronJobs });
     }
     if (this.state.config_received === false) {
       window.location.reload(false);
