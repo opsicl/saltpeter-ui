@@ -14,6 +14,8 @@ class SaltpeterWebSocket {
         this.subscriptions = new Set();
         this.outputPositions = {};  // {cron: {machine: position}}
         this.outputBuffers = {};     // {cron: {machine: full_output_string}}
+        this.hasConnected = false;  // Track if we've connected at least once
+        this.reloadScheduled = false;  // Prevent multiple reload attempts
         this.handlers = {
             status: [],
             output_chunk: [],
@@ -44,10 +46,25 @@ class SaltpeterWebSocket {
         };
         
         this.ws.onopen = (...args) => {
+            console.log('WebSocket connected/reconnected');
             // Resubscribe after reconnect
             if (this.subscriptions.size > 0) {
                 this.subscribe([...this.subscriptions]);
             }
+            // Reload page after backend restart to get fresh state
+            // Only reload if this is a reconnect (not initial connection)
+            // And only if we're not already in the process of reloading
+            if (this.hasConnected && !this.reloadScheduled) {
+                console.log('Backend reconnected - scheduling page reload in 1 second');
+                this.reloadScheduled = true;
+                // Close the connection cleanly before reload
+                this.ws.close();
+                // Wait a moment for the close to complete, then reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+            this.hasConnected = true;
             if (this.onopen) this.onopen(...args);
         };
         
