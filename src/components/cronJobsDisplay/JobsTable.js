@@ -241,13 +241,26 @@ class JobsTable extends React.Component {
     }
     if ((data.hasOwnProperty("running")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
-      //clear previous data
-      for (i = 0; i < cronJobs.length; i++) {
-        cronJobs[i]["runningOn"] = [];
-      }
-
+      
+      // Build set of running job names for quick lookup
       var json_result_running = data.running;
       var keys_running = Object.keys(json_result_running);
+      var runningJobNames = new Set();
+      for (i = 0; i < keys_running.length; i++) {
+        runningJobNames.add(json_result_running[keys_running[i]]["name"]);
+      }
+      
+      // Clear running data only for jobs that are NOT in the running list
+      for (i = 0; i < cronJobs.length; i++) {
+        if (!runningJobNames.has(cronJobs[i]["name"])) {
+          cronJobs[i]["runningOn"] = [];
+          if (cronJobs[i]["status"] === "Running") {
+            cronJobs[i]["status"] = "NotRun";
+          }
+        }
+      }
+
+      // Set running data for jobs that ARE running
       for (i = 0; i < keys_running.length; i++) {
         var key_running = json_result_running[keys_running[i]]["name"];
         for (var j = 0; j < cronJobs.length; j++) {
