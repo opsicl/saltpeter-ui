@@ -254,10 +254,13 @@ class CronJobDetails extends React.Component {
       // Handle running/last_state status updates
       const { running, last_state } = data;
       
+      let isRunning = false;  // Track if this job is currently running
+      
       if (running) {
         // Check if this cron is running
         const runningEntry = Object.values(running).find(r => r.name === this.state.name);
         if (runningEntry) {
+          isRunning = true;  // Mark as running
           const wasRunning = this.state.runningOn.length > 0;
           const machines = runningEntry.machines || [];
           
@@ -291,8 +294,8 @@ class CronJobDetails extends React.Component {
         }
       }
       
-      // Update last_state only if not running
-      if (last_state && last_state[this.state.name] && this.state.runningOn.length === 0) {
+      // Update last_state only if not running (check the flag, not state)
+      if (last_state && last_state[this.state.name] && !isRunning) {
         const lastState = last_state[this.state.name];
         if (lastState.result_ok === true) {
           this.setState({ result: "Success" });
