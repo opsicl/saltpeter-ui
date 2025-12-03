@@ -246,16 +246,19 @@ class JobsTable extends React.Component {
       cronJobs = this.state.jobs;
       needsUpdate = true;
       
-      // Process running data first
+      // Build set of running job names first for use in both sections
+      var runningJobNames = new Set();
       if (data.hasOwnProperty("running")) {
-        console.log('[DEBUG] Processing running data:', JSON.stringify(data.running));
-        // Build set of running job names for quick lookup
         var json_result_running = data.running;
         var keys_running = Object.keys(json_result_running);
-        var runningJobNames = new Set();
         for (i = 0; i < keys_running.length; i++) {
           runningJobNames.add(json_result_running[keys_running[i]]["name"]);
         }
+      }
+      
+      // Process running data first
+      if (data.hasOwnProperty("running")) {
+        console.log('[DEBUG] Processing running data:', JSON.stringify(data.running));
         
         // Clear running data only for jobs that are NOT in the running list
         for (i = 0; i < cronJobs.length; i++) {
@@ -290,8 +293,9 @@ class JobsTable extends React.Component {
           var key_name = keys_last_state[i]
           for (j = 0; j < cronJobs.length; j++) {
             if (cronJobs[j]["name"] === key_name) {
-              // Only apply last_state if job is NOT currently running
-              if (cronJobs[j]["status"] !== "Running") {
+              // Only apply last_state status/result if job is NOT in running dict
+              // Check the running dict data, not the current status
+              if (!runningJobNames.has(key_name)) {
                   if (json_result_last_state[key_name]["result_ok"] === false) {
                       cronJobs[j]["status"] = "Fail"
                   } else {
@@ -301,6 +305,7 @@ class JobsTable extends React.Component {
                   cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
               }
               else {
+                // Job is running - only update last_run time, not status
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
               }
               break
