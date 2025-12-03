@@ -254,6 +254,7 @@ class JobsTable extends React.Component {
         for (i = 0; i < keys_running.length; i++) {
           runningJobNames.add(json_result_running[keys_running[i]]["name"]);
         }
+        console.log('[DEBUG] Built runningJobNames set:', Array.from(runningJobNames));
       }
       
       // Process running data first
@@ -291,11 +292,14 @@ class JobsTable extends React.Component {
         var keys_last_state = Object.keys(json_result_last_state);
         for (i = 0; i < keys_last_state.length; i++) {
           var key_name = keys_last_state[i]
+          console.log('[DEBUG] Processing last_state for:', key_name, 'Is in runningJobNames?', runningJobNames.has(key_name));
           for (j = 0; j < cronJobs.length; j++) {
             if (cronJobs[j]["name"] === key_name) {
+              console.log('[DEBUG] Found job in cronJobs:', key_name, 'current status:', cronJobs[j]["status"]);
               // Only apply last_state status/result if job is NOT in running dict
               // Check the running dict data, not the current status
               if (!runningJobNames.has(key_name)) {
+                  console.log('[DEBUG] Job NOT in running dict, applying last_state');
                   if (json_result_last_state[key_name]["result_ok"] === false) {
                       cronJobs[j]["status"] = "Fail"
                   } else {
@@ -306,6 +310,7 @@ class JobsTable extends React.Component {
               }
               else {
                 // Job is running - only update last_run time, not status
+                console.log('[DEBUG] Job IS in running dict, NOT changing status, only updating last_run');
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
               }
               break
