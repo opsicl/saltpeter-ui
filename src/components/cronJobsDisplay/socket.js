@@ -130,8 +130,12 @@ class SaltpeterWebSocket {
     
     handleStatus(data) {
         console.log('[SOCKET] handleStatus called with:', JSON.stringify(data));
+        console.log('[SOCKET] Number of status handlers:', this.handlers.status.length);
         // Pass the whole status message to handlers (contains running and last_state)
-        this.handlers.status.forEach(handler => handler(data));
+        this.handlers.status.forEach(handler => {
+            console.log('[SOCKET] Calling status handler');
+            handler(data);
+        });
     }
     
     handleOutputChunk(data) {
