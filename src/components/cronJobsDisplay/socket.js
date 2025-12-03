@@ -129,20 +129,7 @@ class SaltpeterWebSocket {
     }
     
     handleStatus(data) {
-        const { cron, machine, status } = data;
-        
-        // Reset position tracking when job starts
-        if (status === 'running') {
-            if (!this.outputPositions[cron]) {
-                this.outputPositions[cron] = {};
-            }
-            if (!this.outputBuffers[cron]) {
-                this.outputBuffers[cron] = {};
-            }
-            this.outputPositions[cron][machine] = 0;
-            this.outputBuffers[cron][machine] = '';
-        }
-        
+        // Pass the whole status message to handlers (contains running and last_state)
         this.handlers.status.forEach(handler => handler(data));
     }
     
