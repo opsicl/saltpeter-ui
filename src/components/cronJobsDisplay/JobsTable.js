@@ -132,19 +132,76 @@ class JobsTable extends React.Component {
   }
 
   handleData(data) {
+    console.log('[DEBUG] handleData called with:', JSON.stringify(data));
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
 
+    // Handle typed protocol messages
+    if (data.type === 'timeline') {
+      // Convert timeline format
+      const timeline = data.timeline;
+      const running = {};
+      const last_state = {};
+      
+      // Extract running and last_state from timeline
+      if (timeline.jobs) {
+        Object.keys(timeline.jobs).forEach(cronName => {
+          const cronJobs = timeline.jobs[cronName];
+          const runningMachines = [];
+          let hasRunning = false;
+          let started = null;
+          let lastRun = null;
+          let resultOk = true;
+          
+          Object.keys(cronJobs).forEach(machine => {
+            const job = cronJobs[machine];
+            if (job.status === 'running') {
+              runningMachines.push(machine);
+              hasRunning = true;
+              if (!started || new Date(job.starttime) < new Date(started)) {
+                started = job.starttime;
+              }
+            }
+            if (job.endtime) {
+              if (!lastRun || new Date(job.endtime) > new Date(lastRun)) {
+                lastRun = job.endtime;
+              }
+              if (job.status === 'failed') {
+                resultOk = false;
+              }
+            }
+          });
+          
+          if (hasRunning) {
+            running[cronName] = {
+              name: cronName,
+              machines: runningMachines,
+              started: started
+            };
+          }
+          
+          if (lastRun) {
+            last_state[cronName] = {
+              last_run: lastRun,
+              result_ok: resultOk
+            };
+          }
+        });
+      }
+      
+      data = { running, last_state };
+    }
+
     // get backend version
-    if (JSON.parse(data).hasOwnProperty("sp_version")){
-        var json_result_version = JSON.parse(data).sp_version;
+    if (data.hasOwnProperty("sp_version")){
+        var json_result_version = data.sp_version;
         this.setState({ backend_version: json_result_version});
     }
 
     //config
-    if (JSON.parse(data).hasOwnProperty("config")) {
-      var json_result_config = JSON.parse(data).config.crons;
+    if (data.hasOwnProperty("config")) {
+      var json_result_config = data.config.crons;
       var keys = Object.keys(json_result_config);
       var cronJobs = [];
       this.setState({ config_received: true});
@@ -180,63 +237,92 @@ class JobsTable extends React.Component {
 
       this.setState({jobs: cronJobs})
 
-      var maintenance_conf = JSON.parse(data).config.maintenance
+      var maintenance_conf = data.config.maintenance
       this.setState({maintenance: maintenance_conf})
     }
-    if ((JSON.parse(data).hasOwnProperty("running")) && (this.state.config_received === true)) {
+    
+    // Process running and last_state together to avoid async setState issues
+    var needsUpdate = false;
+    if ((data.hasOwnProperty("running") || data.hasOwnProperty("last_state")) && (this.state.config_received === true)) {
       cronJobs = this.state.jobs;
-      //clear previous data
-      for (i = 0; i < cronJobs.length; i++) {
-        cronJobs[i]["runningOn"] = [];
+      needsUpdate = true;
+      
+      // Build set of running job names first for use in both sections
+      var runningJobNames = new Set();
+      if (data.hasOwnProperty("running")) {
+        var json_result_running = data.running;
+        var keys_running = Object.keys(json_result_running);
+        for (i = 0; i < keys_running.length; i++) {
+          runningJobNames.add(json_result_running[keys_running[i]]["name"]);
+        }
+        console.log('[DEBUG] Built runningJobNames set:', Array.from(runningJobNames));
       }
+      
+      // Process running data first
+      if (data.hasOwnProperty("running")) {
+        console.log('[DEBUG] Processing running data:', JSON.stringify(data.running));
+        
+        // Clear running data only for jobs that are NOT in the running list
+        for (i = 0; i < cronJobs.length; i++) {
+          if (!runningJobNames.has(cronJobs[i]["name"])) {
+            cronJobs[i]["runningOn"] = [];
+            if (cronJobs[i]["status"] === "Running") {
+              cronJobs[i]["status"] = "NotRun";
+            }
+          }
+        }
 
-      var json_result_running = JSON.parse(data).running;
-      var keys_running = Object.keys(json_result_running);
-      for (i = 0; i < keys_running.length; i++) {
-        var key_running = json_result_running[keys_running[i]]["name"];
-        for (var j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_running) {
-            cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
-            cronJobs[j]["status"] = "Running";
-            cronJobs[j]["running_started"] = json_result_running[keys_running[i]]["started"]
-            break;
+        // Set running data for jobs that ARE running
+        for (i = 0; i < keys_running.length; i++) {
+          var key_running = json_result_running[keys_running[i]]["name"];
+          for (var j = 0; j < cronJobs.length; j++) {
+            if (cronJobs[j]["name"] === key_running) {
+              cronJobs[j]["runningOn"] = json_result_running[keys_running[i]]["machines"];
+              cronJobs[j]["status"] = "Running";
+              cronJobs[j]["running_started"] = json_result_running[keys_running[i]]["started"]
+              break;
+            }
           }
         }
       }
 
-      this.setState({ jobs: cronJobs });
-    }
-
-    if ((JSON.parse(data).hasOwnProperty("last_state")) && (this.state.config_received === true)) {
-      cronJobs = this.state.jobs;
-      //clear previous data
-      //for (i = 0; i < cronJobs.length; i++) {
-      //  cronJobs[i]["result"] = 0;
-      //  cronJobs[i]["result"] = "Notrun";
-      //}
-
-      var json_result_last_state = JSON.parse(data).last_state;
-      var keys_last_state = Object.keys(json_result_last_state);
-      for (i = 0; i < keys_last_state.length; i++) {
-        var key_name = keys_last_state[i]
-        for (j = 0; j < cronJobs.length; j++) {
-          if (cronJobs[j]["name"] === key_name) {
-            if (cronJobs[j]["runningOn"].length === 0) {
-                if (json_result_last_state[key_name]["result_ok"] === false) {
-                    cronJobs[j]["status"] = "Fail"
-                } else {
-                    cronJobs[j]["status"] = "Success"
-                }
-                cronJobs[j]["ran_for"] = Date.now() - new Date(json_result_last_state[key_name]["last_run"])
+      // Process last_state data second (on same cronJobs array)
+      if (data.hasOwnProperty("last_state")) {
+        console.log('[DEBUG] Processing last_state data:', JSON.stringify(data.last_state));
+        var json_result_last_state = data.last_state;
+        var keys_last_state = Object.keys(json_result_last_state);
+        for (i = 0; i < keys_last_state.length; i++) {
+          var key_name = keys_last_state[i]
+          console.log('[DEBUG] Processing last_state for:', key_name, 'Is in runningJobNames?', runningJobNames.has(key_name));
+          for (j = 0; j < cronJobs.length; j++) {
+            if (cronJobs[j]["name"] === key_name) {
+              console.log('[DEBUG] Found job in cronJobs:', key_name, 'current status:', cronJobs[j]["status"]);
+              // Only apply last_state status/result if job is NOT in running dict
+              // Check the running dict data, not the current status
+              if (!runningJobNames.has(key_name)) {
+                  console.log('[DEBUG] Job NOT in running dict, applying last_state');
+                  if (json_result_last_state[key_name]["result_ok"] === false) {
+                      cronJobs[j]["status"] = "Fail"
+                  } else {
+                      cronJobs[j]["status"] = "Success"
+                  }
+                  cronJobs[j]["ran_for"] = Date.now() - new Date(json_result_last_state[key_name]["last_run"])
+                  cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
+              }
+              else {
+                // Job is running - only update last_run time, not status
+                console.log('[DEBUG] Job IS in running dict, NOT changing status, only updating last_run');
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
+              }
+              break
             }
-            else {
-              cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
-            }
-            break
           }
         }
       }
+      
+      // Update state once with all changes
+      console.log('[DEBUG] Final cronJobs state before setState:', cronJobs.map(j => ({name: j.name, status: j.status, runningOn: j.runningOn})));
+      this.setState({ jobs: cronJobs });
     }
     if (this.state.config_received === false) {
       window.location.reload(false);
@@ -375,9 +461,19 @@ class JobsTable extends React.Component {
     }
 
     var self = this;
-    socket.onmessage =  function(event) {
-      self.handleData(event.data);
+    
+    // Handle status updates
+    const handleStatus = (data) => {
+      self.handleData(data);
     };
+    
+    // Handle config updates
+    const handleConfig = (data) => {
+      self.handleData(data);
+    };
+    
+    socket.on('status', handleStatus);
+    socket.on('config', handleConfig);
 
     socket.onclose = function(event) {
       self.setState({jobs: []});
