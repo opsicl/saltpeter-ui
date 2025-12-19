@@ -55,6 +55,7 @@ class CronJobDetails extends React.Component {
       tz: this.props.location.state !== undefined ? this.props.location.state.tz : "local",
       maintenance: this.props.location.state !== undefined ? this.props.location.state.maintenance : {},
       currentTimeLocal: Date.now(),
+      runningJobInstances: {},  // Track job_instance per machine
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -131,6 +132,10 @@ class CronJobDetails extends React.Component {
     var obj = {}
     obj.cron = this.state.name
     obj.machine = machine
+    // Include job_instance if available
+    if (this.state.runningJobInstances[machine]) {
+      obj.job_instance = this.state.runningJobInstances[machine]
+    }
     var obj_main = {}
     obj_main.killMachine = obj
     var jsonString = JSON.stringify(obj_main)
@@ -257,6 +262,16 @@ class CronJobDetails extends React.Component {
       let isRunning = false;  // Track if this job is currently running
       
       if (running) {
+        // Build mapping of machine -> job_instance for all running instances of this cron
+        const jobInstances = {};
+        Object.entries(running).forEach(([procname, proc_info]) => {
+          if (proc_info.name === this.state.name && proc_info.machines) {
+            proc_info.machines.forEach(machine => {
+              jobInstances[machine] = procname;
+            });
+          }
+        });
+        
         // Check if this cron is running
         const runningEntry = Object.values(running).find(r => r.name === this.state.name);
         if (runningEntry) {
@@ -286,6 +301,7 @@ class CronJobDetails extends React.Component {
           this.setState({
             result: "Running",
             runningOn: machines,
+            runningJobInstances: jobInstances,
             startedJob: runningEntry.started ? new Date(runningEntry.started).toLocaleString() : ''
           });
         } else if (this.state.runningOn.length > 0) {
@@ -754,27 +770,47 @@ class CronJobDetails extends React.Component {
                 <div> {this.state.targetsJob !== [] ? this.state.targetsJob.map((target, i) => {
                   if (this.state.results.hasOwnProperty(target)){
                     return <div id={target} style={{display:"none"}}>
-                        <div style={{ display: "flex", alignItems: "center"}}>
-  <p className="machineNameRight" style={{ marginRight: "10px" }}>{target}</p>
-  {this.state.runningOn.includes(target) && (
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+  <div style={{ display: "flex", alignItems: "center"}}>
+    <p className="machineNameRight" style={{ marginRight: "10px" }}>{target}</p>
+    {this.state.runningJobInstances[target] && (
+      <span style={{ fontSize: "11px", color: "#888", marginLeft: "5px" }}>({this.state.runningJobInstances[target]})</span>
+    )}
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px"}}>
+    {this.state.runningOn.includes(target) && (
+      <button
+        className="button"
+        style={{
+          backgroundColor: "#F44336",
+          color: "white",
+          fontSize: "12px",
+          padding: "2px 6px",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+        onClick={() => {
+          this.killJob(target);
+        }}
+      >
+        Kill
+      </button>
+    )}
     <button
-      className="button"
       style={{
-        backgroundColor: "#F44336",
-        color: "white",
-        fontSize: "12px",
-        padding: "2px 6px",
-        borderRadius: "4px",
+        background: "none",
+        border: "none",
+        color: "#888",
+        fontSize: "18px",
         cursor: "pointer",
-        marginLeft: "10em"
+        padding: "0 5px"
       }}
-      onClick={() => {
-        this.killJob(target);
-      }}
+      onClick={() => this.showLastRun(target, this.state.targetsJob.indexOf(target))}
+      title="Close output"
     >
-      Kill
+      ×
     </button>
-  )}
+  </div>
 </div>
 
                         {this.state.results[target]["starttime"] && this.state.tz === "local" ?
