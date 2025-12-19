@@ -25,6 +25,7 @@ class CronJobDetails extends React.Component {
     const { id } = props.match.params;
     this.state = {
       name: id,
+      group: this.props.location.state !== undefined ? this.props.location.state.group : "",
       command: this.props.location.state !== undefined ? this.props.location.state.command : "",
       timeout: this.props.location.state !== undefined ? this.props.location.state.timeout : "",
       cwd: this.props.location.state !== undefined ? this.props.location.state.cwd : "",
@@ -40,13 +41,13 @@ class CronJobDetails extends React.Component {
       mon: this.props.location.state !== undefined ? this.props.location.state.mon : "",
       sec: this.props.location.state !== undefined ? this.props.location.state.sec : "",
       year: this.props.location.state !== undefined ? this.props.location.state.year : "",
+      overlap: this.props.location.state !== undefined ? this.props.location.state.overlap : "",
       result: this.props.location.state !== undefined ? this.props.location.state.result : "NotRun",
       runningOn: [],
       next_run: "",
       last_run: "",
       targetsJob: [],
       results: {},
-      overlap: "",
       untilNextRun: "",
       timeoutCounter: "",
       ranForCounter: "",
@@ -56,6 +57,8 @@ class CronJobDetails extends React.Component {
       maintenance: this.props.location.state !== undefined ? this.props.location.state.maintenance : {},
       currentTimeLocal: Date.now(),
       runningJobInstances: {},  // Track job_instance per machine
+      autoscroll: true,  // Autoscroll enabled by default
+      wrapOutput: false,  // Wrap disabled by default
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -110,6 +113,29 @@ class CronJobDetails extends React.Component {
       const segments = line.split('\r');
       return segments[segments.length - 1];
     }).join('\n');
+  }
+
+  renderOutputWithStderr(text) {
+    // Split text into lines and color [STDERR] lines red
+    const processed = this.processCarriageReturns(text);
+    const lines = processed.split('\n');
+    
+    return lines.map((line, index) => {
+      const isStderr = line.startsWith('[STDERR]');
+      return (
+        <span key={index} style={{ color: isStderr ? '#FE00FE' : '#DFD9F5', display: 'block' }}>
+          {line}
+        </span>
+      );
+    });
+  }
+
+  toggleAutoscroll = () => {
+    this.setState(prevState => ({ autoscroll: !prevState.autoscroll }));
+  }
+
+  toggleWrap = () => {
+    this.setState(prevState => ({ wrapOutput: !prevState.wrapOutput }));
   }
 
   changeTz(tz){
@@ -311,11 +337,11 @@ class CronJobDetails extends React.Component {
           this.setState({
             result: "Running",
             runningOn: machines,
-            runningJobInstances: jobInstances,
+            runningJobInstances: {...this.state.runningJobInstances, ...jobInstances},  // Merge, don't replace
             startedJob: runningEntry.started ? new Date(runningEntry.started).toLocaleString() : ''
           });
         } else if (this.state.runningOn.length > 0) {
-          // Was running, now stopped
+          // Was running, now stopped - keep job instances for debugging
           this.setState({ runningOn: [] });
         }
       }
@@ -673,6 +699,10 @@ class CronJobDetails extends React.Component {
 
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                         <tr>
+                            <th style={{width:"25%"}}>group</th>
+                            <td>{this.state.group}</td>
+                        </tr>
+                        <tr>
                             <th style={{width:"25%"}}>cmd</th>
                             <td><div>{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
                         </tr>
@@ -708,6 +738,11 @@ class CronJobDetails extends React.Component {
                             <tr>
                                 <th style={{width:"25%"}}>timeout</th>
                                <td>{this.state.timeout}</td>
+                            </tr> : ""}
+                        {this.state.overlap !== undefined && this.state.overlap !== '' ?
+                            <tr>
+                                <th style={{width:"25%"}}>overlap</th>
+                               <td>{this.state.overlap ? 'true' : 'false'}</td>
                             </tr> : ""}
                 </table>
 
@@ -833,6 +868,8 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" >ended at: <span>{this.formatDateToUTC(new Date(this.state.results[target]["endtime"]))}</span></p>: ""}
                         {this.state.results[target]["starttime"] ?
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
+                        {this.state.runningJobInstances[target] ?
+                            <p className="sectionDetails" >job instance: <span>{this.state.runningJobInstances[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 
                             <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""}
                         {this.state.results[target]["wrapper_version"] ?
@@ -841,12 +878,42 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" title={this.state.lastHeartbeatCounter[target].exact}>last heartbeat: <span>{this.state.lastHeartbeatCounter[target].relative}</span></p> : ""}
                         {this.state.timeoutCounter.hasOwnProperty(target) ?
                             <p className="sectionDetails" >{this.state.timeoutCounter[target]}</p> : ""}
-                        {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
+                        {this.state.results[target]["ret"] ? 
+                          <>
+                            <p id="machineOutput" className="sectionDetails" >
+                              Output:
+                              <label style={{marginLeft: '20px', cursor: 'pointer', color: '#6ECBF5'}}>
+                                <input type="checkbox" checked={this.state.autoscroll} onChange={this.toggleAutoscroll} style={{marginRight: '5px'}} />
+                                Autoscroll
+                              </label>
+                              <label style={{marginLeft: '20px', cursor: 'pointer', color: '#6ECBF5'}}>
+                                <input type="checkbox" checked={this.state.wrapOutput} onChange={this.toggleWrap} style={{marginRight: '5px'}} />
+                                Wrap
+                              </label>
+                            </p>
+                          </>
+                        : "" }
                         {this.state.results[target]["ret"] ? <p>
-                            <div className="sectionDetailsOutput">
-                              <TextareaAutosize wrap="off" maxRows={15}
-                                value={this.processCarriageReturns(this.state.results[target]["ret"] || "")}>
-                              </TextareaAutosize>
+                            <div 
+                              className="sectionDetailsOutput"
+                              ref={(el) => {
+                                if (el && this.state.autoscroll) {
+                                  el.scrollTop = el.scrollHeight;
+                                }
+                              }}
+                              style={{
+                                maxHeight: '400px',
+                                overflow: 'auto',
+                                padding: '10px',
+                                fontFamily: 'Monospace',
+                                fontSize: '14px',
+                                backgroundColor: '#000',
+                                color: '#DFD9F5',
+                                whiteSpace: this.state.wrapOutput ? 'pre-wrap' : 'pre',
+                                wordWrap: this.state.wrapOutput ? 'break-word' : 'normal'
+                              }}
+                            >
+                              {this.renderOutputWithStderr(this.state.results[target]["ret"] || "")}
                             </div>
                           </p> : "" }
 

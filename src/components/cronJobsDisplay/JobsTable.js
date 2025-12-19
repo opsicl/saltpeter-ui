@@ -235,7 +235,7 @@ class JobsTable extends React.Component {
         });
       }
 
-      this.setState({jobs: cronJobs})
+      this.setState({jobs: this.applySavedSort(cronJobs)})
 
       var maintenance_conf = data.config.maintenance
       this.setState({maintenance: maintenance_conf})
@@ -322,12 +322,92 @@ class JobsTable extends React.Component {
       
       // Update state once with all changes
       console.log('[DEBUG] Final cronJobs state before setState:', cronJobs.map(j => ({name: j.name, status: j.status, runningOn: j.runningOn})));
-      this.setState({ jobs: cronJobs });
+      this.setState({ jobs: this.applySavedSort(cronJobs) });
     }
     if (this.state.config_received === false) {
       window.location.reload(false);
     }
 
+  }
+
+  applySavedSort(jobs) {
+      // Apply saved sort state to jobs array
+      const savedSort = window.localStorage.getItem('sortState');
+      if (!savedSort) return jobs;
+      
+      const { asc, desc } = JSON.parse(savedSort);
+      const column = asc || desc;
+      if (!column) return jobs;
+      
+      const compareAsc = (a, b) => {
+        try {
+          if (a[column] === undefined) a[column] = "";
+          if (b[column] === undefined) b[column] = "";
+          
+          var groupA = a[column];
+          var groupB = b[column];
+          
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+          
+          if (column == 'number_of_targets') {
+            groupA = parseInt(a[column]);
+            groupB = parseInt(b[column]);
+          }
+          
+          let comparison = 0;
+          if (groupA > groupB) {
+            comparison = 1;
+          } else if (groupA < groupB) {
+            comparison = -1;
+          }
+          return comparison;
+        } catch (error) {
+          return 0;
+        }
+      };
+      
+      const compareDesc = (a, b) => {
+        try {
+          if (a[column] === undefined) a[column] = "";
+          if (b[column] === undefined) b[column] = "";
+          
+          var groupA = a[column];
+          var groupB = b[column];
+          
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+          
+          if (column == 'number_of_targets') {
+            groupA = parseInt(a[column]);
+            groupB = parseInt(b[column]);
+          }
+          
+          let comparison = 0;
+          if (groupA < groupB) {
+            comparison = 1;
+          } else if (groupA > groupB) {
+            comparison = -1;
+          }
+          return comparison;
+        } catch (error) {
+          return 0;
+        }
+      };
+      
+      if (desc) {
+        return jobs.sort(compareDesc);
+      } else {
+        return jobs.sort(compareAsc);
+      }
   }
 
   sortColumn(column){
@@ -432,6 +512,7 @@ class JobsTable extends React.Component {
           //desc sort
           elem.textContent = column_name + " \u2191"
           this.setState({ column_asc_sort: "", column_desc_sort: column, jobs: cronJobs.sort(compareDesc)});
+          window.localStorage.setItem('sortState', JSON.stringify({ asc: "", desc: column }));
       /*} 
       else if (this.state.column_desc_sort == column) {
           elem.textContent = column
@@ -441,6 +522,7 @@ class JobsTable extends React.Component {
           // asc sort
           elem.textContent = column_name + " \u2193"
           this.setState({ column_asc_sort: column, column_desc_sort: "", jobs: cronJobs.sort(compareAsc)});
+          window.localStorage.setItem('sortState', JSON.stringify({ asc: column, desc: "" }));
       }
   }
 
@@ -536,6 +618,32 @@ class JobsTable extends React.Component {
         active_columns=["name","command","group","running_on","last_run"]
     }
     this.setState({ active_columns: active_columns})
+
+    // Restore sort state from localStorage
+    const savedSort = window.localStorage.getItem('sortState');
+    if (savedSort) {
+      const { asc, desc } = JSON.parse(savedSort);
+      this.setState({ column_asc_sort: asc, column_desc_sort: desc });
+      
+      // Update the column header to show sort arrow
+      setTimeout(() => {
+        const column = asc || desc;
+        if (column) {
+          const elem = document.getElementById(column);
+          if (elem) {
+            let column_name = column;
+            if (column.includes("_")) {
+              column_name = column.replace("_", " ");
+            }
+            if (desc) {
+              elem.textContent = column_name + " \u2191";
+            } else {
+              elem.textContent = column_name + " \u2193";
+            }
+          }
+        }
+      }, 100);
+    }
   }
 
   componentWillUnmount() {

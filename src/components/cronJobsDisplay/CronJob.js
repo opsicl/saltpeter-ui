@@ -34,6 +34,7 @@ class CronJob extends React.Component {
         sec: this.props.job.sec,
         year: this.props.job.year,
         group: this.props.job.group,
+        overlap: this.props.job.overlap,
         batch_size: this.props.job.batch_size,
         status: this.props.job.status,
         last_run: this.props.job.last_run,
