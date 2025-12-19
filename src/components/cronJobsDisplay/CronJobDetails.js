@@ -689,13 +689,6 @@ class CronJobDetails extends React.Component {
                     (<FaRegCircle title="not run" style={{ color: "#E0D9F6", size: "3px", marginLeft: "10px" }} />) :
                   null
             }
-            {Object.keys(this.state.runningJobInstances).length > 0 && (
-              <span style={{ fontSize: '16px', marginLeft: '15px', color: '#6AC3EC' }}>
-                {Object.entries(this.state.runningJobInstances).map(([machine, jobInstance]) => (
-                  <span key={machine} style={{ marginRight: '10px' }}>({machine}: {jobInstance})</span>
-                ))}
-              </span>
-            )}
           </h1>
           {this.state.group && (
             <div style={{ marginLeft: '0px', marginTop: '-10px', marginBottom: '10px' }}>
@@ -900,8 +893,6 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" >ended at: <span>{this.formatDateToUTC(new Date(this.state.results[target]["endtime"]))}</span></p>: ""}
                         {this.state.results[target]["starttime"] ?
                             <p className="sectionDetails" >ran for: <span>{this.state.ranForCounter[target]}</span></p> : ""}
-                        {this.state.runningJobInstances[target] ?
-                            <p className="sectionDetails" >job instance: <span>{this.state.runningJobInstances[target]}</span></p> : ""}
                         {this.state.results[target]["retcode"] !== "" ? 
                             <p className="sectionDetails" >ret code: <span>{this.state.results[target]["retcode"]}</span></p> : ""}
                         {this.state.results[target]["wrapper_version"] ?
@@ -931,8 +922,9 @@ class CronJobDetails extends React.Component {
                               ref={(el) => { this.outputRefs[target] = el; }}
                               style={{
                                 width: '95%',
-                                minHeight: '400px',
-                                maxHeight: '800px',
+                                height: '200px',
+                                minHeight: '100px',
+                                maxHeight: '1200px',
                                 resize: 'vertical',
                                 overflow: 'auto',
                                 padding: '10px',
