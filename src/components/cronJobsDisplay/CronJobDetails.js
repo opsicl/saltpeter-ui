@@ -102,6 +102,16 @@ class CronJobDetails extends React.Component {
     clearInterval(this.interval);
   };
 
+  processCarriageReturns(text) {
+    // Process \r characters to simulate terminal behavior
+    // Split by \n to process each line separately
+    return text.split('\n').map(line => {
+      // Split by \r and take only the last segment (what would be visible)
+      const segments = line.split('\r');
+      return segments[segments.length - 1];
+    }).join('\n');
+  }
+
   changeTz(tz){
       var local_text = document.getElementById("local_tz");
       var utc_text = document.getElementById("utc_tz");
@@ -835,7 +845,7 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["ret"] ? <p>
                             <div className="sectionDetailsOutput">
                               <TextareaAutosize wrap="off" maxRows={15}
-                                value={this.state.results[target]["ret"] || ""}>
+                                value={this.processCarriageReturns(this.state.results[target]["ret"] || "")}>
                               </TextareaAutosize>
                             </div>
                           </p> : "" }
