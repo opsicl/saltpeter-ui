@@ -70,6 +70,7 @@ class CronJobDetails extends React.Component {
     this.changeTz.bind(this);
     this.formatDateToUTC.bind(this);
     this.formatDateToLocal.bind(this);
+    this.outputRefs = {};  // Store refs to output textareas for autoscroll
   }
 
    formatDateToUTC(date) {
@@ -136,6 +137,28 @@ class CronJobDetails extends React.Component {
 
   toggleWrap = () => {
     this.setState(prevState => ({ wrapOutput: !prevState.wrapOutput }));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Only autoscroll when output actually changes and autoscroll is enabled
+    if (this.state.autoscroll) {
+      // Check if any machine's output changed
+      const prevResults = prevState.results || {};
+      const currResults = this.state.results || {};
+      
+      for (const machine in currResults) {
+        const prevOutput = prevResults[machine]?.ret || '';
+        const currOutput = currResults[machine]?.ret || '';
+        
+        if (prevOutput !== currOutput) {
+          // Output changed for this machine - scroll its textarea
+          const textarea = this.outputRefs[machine];
+          if (textarea) {
+            textarea.scrollTop = textarea.scrollHeight;
+          }
+        }
+      }
+    }
   }
 
   changeTz(tz){
@@ -666,7 +689,20 @@ class CronJobDetails extends React.Component {
                     (<FaRegCircle title="not run" style={{ color: "#E0D9F6", size: "3px", marginLeft: "10px" }} />) :
                   null
             }
+            {Object.keys(this.state.runningJobInstances).length > 0 && (
+              <span style={{ fontSize: '16px', marginLeft: '15px', color: '#6AC3EC' }}>
+                {Object.entries(this.state.runningJobInstances).map(([machine, jobInstance]) => (
+                  <span key={machine} style={{ marginRight: '10px' }}>({machine}: {jobInstance})</span>
+                ))}
+              </span>
+            )}
           </h1>
+          {this.state.group && (
+            <div style={{ marginLeft: '0px', marginTop: '-10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '14px', color: '#888' }}>group: </span>
+              <span style={{ fontSize: '14px', color: '#6ECBF5' }}>{this.state.group}</span>
+            </div>
+          )}
         </div>
         <div>
         <div className="details1">
@@ -698,10 +734,6 @@ class CronJobDetails extends React.Component {
                 </table> 
 
                 <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
-                        <tr>
-                            <th style={{width:"25%"}}>group</th>
-                            <td>{this.state.group}</td>
-                        </tr>
                         <tr>
                             <th style={{width:"25%"}}>cmd</th>
                             <td><div>{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
@@ -896,13 +928,12 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["ret"] ? <p>
                             <div 
                               className="sectionDetailsOutput"
-                              ref={(el) => {
-                                if (el && this.state.autoscroll) {
-                                  el.scrollTop = el.scrollHeight;
-                                }
-                              }}
+                              ref={(el) => { this.outputRefs[target] = el; }}
                               style={{
-                                maxHeight: '400px',
+                                width: '95%',
+                                minHeight: '400px',
+                                maxHeight: '800px',
+                                resize: 'vertical',
                                 overflow: 'auto',
                                 padding: '10px',
                                 fontFamily: 'Monospace',
@@ -910,7 +941,9 @@ class CronJobDetails extends React.Component {
                                 backgroundColor: '#000',
                                 color: '#DFD9F5',
                                 whiteSpace: this.state.wrapOutput ? 'pre-wrap' : 'pre',
-                                wordWrap: this.state.wrapOutput ? 'break-word' : 'normal'
+                                wordWrap: this.state.wrapOutput ? 'break-word' : 'normal',
+                                border: '1px solid #444',
+                                outline: 'none'
                               }}
                             >
                               {this.renderOutputWithStderr(this.state.results[target]["ret"] || "")}
