@@ -123,9 +123,11 @@ class CronJobDetails extends React.Component {
     
     return lines.map((line, index) => {
       const isStderr = line.startsWith('[STDERR]');
+      // Add \n back except for last line to preserve newlines in copy/paste
+      const lineWithNewline = index < lines.length - 1 ? line + '\n' : line;
       return (
-        <span key={index} style={{ color: isStderr ? '#FE00FE' : '#DFD9F5', display: 'block' }}>
-          {line}
+        <span key={index} style={{ color: isStderr ? '#FE00FE' : '#DFD9F5' }}>
+          {lineWithNewline}
         </span>
       );
     });
@@ -151,11 +153,13 @@ class CronJobDetails extends React.Component {
         const currOutput = currResults[machine]?.ret || '';
         
         if (prevOutput !== currOutput) {
-          // Output changed for this machine - scroll its textarea
-          const textarea = this.outputRefs[machine];
-          if (textarea) {
-            textarea.scrollTop = textarea.scrollHeight;
-          }
+          // Output changed for this machine - scroll its div after render completes
+          setTimeout(() => {
+            const outputDiv = this.outputRefs[machine];
+            if (outputDiv) {
+              outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+          }, 0);
         }
       }
     }
