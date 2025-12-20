@@ -153,11 +153,14 @@ class CronJobDetails extends React.Component {
         const currOutput = currResults[machine]?.ret || '';
         
         if (prevOutput !== currOutput) {
+          console.log(`[Autoscroll] Output changed for ${machine}, length: ${prevOutput.length} -> ${currOutput.length}`);
           // Output changed for this machine - scroll after browser renders
           requestAnimationFrame(() => {
             const outputDiv = this.outputRefs[machine];
+            console.log(`[Autoscroll] Scrolling ${machine}:`, outputDiv ? `scrollHeight=${outputDiv.scrollHeight}, scrollTop=${outputDiv.scrollTop}` : 'ref not found');
             if (outputDiv) {
               outputDiv.scrollTop = outputDiv.scrollHeight;
+              console.log(`[Autoscroll] After scroll: scrollTop=${outputDiv.scrollTop}`);
             }
           });
         }
