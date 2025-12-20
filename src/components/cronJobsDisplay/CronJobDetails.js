@@ -138,47 +138,67 @@ class CronJobDetails extends React.Component {
     this.setState(prevState => ({ autoscroll: !prevState.autoscroll }));
   }
 
+  setupOutputRef = (machine) => (el) => {
+    // Store ref
+    this.outputRefs[machine] = el;
+    
+    // Disconnect old observer if exists
+    if (this.outputObservers[machine]) {
+      this.outputObservers[machine].disconnect();
+      delete this.outputObservers[machine];
+    }
+    
+    // Set up new observer if div exists and autoscroll enabled
+    if (el && this.state.autoscroll) {
+      const observer = new MutationObserver(() => {
+        if (this.state.autoscroll && el) {
+          el.scrollTop = el.scrollHeight;
+        }
+      });
+      
+      observer.observe(el, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+      
+      this.outputObservers[machine] = observer;
+    }
+  }
+
   toggleWrap = () => {
     this.setState(prevState => ({ wrapOutput: !prevState.wrapOutput }));
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // Set up MutationObservers for output divs when autoscroll is enabled
-    if (this.state.autoscroll) {
-      const currResults = this.state.results || {};
-      
-      for (const machine in currResults) {
-        const outputDiv = this.outputRefs[machine];
-        
-        // If div exists, set up or refresh observer
-        if (outputDiv) {
-          // If we already have an observer, disconnect it first (div might have been recreated)
-          if (this.outputObservers[machine]) {
-            this.outputObservers[machine].disconnect();
+    // If autoscroll was just toggled, update observers
+    if (prevState.autoscroll !== this.state.autoscroll) {
+      if (this.state.autoscroll) {
+        // Re-setup all observers
+        for (const machine in this.outputRefs) {
+          const el = this.outputRefs[machine];
+          if (el && !this.outputObservers[machine]) {
+            const observer = new MutationObserver(() => {
+              if (this.state.autoscroll && el) {
+                el.scrollTop = el.scrollHeight;
+              }
+            });
+            
+            observer.observe(el, {
+              childList: true,
+              characterData: true,
+              subtree: true
+            });
+            
+            this.outputObservers[machine] = observer;
           }
-          
-          const observer = new MutationObserver(() => {
-            // Content changed - scroll to bottom if autoscroll is still enabled
-            if (this.state.autoscroll && outputDiv) {
-              outputDiv.scrollTop = outputDiv.scrollHeight;
-            }
-          });
-          
-          // Observe the div for content changes
-          observer.observe(outputDiv, {
-            childList: true,      // Watch for child elements being added/removed
-            characterData: true,  // Watch for text content changes
-            subtree: true         // Watch all descendants
-          });
-          
-          this.outputObservers[machine] = observer;
         }
-      }
-    } else {
-      // Autoscroll disabled - disconnect all observers
-      for (const machine in this.outputObservers) {
-        this.outputObservers[machine].disconnect();
-        delete this.outputObservers[machine];
+      } else {
+        // Disconnect all observers
+        for (const machine in this.outputObservers) {
+          this.outputObservers[machine].disconnect();
+          delete this.outputObservers[machine];
+        }
       }
     }
   }
@@ -948,7 +968,7 @@ class CronJobDetails extends React.Component {
                         {this.state.results[target]["ret"] ? <p>
                             <div 
                               className="sectionDetailsOutput"
-                              ref={(el) => { this.outputRefs[target] = el; }}
+                              ref={this.setupOutputRef(target)}
                               style={{
                                 width: '95%',
                                 height: '200px',
