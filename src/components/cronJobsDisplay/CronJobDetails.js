@@ -71,6 +71,7 @@ class CronJobDetails extends React.Component {
     this.formatDateToUTC.bind(this);
     this.formatDateToLocal.bind(this);
     this.outputRefs = {};  // Store refs to output textareas for autoscroll
+    this.outputObservers = {};  // Store MutationObservers for each output div
   }
 
    formatDateToUTC(date) {
@@ -142,32 +143,45 @@ class CronJobDetails extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('[Autoscroll] componentDidUpdate called, autoscroll:', this.state.autoscroll);
-    // Only autoscroll when output actually changes and autoscroll is enabled
+    // Set up MutationObservers for output divs when autoscroll is enabled
     if (this.state.autoscroll) {
-      // Check if any machine's output changed
-      const prevResults = prevState.results || {};
       const currResults = this.state.results || {};
       
-      console.log('[Autoscroll] Checking for output changes. Machines:', Object.keys(currResults));
-      
       for (const machine in currResults) {
-        const prevOutput = prevResults[machine]?.ret || '';
-        const currOutput = currResults[machine]?.ret || '';
+        const outputDiv = this.outputRefs[machine];
         
-        if (prevOutput !== currOutput) {
-          console.log(`[Autoscroll] Output changed for ${machine}, length: ${prevOutput.length} -> ${currOutput.length}`);
-          // Output changed for this machine - scroll after browser renders
-          requestAnimationFrame(() => {
-            const outputDiv = this.outputRefs[machine];
-            console.log(`[Autoscroll] Scrolling ${machine}:`, outputDiv ? `scrollHeight=${outputDiv.scrollHeight}, scrollTop=${outputDiv.scrollTop}` : 'ref not found');
-            if (outputDiv) {
+        // If div exists and we haven't set up an observer yet
+        if (outputDiv && !this.outputObservers[machine]) {
+          const observer = new MutationObserver(() => {
+            // Content changed - scroll to bottom if autoscroll is still enabled
+            if (this.state.autoscroll) {
               outputDiv.scrollTop = outputDiv.scrollHeight;
-              console.log(`[Autoscroll] After scroll: scrollTop=${outputDiv.scrollTop}`);
             }
           });
+          
+          // Observe the div for content changes
+          observer.observe(outputDiv, {
+            childList: true,      // Watch for child elements being added/removed
+            characterData: true,  // Watch for text content changes
+            subtree: true         // Watch all descendants
+          });
+          
+          this.outputObservers[machine] = observer;
         }
       }
+    } else {
+      // Autoscroll disabled - disconnect all observers
+      for (const machine in this.outputObservers) {
+        this.outputObservers[machine].disconnect();
+        delete this.outputObservers[machine];
+      }
+    }
+  }
+  
+  componentWillUnmount() {
+    // Clean up observers
+    for (const machine in this.outputObservers) {
+      this.outputObservers[machine].disconnect();
     }
   }
 
