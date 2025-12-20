@@ -158,8 +158,14 @@ class CronJobDetails extends React.Component {
         // Set up new observer if div exists and autoscroll enabled
         if (el && this.state.autoscroll) {
           console.log(`[Autoscroll] Setting up new observer for ${machine}`);
+          console.log(`[Autoscroll] Initial content length:`, el.textContent?.length || 0, 'innerHTML:', el.innerHTML?.length || 0);
+          console.log(`[Autoscroll] Computed style color:`, window.getComputedStyle(el).color);
+          console.log(`[Autoscroll] Computed style backgroundColor:`, window.getComputedStyle(el).backgroundColor);
           const observer = new MutationObserver(() => {
             console.log(`[Autoscroll] Content changed for ${machine}, scrolling...`);
+            console.log(`[Autoscroll] Div content length:`, el.textContent?.length || 0);
+            console.log(`[Autoscroll] Div innerHTML length:`, el.innerHTML?.length || 0);
+            console.log(`[Autoscroll] First 100 chars:`, el.textContent?.substring(0, 100));
             if (this.state.autoscroll && el) {
               el.scrollTop = el.scrollHeight;
               console.log(`[Autoscroll] Scrolled ${machine}: scrollTop=${el.scrollTop}, scrollHeight=${el.scrollHeight}`);
