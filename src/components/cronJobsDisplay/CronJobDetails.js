@@ -150,11 +150,16 @@ class CronJobDetails extends React.Component {
       for (const machine in currResults) {
         const outputDiv = this.outputRefs[machine];
         
-        // If div exists and we haven't set up an observer yet
-        if (outputDiv && !this.outputObservers[machine]) {
+        // If div exists, set up or refresh observer
+        if (outputDiv) {
+          // If we already have an observer, disconnect it first (div might have been recreated)
+          if (this.outputObservers[machine]) {
+            this.outputObservers[machine].disconnect();
+          }
+          
           const observer = new MutationObserver(() => {
             // Content changed - scroll to bottom if autoscroll is still enabled
-            if (this.state.autoscroll) {
+            if (this.state.autoscroll && outputDiv) {
               outputDiv.scrollTop = outputDiv.scrollHeight;
             }
           });
