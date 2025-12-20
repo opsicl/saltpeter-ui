@@ -110,11 +110,17 @@ class CronJobDetails extends React.Component {
 
   processCarriageReturns(text) {
     // Process \r characters to simulate terminal behavior
-    // Split by \n to process each line separately
-    return text.split('\n').map(line => {
-      // Split by \r and take only the last segment (what would be visible)
-      const segments = line.split('\r');
-      return segments[segments.length - 1];
+    // First normalize line endings: convert \r\n to \n, standalone \r to \n
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    // Now split by \n and process any remaining \r within lines (for progress bars)
+    return normalized.split('\n').map(line => {
+      // If line contains \r, it's a progress indicator - take last segment
+      if (line.includes('\r')) {
+        const segments = line.split('\r');
+        return segments[segments.length - 1];
+      }
+      return line;
     }).join('\n');
   }
 
