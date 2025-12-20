@@ -139,20 +139,26 @@ class CronJobDetails extends React.Component {
   }
 
   setupOutputRef = (machine) => (el) => {
+    console.log(`[Autoscroll] setupOutputRef called for ${machine}, el exists:`, !!el, 'autoscroll:', this.state.autoscroll);
+    
     // Store ref
     this.outputRefs[machine] = el;
     
     // Disconnect old observer if exists
     if (this.outputObservers[machine]) {
+      console.log(`[Autoscroll] Disconnecting old observer for ${machine}`);
       this.outputObservers[machine].disconnect();
       delete this.outputObservers[machine];
     }
     
     // Set up new observer if div exists and autoscroll enabled
     if (el && this.state.autoscroll) {
+      console.log(`[Autoscroll] Setting up new observer for ${machine}`);
       const observer = new MutationObserver(() => {
+        console.log(`[Autoscroll] Content changed for ${machine}, scrolling...`);
         if (this.state.autoscroll && el) {
           el.scrollTop = el.scrollHeight;
+          console.log(`[Autoscroll] Scrolled ${machine}: scrollTop=${el.scrollTop}, scrollHeight=${el.scrollHeight}`);
         }
       });
       
@@ -163,6 +169,9 @@ class CronJobDetails extends React.Component {
       });
       
       this.outputObservers[machine] = observer;
+      console.log(`[Autoscroll] Observer set up successfully for ${machine}`);
+    } else {
+      console.log(`[Autoscroll] Not setting up observer for ${machine} - el:`, !!el, 'autoscroll:', this.state.autoscroll);
     }
   }
 
