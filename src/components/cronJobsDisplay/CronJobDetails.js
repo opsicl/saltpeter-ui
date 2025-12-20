@@ -142,11 +142,14 @@ class CronJobDetails extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log('[Autoscroll] componentDidUpdate called, autoscroll:', this.state.autoscroll);
     // Only autoscroll when output actually changes and autoscroll is enabled
     if (this.state.autoscroll) {
       // Check if any machine's output changed
       const prevResults = prevState.results || {};
       const currResults = this.state.results || {};
+      
+      console.log('[Autoscroll] Checking for output changes. Machines:', Object.keys(currResults));
       
       for (const machine in currResults) {
         const prevOutput = prevResults[machine]?.ret || '';
@@ -935,7 +938,7 @@ class CronJobDetails extends React.Component {
                                 resize: 'vertical',
                                 overflow: 'auto',
                                 padding: '10px',
-                                fontFamily: 'Monospace',
+                                fontFamily: '"Courier New", Courier, monospace',
                                 fontSize: '14px',
                                 backgroundColor: '#000',
                                 color: '#DFD9F5',
