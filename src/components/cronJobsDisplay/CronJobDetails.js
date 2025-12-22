@@ -59,7 +59,24 @@ class CronJobDetails extends React.Component {
       runningJobInstances: {},  // Track job_instance per machine
       autoscroll: true,  // Autoscroll enabled by default
       wrapOutput: false,  // Wrap disabled by default
-      cronConfig: this.props.location.state !== undefined && this.props.location.state.config !== undefined && this.props.location.state.config[this.props.location.state.name] !== undefined ? this.props.location.state.config[this.props.location.state.name] : {},  // Store full cron config dynamically (only actual config from server)
+      cronConfig: this.props.location.state !== undefined ? {
+        command: this.props.location.state.command,
+        cwd: this.props.location.state.cwd,
+        user: this.props.location.state.user,
+        timeout: this.props.location.state.timeout,
+        targets: this.props.location.state.targets,
+        target_type: this.props.location.state.target_type,
+        number_of_targets: this.props.location.state.number_of_targets,
+        dom: this.props.location.state.dom,
+        dow: this.props.location.state.dow,
+        hour: this.props.location.state.hour,
+        min: this.props.location.state.min,
+        mon: this.props.location.state.mon,
+        sec: this.props.location.state.sec,
+        year: this.props.location.state.year,
+        batch_size: this.props.location.state.batch_size,
+        overlap: this.props.location.state.overlap,
+      } : {},  // Store full cron config dynamically (only actual config from server)
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
