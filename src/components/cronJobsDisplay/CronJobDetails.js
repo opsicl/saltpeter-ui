@@ -59,6 +59,7 @@ class CronJobDetails extends React.Component {
       runningJobInstances: {},  // Track job_instance per machine
       autoscroll: true,  // Autoscroll enabled by default
       wrapOutput: false,  // Wrap disabled by default
+      cronConfig: {},  // Store full cron config dynamically
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -91,6 +92,43 @@ class CronJobDetails extends React.Component {
            ('0' + date.getHours()).slice(-2) + ':' +
            ('0' + date.getMinutes()).slice(-2) + ':' +
            ('0' + date.getSeconds()).slice(-2);
+  }
+
+  // Render a config field value dynamically
+  renderConfigValue(value) {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false';
+    }
+    
+    if (Array.isArray(value)) {
+      return value.map((item, index) => (
+        <div key={index}>{String(item)}</div>
+      ));
+    }
+    
+    if (typeof value === 'object') {
+      return JSON.stringify(value, null, 2);
+    }
+    
+    // Handle multi-line strings (like command)
+    const strValue = String(value);
+    if (strValue.includes('\n')) {
+      return strValue.split('\n').map((str, index) => <p key={index}>{str}</p>);
+    }
+    
+    return strValue;
+  }
+
+  // Format field name for display (convert snake_case to Title Case)
+  formatFieldName(fieldName) {
+    return fieldName
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
 
@@ -527,24 +565,29 @@ class CronJobDetails extends React.Component {
     if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
       var json_result_config_maintenance = data.config.maintenance
+      
+      // Store full cron config for dynamic rendering
+      const cronConfig = json_result_config[this.state.name] || {};
+      
       this.setState({
-          command: json_result_config[this.state.name]["command"],
-          cwd: json_result_config[this.state.name]["cwd"],
-          user: json_result_config[this.state.name]["user"],
-          timeout: json_result_config[this.state.name]["timeout"],
-          targets: json_result_config[this.state.name]["targets"],
-          target_type: json_result_config[this.state.name]["target_type"],
-          number_of_targets: json_result_config[this.state.name]["number_of_targets"],
-          dom: json_result_config[this.state.name]["dom"],
-          dow: json_result_config[this.state.name]["dow"],
-          hour: json_result_config[this.state.name]["hour"],
-          min: json_result_config[this.state.name]["min"],
-          mon: json_result_config[this.state.name]["mon"],
-          sec: json_result_config[this.state.name]["sec"],
-          year: json_result_config[this.state.name]["year"],
-          batch_size: json_result_config[this.state.name]["batch_size"],
+          command: cronConfig["command"],
+          cwd: cronConfig["cwd"],
+          user: cronConfig["user"],
+          timeout: cronConfig["timeout"],
+          targets: cronConfig["targets"],
+          target_type: cronConfig["target_type"],
+          number_of_targets: cronConfig["number_of_targets"],
+          dom: cronConfig["dom"],
+          dow: cronConfig["dow"],
+          hour: cronConfig["hour"],
+          min: cronConfig["min"],
+          mon: cronConfig["mon"],
+          sec: cronConfig["sec"],
+          year: cronConfig["year"],
+          batch_size: cronConfig["batch_size"],
           maintenance: json_result_config_maintenance,
           result: "NotRun",
+          cronConfig: cronConfig,  // Store full config
       });
     }
     // details - legacy format {cronname: {data}}
@@ -803,50 +846,22 @@ class CronJobDetails extends React.Component {
                     </tbody>
                 </table> 
 
-                <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
-                        <tr>
-                            <th style={{width:"25%"}}>cmd</th>
-                            <td><div>{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>user</th>
-                            <td>{this.state.user}</td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>cwd</th>
-                            <td>{this.state.cwd}</td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>targets</th>
-                            <td>
-                               {Array.isArray(this.state.targets) ? this.state.targets.map((target, index) => (<div key={index}>{target}</div>)) : <div>{this.state.targets}</div>}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>target type</th>
-                            <td>{this.state.target_type}</td>
-                        </tr>
-                        {(Number.isInteger(this.state.number_of_targets) || (this.state.number_of_targets === 0)) ? 
-                            <tr>
-                                <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
-                                <td>{this.state.number_of_targets}</td>
-                            </tr> : ""}
-                        {this.state.batch_size ? 
-                            <tr>
-                                <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
-                                <td>{this.state.batch_size}</td>
-                            </tr> : ""}
-                        {(Number.isInteger(this.state.timeout) || (this.state.timeout === 0)) ?
-                            <tr>
-                                <th style={{width:"25%"}}>timeout</th>
-                               <td>{this.state.timeout}</td>
-                            </tr> : ""}
-                        {this.state.overlap !== undefined && this.state.overlap !== '' ?
-                            <tr>
-                                <th style={{width:"25%"}}>overlap</th>
-                               <td>{this.state.overlap ? 'true' : 'false'}</td>
-                            </tr> : ""}
-                </table>
+                <div style={{ maxHeight: "33vh", overflowY: "auto" }}>
+                  <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
+                    <tbody>
+                      {Object.entries(this.state.cronConfig)
+                        .filter(([key]) => !['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year'].includes(key))
+                        .filter(([key, value]) => value !== undefined && value !== null && value !== '')
+                        .map(([key, value]) => (
+                          <tr key={key}>
+                            <th style={{width:"25%"}}>{this.formatFieldName(key)}</th>
+                            <td><div>{this.renderConfigValue(value)}</div></td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
 
 
                 <h1 className="sectionTitle"><span> TIMES </span></h1>
