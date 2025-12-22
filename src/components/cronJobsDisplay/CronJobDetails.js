@@ -59,7 +59,7 @@ class CronJobDetails extends React.Component {
       runningJobInstances: {},  // Track job_instance per machine
       autoscroll: true,  // Autoscroll enabled by default
       wrapOutput: false,  // Wrap disabled by default
-      cronConfig: {},  // Store full cron config dynamically
+      cronConfig: this.props.location.state || {},  // Store full cron config dynamically, initialize from props
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -121,14 +121,6 @@ class CronJobDetails extends React.Component {
     }
     
     return strValue;
-  }
-
-  // Format field name for display (convert snake_case to Title Case)
-  formatFieldName(fieldName) {
-    return fieldName
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
   }
 
 
@@ -850,11 +842,11 @@ class CronJobDetails extends React.Component {
                   <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                     <tbody>
                       {Object.entries(this.state.cronConfig)
-                        .filter(([key]) => !['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year'].includes(key))
+                        .filter(([key]) => !['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year', 'group'].includes(key))
                         .filter(([key, value]) => value !== undefined && value !== null && value !== '')
                         .map(([key, value]) => (
                           <tr key={key}>
-                            <th style={{width:"25%"}}>{this.formatFieldName(key)}</th>
+                            <th style={{width:"25%"}}>{key}</th>
                             <td><div>{this.renderConfigValue(value)}</div></td>
                           </tr>
                         ))
