@@ -59,7 +59,7 @@ class CronJobDetails extends React.Component {
       runningJobInstances: {},  // Track job_instance per machine
       autoscroll: true,  // Autoscroll enabled by default
       wrapOutput: false,  // Wrap disabled by default
-      cronConfig: this.props.location.state || {},  // Store full cron config dynamically, initialize from props
+      cronConfig: {},  // Store full cron config dynamically (only actual config from server)
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -842,7 +842,18 @@ class CronJobDetails extends React.Component {
                   <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
                     <tbody>
                       {Object.entries(this.state.cronConfig)
-                        .filter(([key]) => !['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year', 'group'].includes(key))
+                        .filter(([key]) => {
+                          // Filter out time fields (already shown above)
+                          const timeFields = ['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year'];
+                          // Filter out UI state and non-config fields
+                          const uiFields = ['group', 'name', 'maintenance', 'tz', 'backend_version', 
+                                           'settings', 'last_run', 'next_run', 'status', 'result', 
+                                           'running_started', 'overlap', 'runningOn', 'results',
+                                           'targetsJob', 'untilNextRun', 'timeoutCounter', 'ranForCounter',
+                                           'startedJob', 'currentTimeLocal', 'runningJobInstances',
+                                           'autoscroll', 'wrapOutput', 'currentTime'];
+                          return ![...timeFields, ...uiFields].includes(key);
+                        })
                         .filter(([key, value]) => value !== undefined && value !== null && value !== '')
                         .map(([key, value]) => (
                           <tr key={key}>
