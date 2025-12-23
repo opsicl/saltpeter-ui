@@ -25,6 +25,7 @@ class CronJobDetails extends React.Component {
     const { id } = props.match.params;
     this.state = {
       name: id,
+      group: this.props.location.state !== undefined ? this.props.location.state.group : "",
       command: this.props.location.state !== undefined ? this.props.location.state.command : "",
       timeout: this.props.location.state !== undefined ? this.props.location.state.timeout : "",
       cwd: this.props.location.state !== undefined ? this.props.location.state.cwd : "",
@@ -40,13 +41,13 @@ class CronJobDetails extends React.Component {
       mon: this.props.location.state !== undefined ? this.props.location.state.mon : "",
       sec: this.props.location.state !== undefined ? this.props.location.state.sec : "",
       year: this.props.location.state !== undefined ? this.props.location.state.year : "",
+      overlap: this.props.location.state !== undefined ? this.props.location.state.overlap : "",
       result: this.props.location.state !== undefined ? this.props.location.state.result : "NotRun",
       runningOn: [],
       next_run: "",
       last_run: "",
       targetsJob: [],
       results: {},
-      overlap: "",
       untilNextRun: "",
       timeoutCounter: "",
       ranForCounter: "",
@@ -56,6 +57,26 @@ class CronJobDetails extends React.Component {
       maintenance: this.props.location.state !== undefined ? this.props.location.state.maintenance : {},
       currentTimeLocal: Date.now(),
       runningJobInstances: {},  // Track job_instance per machine
+      autoscroll: true,  // Autoscroll enabled by default
+      wrapOutput: false,  // Wrap disabled by default
+      cronConfig: this.props.location.state !== undefined ? {
+        command: this.props.location.state.command,
+        cwd: this.props.location.state.cwd,
+        user: this.props.location.state.user,
+        timeout: this.props.location.state.timeout,
+        targets: this.props.location.state.targets,
+        target_type: this.props.location.state.target_type,
+        number_of_targets: this.props.location.state.number_of_targets,
+        dom: this.props.location.state.dom,
+        dow: this.props.location.state.dow,
+        hour: this.props.location.state.hour,
+        min: this.props.location.state.min,
+        mon: this.props.location.state.mon,
+        sec: this.props.location.state.sec,
+        year: this.props.location.state.year,
+        batch_size: this.props.location.state.batch_size,
+        overlap: this.props.location.state.overlap,
+      } : {},  // Store full cron config dynamically (only actual config from server)
     }
     this.handleData.bind(this);
     this.calculateTimeout.bind(this);
@@ -67,6 +88,9 @@ class CronJobDetails extends React.Component {
     this.changeTz.bind(this);
     this.formatDateToUTC.bind(this);
     this.formatDateToLocal.bind(this);
+    this.outputRefs = {};  // Store refs to output textareas for autoscroll
+    this.outputObservers = {};  // Store MutationObservers for each output div
+    this.refCallbacks = {};  // Cache ref callbacks to prevent recreation
   }
 
    formatDateToUTC(date) {
@@ -87,6 +111,35 @@ class CronJobDetails extends React.Component {
            ('0' + date.getSeconds()).slice(-2);
   }
 
+  // Render a config field value dynamically
+  renderConfigValue(value) {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false';
+    }
+    
+    if (Array.isArray(value)) {
+      return value.map((item, index) => (
+        <div key={index}>{String(item)}</div>
+      ));
+    }
+    
+    if (typeof value === 'object') {
+      return JSON.stringify(value, null, 2);
+    }
+    
+    // Handle multi-line strings (like command)
+    const strValue = String(value);
+    if (strValue.includes('\n')) {
+      return strValue.split('\n').map((str, index) => <p key={index}>{str}</p>);
+    }
+    
+    return strValue;
+  }
+
 
   startInterval = () => {
     this.interval = setInterval(
@@ -101,6 +154,121 @@ class CronJobDetails extends React.Component {
   stopInterval = () => {
     clearInterval(this.interval);
   };
+
+  processCarriageReturns(text) {
+    // Process \r characters to simulate terminal behavior
+    // First normalize line endings: convert \r\n to \n, standalone \r to \n
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    // Now split by \n and process any remaining \r within lines (for progress bars)
+    return normalized.split('\n').map(line => {
+      // If line contains \r, it's a progress indicator - take last segment
+      if (line.includes('\r')) {
+        const segments = line.split('\r');
+        return segments[segments.length - 1];
+      }
+      return line;
+    }).join('\n');
+  }
+
+  renderOutputWithStderr(text) {
+    // Split text into lines and color [STDERR] lines red
+    const processed = this.processCarriageReturns(text);
+    const lines = processed.split('\n');
+    
+    return lines.map((line, index) => {
+      const isStderr = line.startsWith('[STDERR]');
+      // Add \n back except for last line to preserve newlines in copy/paste
+      const lineWithNewline = index < lines.length - 1 ? line + '\n' : line;
+      return (
+        <span key={index} style={{ color: isStderr ? '#FE00FE' : '#DFD9F5' }}>
+          {lineWithNewline}
+        </span>
+      );
+    });
+  }
+
+  toggleAutoscroll = () => {
+    this.setState(prevState => ({ autoscroll: !prevState.autoscroll }));
+  }
+
+  setupOutputRef = (machine) => {
+    // Cache the callback per machine to prevent recreation on every render
+    if (!this.refCallbacks[machine]) {
+      this.refCallbacks[machine] = (el) => {
+        // Store ref
+        this.outputRefs[machine] = el;
+        
+        // Disconnect old observer if exists
+        if (this.outputObservers[machine]) {
+          this.outputObservers[machine].disconnect();
+          delete this.outputObservers[machine];
+        }
+        
+        // Set up new observer if div exists and autoscroll enabled
+        if (el && this.state.autoscroll) {
+          const observer = new MutationObserver(() => {
+            if (this.state.autoscroll && el) {
+              el.scrollTop = el.scrollHeight;
+            }
+          });
+          
+          observer.observe(el, {
+            childList: true,
+            characterData: true,
+            subtree: true
+          });
+          
+          this.outputObservers[machine] = observer;
+        }
+      };
+    }
+    return this.refCallbacks[machine];
+  }
+
+  toggleWrap = () => {
+    this.setState(prevState => ({ wrapOutput: !prevState.wrapOutput }));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // If autoscroll was just toggled, update observers
+    if (prevState.autoscroll !== this.state.autoscroll) {
+      if (this.state.autoscroll) {
+        // Re-setup all observers
+        for (const machine in this.outputRefs) {
+          const el = this.outputRefs[machine];
+          if (el && !this.outputObservers[machine]) {
+            const observer = new MutationObserver(() => {
+              if (this.state.autoscroll && el) {
+                el.scrollTop = el.scrollHeight;
+              }
+            });
+            
+            observer.observe(el, {
+              childList: true,
+              characterData: true,
+              subtree: true
+            });
+            
+            this.outputObservers[machine] = observer;
+          }
+        }
+      } else {
+        // Disconnect all observers
+        for (const machine in this.outputObservers) {
+          this.outputObservers[machine].disconnect();
+          delete this.outputObservers[machine];
+        }
+      }
+    }
+  }
+  
+  componentWillUnmount() {
+    // Clean up observers
+    for (const machine in this.outputObservers) {
+      this.outputObservers[machine].disconnect();
+    }
+  }
 
   changeTz(tz){
       var local_text = document.getElementById("local_tz");
@@ -177,12 +345,15 @@ class CronJobDetails extends React.Component {
       for (let machine in this.state.results) {
         if (this.state.runningOn.includes(machine)) {
           start_time = this.state.results[machine]["starttime"];
-          let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60))/1000 );
-          let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60*60)) / (1000*60) );
-          let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          if (secondsDiff < 0) { secondsDiff = 0; }
-          if (minutesDiff < 0) { minutesDiff = 0 }
-          if (hoursDiff < 0) {hoursDiff = 0 }
+          // Calculate remaining time in milliseconds
+          let remainingMs = new Date(start_time).getTime() - currentTime + (this.state.timeout * 1000);
+          if (remainingMs < 0) { remainingMs = 0; }
+          
+          // Convert to hours, minutes, seconds without 24h wrapping
+          let secondsDiff = Math.floor((remainingMs / 1000) % 60);
+          let minutesDiff = Math.floor((remainingMs / (1000 * 60)) % 60);
+          let hoursDiff = Math.floor(remainingMs / (1000 * 60 * 60));
+          
           machinesTimeouts[machine] = "timeout: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
         }
       }
@@ -301,11 +472,11 @@ class CronJobDetails extends React.Component {
           this.setState({
             result: "Running",
             runningOn: machines,
-            runningJobInstances: jobInstances,
+            runningJobInstances: {...this.state.runningJobInstances, ...jobInstances},  // Merge, don't replace
             startedJob: runningEntry.started ? new Date(runningEntry.started).toLocaleString() : ''
           });
         } else if (this.state.runningOn.length > 0) {
-          // Was running, now stopped
+          // Was running, now stopped - keep job instances for debugging
           this.setState({ runningOn: [] });
         }
       }
@@ -391,24 +562,29 @@ class CronJobDetails extends React.Component {
     if (data.hasOwnProperty("config")){
       var json_result_config = data.config.crons;
       var json_result_config_maintenance = data.config.maintenance
+      
+      // Store full cron config for dynamic rendering
+      const cronConfig = json_result_config[this.state.name] || {};
+      
       this.setState({
-          command: json_result_config[this.state.name]["command"],
-          cwd: json_result_config[this.state.name]["cwd"],
-          user: json_result_config[this.state.name]["user"],
-          timeout: json_result_config[this.state.name]["timeout"],
-          targets: json_result_config[this.state.name]["targets"],
-          target_type: json_result_config[this.state.name]["target_type"],
-          number_of_targets: json_result_config[this.state.name]["number_of_targets"],
-          dom: json_result_config[this.state.name]["dom"],
-          dow: json_result_config[this.state.name]["dow"],
-          hour: json_result_config[this.state.name]["hour"],
-          min: json_result_config[this.state.name]["min"],
-          mon: json_result_config[this.state.name]["mon"],
-          sec: json_result_config[this.state.name]["sec"],
-          year: json_result_config[this.state.name]["year"],
-          batch_size: json_result_config[this.state.name]["batch_size"],
+          command: cronConfig["command"],
+          cwd: cronConfig["cwd"],
+          user: cronConfig["user"],
+          timeout: cronConfig["timeout"],
+          targets: cronConfig["targets"],
+          target_type: cronConfig["target_type"],
+          number_of_targets: cronConfig["number_of_targets"],
+          dom: cronConfig["dom"],
+          dow: cronConfig["dow"],
+          hour: cronConfig["hour"],
+          min: cronConfig["min"],
+          mon: cronConfig["mon"],
+          sec: cronConfig["sec"],
+          year: cronConfig["year"],
+          batch_size: cronConfig["batch_size"],
           maintenance: json_result_config_maintenance,
           result: "NotRun",
+          cronConfig: cronConfig,  // Store full config
       });
     }
     // details - legacy format {cronname: {data}}
@@ -631,6 +807,12 @@ class CronJobDetails extends React.Component {
                   null
             }
           </h1>
+          {this.state.group && (
+            <div style={{ marginLeft: '0px', marginTop: '-10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '14px', color: '#888' }}>group: </span>
+              <span style={{ fontSize: '14px', color: '#6ECBF5' }}>{this.state.group}</span>
+            </div>
+          )}
         </div>
         <div>
         <div className="details1">
@@ -661,45 +843,33 @@ class CronJobDetails extends React.Component {
                     </tbody>
                 </table> 
 
-                <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
-                        <tr>
-                            <th style={{width:"25%"}}>cmd</th>
-                            <td><div>{this.state.command.split('\n').map(str => <p>{str}</p>)}</div></td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>user</th>
-                            <td>{this.state.user}</td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>cwd</th>
-                            <td>{this.state.cwd}</td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>targets</th>
-                            <td>
-                               {Array.isArray(this.state.targets) ? this.state.targets.map((target, index) => (<div key={index}>{target}</div>)) : <div>{this.state.targets}</div>}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style={{width:"25%"}}>target type</th>
-                            <td>{this.state.target_type}</td>
-                        </tr>
-                        {(Number.isInteger(this.state.number_of_targets) || (this.state.number_of_targets === 0)) ? 
-                            <tr>
-                                <th style={{width:"25%", marginBottom:"30px"}}>no. of targets</th>
-                                <td>{this.state.number_of_targets}</td>
-                            </tr> : ""}
-                        {this.state.batch_size ? 
-                            <tr>
-                                <th style={{width:"25%", marginBottom:"30px"}}>batch size</th>
-                                <td>{this.state.batch_size}</td>
-                            </tr> : ""}
-                        {(Number.isInteger(this.state.timeout) || (this.state.timeout === 0)) ?
-                            <tr>
-                                <th style={{width:"25%"}}>timeout</th>
-                               <td>{this.state.timeout}</td>
-                            </tr> : ""}
-                </table>
+                <div style={{ maxHeight: "33vh", overflowY: "auto" }}>
+                  <table className="configTable" style = {{marginTop: "10px", textAlign:"left"}}>
+                    <tbody>
+                      {Object.entries(this.state.cronConfig)
+                        .filter(([key]) => {
+                          // Filter out time fields (already shown above)
+                          const timeFields = ['sec', 'min', 'hour', 'dow', 'dom', 'mon', 'year'];
+                          // Filter out UI state and non-config fields
+                          const uiFields = ['group', 'name', 'maintenance', 'tz', 'backend_version', 
+                                           'settings', 'last_run', 'next_run', 'status', 'result', 
+                                           'running_started', 'overlap', 'runningOn', 'results',
+                                           'targetsJob', 'untilNextRun', 'timeoutCounter', 'ranForCounter',
+                                           'startedJob', 'currentTimeLocal', 'runningJobInstances',
+                                           'autoscroll', 'wrapOutput', 'currentTime'];
+                          return ![...timeFields, ...uiFields].includes(key);
+                        })
+                        .filter(([key, value]) => value !== undefined && value !== null && value !== '')
+                        .map(([key, value]) => (
+                          <tr key={key}>
+                            <th style={{width:"25%"}}>{key}</th>
+                            <td><div>{this.renderConfigValue(value)}</div></td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
 
 
                 <h1 className="sectionTitle"><span> TIMES </span></h1>
@@ -831,12 +1001,44 @@ class CronJobDetails extends React.Component {
                             <p className="sectionDetails" title={this.state.lastHeartbeatCounter[target].exact}>last heartbeat: <span>{this.state.lastHeartbeatCounter[target].relative}</span></p> : ""}
                         {this.state.timeoutCounter.hasOwnProperty(target) ?
                             <p className="sectionDetails" >{this.state.timeoutCounter[target]}</p> : ""}
-                        {this.state.results[target]["ret"] ? <p id="machineOutput" className="sectionDetails" >Output:</p> : "" }
+                        {this.state.results[target]["ret"] ? 
+                          <>
+                            <p id="machineOutput" className="sectionDetails" >
+                              Output:
+                              <label style={{marginLeft: '20px', cursor: 'pointer', color: '#6ECBF5'}}>
+                                <input type="checkbox" checked={this.state.autoscroll} onChange={this.toggleAutoscroll} style={{marginRight: '5px'}} />
+                                Autoscroll
+                              </label>
+                              <label style={{marginLeft: '20px', cursor: 'pointer', color: '#6ECBF5'}}>
+                                <input type="checkbox" checked={this.state.wrapOutput} onChange={this.toggleWrap} style={{marginRight: '5px'}} />
+                                Wrap
+                              </label>
+                            </p>
+                          </>
+                        : "" }
                         {this.state.results[target]["ret"] ? <p>
-                            <div className="sectionDetailsOutput">
-                              <TextareaAutosize wrap="off" maxRows={15}
-                                value={this.state.results[target]["ret"] || ""}>
-                              </TextareaAutosize>
+                            <div 
+                              className="sectionDetailsOutput"
+                              ref={this.setupOutputRef(target)}
+                              style={{
+                                width: '95%',
+                                height: '200px',
+                                minHeight: '100px',
+                                maxHeight: '1200px',
+                                resize: 'vertical',
+                                overflow: 'auto',
+                                padding: '10px',
+                                fontFamily: '"Courier New", Courier, monospace',
+                                fontSize: '14px',
+                                backgroundColor: '#000',
+                                color: '#DFD9F5',
+                                whiteSpace: this.state.wrapOutput ? 'pre-wrap' : 'pre',
+                                wordWrap: this.state.wrapOutput ? 'break-word' : 'normal',
+                                border: '1px solid #444',
+                                outline: 'none'
+                              }}
+                            >
+                              {this.renderOutputWithStderr(this.state.results[target]["ret"] || "")}
                             </div>
                           </p> : "" }
 

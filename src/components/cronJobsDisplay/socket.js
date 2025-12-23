@@ -28,7 +28,7 @@ class SaltpeterWebSocket {
                 const data = JSON.parse(event.data);
                 this.handleMessage(data);
             } catch (e) {
-                console.error('Error parsing WebSocket message:', e);
+                // Ignore parse errors
             }
         };
         
@@ -47,12 +47,9 @@ class SaltpeterWebSocket {
         };
         
         this.ws.onopen = (...args) => {
-            console.log('WebSocket connected/reconnected');
-            
             // Reload page after backend restart to get fresh state
             // Only reload if this is a reconnect (not initial connection)
             if (this.hasConnected) {
-                console.log('Backend reconnected - clearing stale state and reloading');
                 // Clear sessionStorage to remove stale job state
                 sessionStorage.removeItem('savedState');
                 window.location.reload();
@@ -103,7 +100,6 @@ class SaltpeterWebSocket {
     
     handleMessage(data) {
         if (!data.type) {
-            console.warn('Message missing type field:', data);
             return;
         }
         
@@ -124,16 +120,13 @@ class SaltpeterWebSocket {
                 this.handleDetails(data);
                 break;
             default:
-                console.warn('Unknown message type:', data.type);
+                break;
         }
     }
     
     handleStatus(data) {
-        console.log('[SOCKET] handleStatus called with:', JSON.stringify(data));
-        console.log('[SOCKET] Number of status handlers:', this.handlers.status.length);
         // Pass the whole status message to handlers (contains running and last_state)
         this.handlers.status.forEach(handler => {
-            console.log('[SOCKET] Calling status handler');
             handler(data);
         });
     }
@@ -158,18 +151,15 @@ class SaltpeterWebSocket {
         // Verify position matches expected
         const expected = this.outputPositions[cron][machine];
         if (position !== expected) {
-            console.warn(`Position mismatch for ${cron}/${machine}: expected ${expected}, got ${position}`);
             // Don't reset buffer - this loses output
             // If position < expected, it's a duplicate chunk we already have
             if (position < expected) {
-                console.log(`Ignoring duplicate chunk at position ${position}`);
                 // Still send ACK for current position
                 this.sendAck(cron, machine, expected);
                 return;
             }
             // If position > expected, we're missing chunks
             // Continue anyway and hope backend resends missing parts
-            console.warn(`Gap detected: missing bytes ${expected} to ${position}`);
         }
         
         // Append chunk to buffer

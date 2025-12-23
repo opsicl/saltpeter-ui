@@ -221,8 +221,19 @@
   font-family: Montserrat-Regular !important;
   padding: 3px !important;
   color: #6AC3EC;
-
-
 }
 
+.versions {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-family: Montserrat-Regular;
+  font-size: 12px;
+  color: #888;
+  pointer-events: none;
+  z-index: 1000;
+}
 
+.versions p {
+  margin: 2px 0;
+}

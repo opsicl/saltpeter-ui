@@ -132,7 +132,6 @@ class JobsTable extends React.Component {
   }
 
   handleData(data) {
-    console.log('[DEBUG] handleData called with:', JSON.stringify(data));
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
@@ -235,7 +234,7 @@ class JobsTable extends React.Component {
         });
       }
 
-      this.setState({jobs: cronJobs})
+      this.setState({jobs: this.applySavedSort(cronJobs)})
 
       var maintenance_conf = data.config.maintenance
       this.setState({maintenance: maintenance_conf})
@@ -255,12 +254,10 @@ class JobsTable extends React.Component {
         for (i = 0; i < keys_running.length; i++) {
           runningJobNames.add(json_result_running[keys_running[i]]["name"]);
         }
-        console.log('[DEBUG] Built runningJobNames set:', Array.from(runningJobNames));
       }
       
       // Process running data first
       if (data.hasOwnProperty("running")) {
-        console.log('[DEBUG] Processing running data:', JSON.stringify(data.running));
         
         // Clear running data only for jobs that are NOT in the running list
         for (i = 0; i < cronJobs.length; i++) {
@@ -288,19 +285,15 @@ class JobsTable extends React.Component {
 
       // Process last_state data second (on same cronJobs array)
       if (data.hasOwnProperty("last_state")) {
-        console.log('[DEBUG] Processing last_state data:', JSON.stringify(data.last_state));
         var json_result_last_state = data.last_state;
         var keys_last_state = Object.keys(json_result_last_state);
         for (i = 0; i < keys_last_state.length; i++) {
           var key_name = keys_last_state[i]
-          console.log('[DEBUG] Processing last_state for:', key_name, 'Is in runningJobNames?', runningJobNames.has(key_name));
           for (j = 0; j < cronJobs.length; j++) {
             if (cronJobs[j]["name"] === key_name) {
-              console.log('[DEBUG] Found job in cronJobs:', key_name, 'current status:', cronJobs[j]["status"]);
               // Only apply last_state status/result if job is NOT in running dict
               // Check the running dict data, not the current status
               if (!runningJobNames.has(key_name)) {
-                  console.log('[DEBUG] Job NOT in running dict, applying last_state');
                   if (json_result_last_state[key_name]["result_ok"] === false) {
                       cronJobs[j]["status"] = "Fail"
                   } else {
@@ -311,7 +304,6 @@ class JobsTable extends React.Component {
               }
               else {
                 // Job is running - only update last_run time, not status
-                console.log('[DEBUG] Job IS in running dict, NOT changing status, only updating last_run');
                 cronJobs[j]["last_run"] = json_result_last_state[key_name]["last_run"]
               }
               break
@@ -321,13 +313,92 @@ class JobsTable extends React.Component {
       }
       
       // Update state once with all changes
-      console.log('[DEBUG] Final cronJobs state before setState:', cronJobs.map(j => ({name: j.name, status: j.status, runningOn: j.runningOn})));
-      this.setState({ jobs: cronJobs });
+      this.setState({ jobs: this.applySavedSort(cronJobs) });
     }
     if (this.state.config_received === false) {
       window.location.reload(false);
     }
 
+  }
+
+  applySavedSort(jobs) {
+      // Apply saved sort state to jobs array
+      const savedSort = window.localStorage.getItem('sortState');
+      if (!savedSort) return jobs;
+      
+      const { asc, desc } = JSON.parse(savedSort);
+      const column = asc || desc;
+      if (!column) return jobs;
+      
+      const compareAsc = (a, b) => {
+        try {
+          if (a[column] === undefined) a[column] = "";
+          if (b[column] === undefined) b[column] = "";
+          
+          var groupA = a[column];
+          var groupB = b[column];
+          
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+          
+          if (column == 'number_of_targets') {
+            groupA = parseInt(a[column]);
+            groupB = parseInt(b[column]);
+          }
+          
+          let comparison = 0;
+          if (groupA > groupB) {
+            comparison = 1;
+          } else if (groupA < groupB) {
+            comparison = -1;
+          }
+          return comparison;
+        } catch (error) {
+          return 0;
+        }
+      };
+      
+      const compareDesc = (a, b) => {
+        try {
+          if (a[column] === undefined) a[column] = "";
+          if (b[column] === undefined) b[column] = "";
+          
+          var groupA = a[column];
+          var groupB = b[column];
+          
+          if (typeof a[column] === 'string' || a[column] instanceof String) {
+            groupA = a[column].toUpperCase();
+          }
+          if (typeof b[column] === 'string' || b[column] instanceof String) {
+            groupB = b[column].toUpperCase();
+          }
+          
+          if (column == 'number_of_targets') {
+            groupA = parseInt(a[column]);
+            groupB = parseInt(b[column]);
+          }
+          
+          let comparison = 0;
+          if (groupA < groupB) {
+            comparison = 1;
+          } else if (groupA > groupB) {
+            comparison = -1;
+          }
+          return comparison;
+        } catch (error) {
+          return 0;
+        }
+      };
+      
+      if (desc) {
+        return jobs.sort(compareDesc);
+      } else {
+        return jobs.sort(compareAsc);
+      }
   }
 
   sortColumn(column){
@@ -432,6 +503,7 @@ class JobsTable extends React.Component {
           //desc sort
           elem.textContent = column_name + " \u2191"
           this.setState({ column_asc_sort: "", column_desc_sort: column, jobs: cronJobs.sort(compareDesc)});
+          window.localStorage.setItem('sortState', JSON.stringify({ asc: "", desc: column }));
       /*} 
       else if (this.state.column_desc_sort == column) {
           elem.textContent = column
@@ -441,6 +513,7 @@ class JobsTable extends React.Component {
           // asc sort
           elem.textContent = column_name + " \u2193"
           this.setState({ column_asc_sort: column, column_desc_sort: "", jobs: cronJobs.sort(compareAsc)});
+          window.localStorage.setItem('sortState', JSON.stringify({ asc: column, desc: "" }));
       }
   }
 
@@ -536,6 +609,32 @@ class JobsTable extends React.Component {
         active_columns=["name","command","group","running_on","last_run"]
     }
     this.setState({ active_columns: active_columns})
+
+    // Restore sort state from localStorage
+    const savedSort = window.localStorage.getItem('sortState');
+    if (savedSort) {
+      const { asc, desc } = JSON.parse(savedSort);
+      this.setState({ column_asc_sort: asc, column_desc_sort: desc });
+      
+      // Update the column header to show sort arrow
+      setTimeout(() => {
+        const column = asc || desc;
+        if (column) {
+          const elem = document.getElementById(column);
+          if (elem) {
+            let column_name = column;
+            if (column.includes("_")) {
+              column_name = column.replace("_", " ");
+            }
+            if (desc) {
+              elem.textContent = column_name + " \u2191";
+            } else {
+              elem.textContent = column_name + " \u2193";
+            }
+          }
+        }
+      }, 100);
+    }
   }
 
   componentWillUnmount() {
