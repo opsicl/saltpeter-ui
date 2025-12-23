@@ -132,7 +132,6 @@ class JobsTable extends React.Component {
   }
 
   handleData(data) {
-    console.log('[DEBUG] handleData called with:', JSON.stringify(data));
     //localStorage.setItem('savedState', JSON.stringify(this.state))
     
     sessionStorage.setItem('savedState', JSON.stringify(this.state))
