@@ -360,12 +360,15 @@ class CronJobDetails extends React.Component {
       for (let machine in this.state.results) {
         if (this.state.runningOn.includes(machine)) {
           start_time = this.state.results[machine]["starttime"];
-          let secondsDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60))/1000 );
-          let minutesDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000*60*60)) / (1000*60) );
-          let hoursDiff = Math.floor( ((new Date(start_time) - currentTime + (this.state.timeout * 1000)) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          if (secondsDiff < 0) { secondsDiff = 0; }
-          if (minutesDiff < 0) { minutesDiff = 0 }
-          if (hoursDiff < 0) {hoursDiff = 0 }
+          // Calculate remaining time in milliseconds
+          let remainingMs = new Date(start_time).getTime() - currentTime + (this.state.timeout * 1000);
+          if (remainingMs < 0) { remainingMs = 0; }
+          
+          // Convert to hours, minutes, seconds without 24h wrapping
+          let secondsDiff = Math.floor((remainingMs / 1000) % 60);
+          let minutesDiff = Math.floor((remainingMs / (1000 * 60)) % 60);
+          let hoursDiff = Math.floor(remainingMs / (1000 * 60 * 60));
+          
           machinesTimeouts[machine] = "timeout: " + hoursDiff + "h " + minutesDiff + "m " + secondsDiff + "s"
         }
       }
