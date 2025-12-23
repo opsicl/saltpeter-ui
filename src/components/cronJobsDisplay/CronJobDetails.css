@@ -54,6 +54,9 @@
   font-style: normal;
   text-indent: 3em;
   font-weight: bold;
+  margin: 0;
+  padding: 5px 0;
+  line-height: 1.5;
   #color: #DEFE47;
 }
 
@@ -136,6 +139,7 @@
   width: 40%;
   overflow: auto;
   scrollbar-color: #6ECBF5 #000000;
+  padding-bottom: 60px;
   #background-color: #220524;
 }
 
@@ -151,7 +155,7 @@
 }
 
 .targetsList {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   overflow: visible;
 }
 
